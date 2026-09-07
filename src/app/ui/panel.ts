@@ -64,11 +64,11 @@ import { Component, input } from '@angular/core';
     }
 
     .panel__controls {
-      padding: 16px 18px 20px;
+      padding: 18px 18px 22px;
       border-top: 1px solid var(--rule);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 22px;
       min-width: 0;
     }
 

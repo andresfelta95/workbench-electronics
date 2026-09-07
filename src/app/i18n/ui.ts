@@ -59,6 +59,7 @@ export interface UiStrings {
     supply: string;
     branch: string;
     equivalent: string;
+    arrangement: string;
     load: string;
     noLoad: string;
     output: string;
@@ -153,6 +154,7 @@ const en: UiStrings = {
     supply: 'Supply',
     branch: 'Branch',
     equivalent: 'Equivalent resistance',
+    arrangement: 'Arrangement',
     load: 'Load',
     noLoad: 'None',
     output: 'Output',
@@ -255,6 +257,7 @@ const es: UiStrings = {
     supply: 'Fuente',
     branch: 'Rama',
     equivalent: 'Resistencia equivalente',
+    arrangement: 'Conexión',
     load: 'Carga',
     noLoad: 'Ninguna',
     output: 'Salida',

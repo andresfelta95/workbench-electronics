@@ -169,11 +169,15 @@ type Unknown = 'i' | 'v' | 'r';
     }
 
     .readouts {
-      display: grid;
+      display: flex;
+      flex-wrap: wrap;
       gap: 1px;
       background: var(--rule);
       border-top: 1px solid var(--rule);
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .readouts > * {
+      flex: 1 1 150px;
     }
   `,
 })

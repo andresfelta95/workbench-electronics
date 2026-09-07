@@ -1,59 +1,91 @@
-# Electronics
+# Workbench / Banco de Trabajo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.7.
+Interactive electronics course at **https://electronics.paisbru.com** — bilingual
+(EN/ES), fully static, and free with no paid tier.
 
-## Development server
+Every concept ships with an instrument the reader operates and a consequence they
+see or hear at the same instant. Circuits are drawn as SVG components, not
+images, so values update live and the prose can highlight the part it is talking
+about.
 
-To start a local development server, run:
+## Stack
 
-```bash
-ng serve
-```
+- **Angular 22**, standalone + signals, zoneless. Node 22 (`.nvmrc`), pnpm 9.15.0.
+- **Prerendered to static HTML** (`outputMode: static`) — every route is a real
+  file. Served by nginx; there is no backend.
+- **Content is Markdown**, compiled to lazy-loaded TypeScript modules at build
+  time. Writing a lesson is writing prose.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Working on it
 
 ```bash
-ng generate --help
+nvm use          # Node 22
+pnpm install
+pnpm start       # rebuilds content, then ng serve
+pnpm build       # content + prerender into dist/electronics/browser
+pnpm content     # regenerate content only, after editing content/
 ```
 
-## Building
+`src/app/content-generated/` and `public/sitemap.xml` are build artefacts and are
+git-ignored. `pnpm content` recreates them.
 
-To build the project run:
+## Adding a lesson
+
+1. Create the Markdown in **both** languages under the same module folder and the
+   same file name — the ids are language-neutral so the language switcher can map
+   one to the other:
+
+   ```
+   content/en/02-time-and-frequency/01-rc-transient.md
+   content/es/02-time-and-frequency/01-rc-transient.md
+   ```
+
+2. Front matter (all fields required except `minutes`):
+
+   ```yaml
+   ---
+   slug: rc-transient        # the URL segment, translated per language
+   title: The RC transient
+   summary: One sentence, used on the module page and as the meta description.
+   minutes: 9
+   ---
+   ```
+
+3. Write the prose. Two directives are available:
+
+   ```markdown
+   ::widget{type="divider" vin="9" r1="10k" r2="10k"}
+
+   :::key Optional heading
+   A callout. Tones: note, warning, key, safety.
+   :::
+   ```
+
+4. `pnpm content`. The build fails loudly if the two languages disagree about
+   which modules or lessons exist, so a half-translated lesson cannot ship.
+
+Modules themselves are defined by `_module.md` in each module folder, with
+`slug`, `title` and `summary`. A module with no lessons renders as "being
+written" rather than disappearing — the full path is public from day one.
+
+## Adding an instrument
+
+1. Build a standalone component that takes a single input:
+   `readonly props = input<Record<string, string>>({})`. Seed state from it with
+   `linkedSignal(() => parseValue(this.props()['r1'], 10000))`.
+2. Register it in `src/app/lesson/widget-registry.ts` as a dynamic import.
+3. Reference it from any lesson with `::widget{type="your-type"}`.
+
+Reuse `app-panel`, `app-control` and `app-readout` from `src/app/ui/`, and the
+symbols in `src/app/schematic/`. Every instrument must be operable from the
+keyboard: `app-control` pairs its slider with a real text box for that reason.
+
+## Deploy
 
 ```bash
-ng build
+docker compose -f ~/docker/compose/electronics.yml up -d --build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Behind cloudflared (`electronics.paisbru.com` → `http://electronics:80`), on
+`server-net`, with no host port. Changing the cloudflared config requires
+`up -d --force-recreate`, never `docker restart`.

@@ -53,7 +53,7 @@ const MIN_RESISTORS = 2;
 
       <div panelControls>
         <fieldset class="modes">
-          <legend>{{ t().widget.equivalent }}</legend>
+          <legend>{{ t().widget.arrangement }}</legend>
           @for (option of modes; track option.key) {
             <label class="mode" [class.mode--on]="mode() === option.key">
               <input
@@ -189,11 +189,15 @@ const MIN_RESISTORS = 2;
     }
 
     .readouts {
-      display: grid;
+      display: flex;
+      flex-wrap: wrap;
       gap: 1px;
       background: var(--rule);
       border-top: 1px solid var(--rule);
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .readouts > * {
+      flex: 1 1 150px;
     }
   `,
 })

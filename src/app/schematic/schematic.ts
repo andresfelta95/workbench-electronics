@@ -106,8 +106,8 @@ const SYMBOL_STYLES = `
     <svg:g [attr.transform]="transform()" [attr.class]="klass()">
       <svg:path class="stroke" [attr.d]="path()" />
       @if (vertical()) {
-        <svg:text class="label" x="14" y="26">{{ name() }}</svg:text>
-        <svg:text class="value" x="14" y="38">{{ value() }}</svg:text>
+        <svg:text class="label" x="14" y="17">{{ name() }}</svg:text>
+        <svg:text class="value" x="14" y="29">{{ value() }}</svg:text>
       } @else {
         <svg:text class="label" x="30" y="-14" text-anchor="middle">{{ name() }}</svg:text>
         <svg:text class="value" x="30" y="26" text-anchor="middle">{{ value() }}</svg:text>
