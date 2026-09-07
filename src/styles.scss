@@ -1,1 +1,295 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   Workbench — global design system
+   Tokens are declared for all three theme states: bare :root (light),
+   prefers-color-scheme dark guarded against an explicit light choice, and
+   an explicit [data-theme="dark"] stamp. Components only ever read tokens.
+   ========================================================================== */
+
+:root {
+  --bg: #eff1ef;
+  --surface: #fafbfa;
+  --surface-2: #e6eae7;
+  --ink: #14181a;
+  --muted: #5c6668;
+  --faint: #8a9492;
+  --rule: #cbd3cf;
+  --rule-strong: #aab4b0;
+  --copper: #a85b2b;
+  --copper-ink: #8f4b21;
+  --copper-soft: #f2e5db;
+  --signal: #1b6763;
+  --signal-soft: #dfebe9;
+  --warn: #9a5b12;
+  --warn-soft: #f6e8d5;
+  --danger: #a33227;
+  --danger-soft: #f6e0dd;
+  --trace: #b8763f;
+
+  --sans: 'IBM Plex Sans Condensed', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --measure: 68ch;
+  --page: 1180px;
+  --radius: 3px;
+
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5rem;
+  --step-3: 1.9rem;
+  --step-4: clamp(2.1rem, 4vw, 2.9rem);
+  --step-5: clamp(2.6rem, 6.4vw, 4rem);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f1313;
+    --surface: #161b1b;
+    --surface-2: #1e2525;
+    --ink: #e4eae7;
+    --muted: #9aa5a3;
+    --faint: #6e7a78;
+    --rule: #2b3433;
+    --rule-strong: #3d4847;
+    --copper: #d9854d;
+    --copper-ink: #e79a66;
+    --copper-soft: #2c1f18;
+    --signal: #59b7b0;
+    --signal-soft: #142827;
+    --warn: #d69a4e;
+    --warn-soft: #2a2115;
+    --danger: #e07a6c;
+    --danger-soft: #2c1a18;
+    --trace: #d9854d;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f1313;
+  --surface: #161b1b;
+  --surface-2: #1e2525;
+  --ink: #e4eae7;
+  --muted: #9aa5a3;
+  --faint: #6e7a78;
+  --rule: #2b3433;
+  --rule-strong: #3d4847;
+  --copper: #d9854d;
+  --copper-ink: #e79a66;
+  --copper-soft: #2c1f18;
+  --signal: #59b7b0;
+  --signal-soft: #142827;
+  --warn: #d69a4e;
+  --warn-soft: #2a2115;
+  --danger: #e07a6c;
+  --danger-soft: #2c1a18;
+  --trace: #d9854d;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--step-0);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--sans);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p,
+ul,
+ol,
+figure,
+table {
+  margin: 0;
+}
+
+a {
+  color: var(--copper-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--copper);
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--mono);
+  font-size: 0.87em;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+svg {
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* Utility ---------------------------------------------------------------- */
+
+.page {
+  width: 100%;
+  max-width: var(--page);
+  margin: 0 auto;
+  padding-inline: clamp(18px, 4vw, 48px);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 10px 16px;
+}
+
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+}
+
+/* Rendered lesson prose -------------------------------------------------- */
+
+.prose {
+  max-width: var(--measure);
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2 {
+  font-size: var(--step-3);
+  margin-top: 1.9em;
+  padding-top: 0.55em;
+  border-top: 1px solid var(--rule);
+}
+
+.prose h3 {
+  font-size: var(--step-1);
+  margin-top: 1.7em;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.15em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55em;
+}
+
+.prose li::marker {
+  color: var(--copper);
+}
+
+.prose li > p {
+  margin: 0;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose code {
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+}
+
+.prose p > code:only-child {
+  display: block;
+  white-space: normal;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--copper);
+  padding: 14px 18px;
+  font-size: 1rem;
+  color: var(--ink);
+  overflow-x: auto;
+}
+
+.prose pre {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  padding: 16px 18px;
+  overflow-x: auto;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--rule-strong);
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

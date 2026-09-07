@@ -1,0 +1,54 @@
+@if (module(); as module) {
+  <article class="page module">
+    <nav class="crumb">
+      <a [routerLink]="['/', lang()]" fragment="path">{{ t().module.backToCurriculum }}</a>
+    </nav>
+
+    <header class="module__head">
+      <p class="eyebrow">{{ t().module.label }} {{ module.number }}</p>
+      <h1>{{ module.title }}</h1>
+      <p class="module__summary">{{ module.summary }}</p>
+      @if (module.intro) {
+        <div class="prose module__intro" [innerHTML]="module.intro"></div>
+      }
+    </header>
+
+    @if (module.lessons.length) {
+      <section class="lessons">
+        <h2 class="lessons__label">{{ t().module.lessons }}</h2>
+        <ol>
+          @for (lesson of module.lessons; track lesson.id; let i = $index) {
+            <li>
+              <a [routerLink]="['/', lang(), module.slug, lesson.slug]">
+                <span class="lesson__n">{{ module.number }}.{{ i + 1 }}</span>
+                <span class="lesson__body">
+                  <span class="lesson__title">{{ lesson.title }}</span>
+                  <span class="lesson__summary">{{ lesson.summary }}</span>
+                  @if (lesson.widgets.length) {
+                    <span class="lesson__widgets">
+                      @for (widget of lesson.widgets; track $index) {
+                        <span class="chip">{{ widget }}</span>
+                      }
+                    </span>
+                  }
+                </span>
+                <span class="lesson__time">{{ lesson.minutes }} {{ t().lesson.minutes }}</span>
+              </a>
+            </li>
+          }
+        </ol>
+      </section>
+    } @else {
+      <section class="pending">
+        <p class="pending__label">{{ t().module.noLessonsYet }}</p>
+        <p>{{ t().module.noLessonsBody }}</p>
+      </section>
+    }
+  </article>
+} @else {
+  <div class="page module">
+    <h1>{{ t().notFound.heading }}</h1>
+    <p>{{ t().notFound.body }}</p>
+    <p><a [routerLink]="['/', lang()]">{{ t().notFound.cta }}</a></p>
+  </div>
+}

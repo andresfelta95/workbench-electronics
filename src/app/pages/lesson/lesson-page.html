@@ -1,0 +1,40 @@
+@if (lesson(); as lesson) {
+  <article class="page lesson">
+    <nav class="crumb">
+      <a [routerLink]="['/', lang(), lesson.moduleSlug]">
+        {{ t().module.label }} {{ position() }} · {{ lesson.moduleTitle }}
+      </a>
+    </nav>
+
+    <header class="lesson__head">
+      <h1>{{ lesson.title }}</h1>
+      <p class="lesson__summary">{{ lesson.summary }}</p>
+      <p class="lesson__meta">{{ lesson.minutes }} {{ t().lesson.minutes }}</p>
+    </header>
+
+    <app-lesson-body [blocks]="lesson.blocks" />
+
+    <nav class="pager" [attr.aria-label]="t().lesson.next">
+      @if (neighbours().previous; as previous) {
+        <a class="pager__link pager__link--prev" [routerLink]="['/', lang(), previous.module.slug, previous.lesson.slug]">
+          <span class="pager__label">← {{ t().lesson.previous }}</span>
+          <span class="pager__title">{{ previous.lesson.title }}</span>
+        </a>
+      } @else {
+        <span></span>
+      }
+      @if (neighbours().next; as next) {
+        <a class="pager__link pager__link--next" [routerLink]="['/', lang(), next.module.slug, next.lesson.slug]">
+          <span class="pager__label">{{ t().lesson.next }} →</span>
+          <span class="pager__title">{{ next.lesson.title }}</span>
+        </a>
+      }
+    </nav>
+  </article>
+} @else {
+  <div class="page lesson">
+    <h1>{{ t().notFound.heading }}</h1>
+    <p>{{ t().notFound.body }}</p>
+    <p><a [routerLink]="['/', lang()]">{{ t().notFound.cta }}</a></p>
+  </div>
+}

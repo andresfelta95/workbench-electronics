@@ -1,0 +1,169 @@
+.module {
+  padding-block: clamp(24px, 4vw, 44px) 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.crumb {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+}
+
+.crumb a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.crumb a:hover {
+  color: var(--copper);
+}
+
+.module__head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: var(--measure);
+}
+
+h1 {
+  font-size: var(--step-4);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+
+.module__summary {
+  font-size: var(--step-1);
+  color: var(--muted);
+}
+
+.module__intro {
+  color: var(--ink);
+}
+
+.lessons__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lessons ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lessons li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.lessons a {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 6px 14px;
+  padding: 18px 4px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+@media (min-width: 760px) {
+  .lessons a {
+    grid-template-columns: 52px minmax(0, 1fr) 80px;
+  }
+}
+
+.lessons a:hover {
+  background: var(--surface);
+}
+
+.lessons a:hover .lesson__title {
+  color: var(--copper);
+}
+
+.lesson__n {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--copper);
+  font-variant-numeric: tabular-nums;
+  padding-top: 3px;
+}
+
+.lesson__body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.lesson__title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: var(--step-1);
+  line-height: 1.2;
+}
+
+.lesson__summary {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.lesson__widgets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--signal);
+  border: 1px solid var(--rule);
+  background: var(--signal-soft);
+  padding: 2px 7px;
+}
+
+.lesson__time {
+  grid-column: 2;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+@media (min-width: 760px) {
+  .lesson__time {
+    grid-column: 3;
+    text-align: right;
+    padding-top: 4px;
+  }
+}
+
+.pending {
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  padding: 24px;
+  max-width: var(--measure);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pending__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.pending p:last-child {
+  color: var(--muted);
+}

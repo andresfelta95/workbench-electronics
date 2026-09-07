@@ -1,0 +1,145 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  outline: none;
+}
+
+/* Masthead --------------------------------------------------------------- */
+
+.masthead {
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.masthead__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  min-width: 0;
+}
+
+.brand__mark {
+  width: 40px;
+  height: 20px;
+  color: var(--copper);
+  flex: none;
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.brand__name {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+}
+
+.brand__tagline {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.masthead__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  flex: none;
+}
+
+.masthead__nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+}
+
+.masthead__nav a:hover {
+  color: var(--copper);
+  border-color: var(--rule);
+}
+
+.masthead__nav .lang {
+  color: var(--ink);
+  border-color: var(--rule);
+}
+
+.theme {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme:hover {
+  color: var(--copper);
+  border-color: var(--rule-strong);
+}
+
+@media (max-width: 560px) {
+  .brand__tagline {
+    display: none;
+  }
+}
+
+/* Footer ----------------------------------------------------------------- */
+
+.footer {
+  border-top: 1px solid var(--rule);
+  margin-top: 80px;
+}
+
+.footer__inner {
+  padding-block: 28px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer__free {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.footer__meta {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--faint);
+  letter-spacing: 0.03em;
+}

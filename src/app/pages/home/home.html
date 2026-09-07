@@ -1,0 +1,87 @@
+<section class="hero page">
+  <div class="hero__text">
+    <p class="eyebrow">{{ t().home.eyebrow }}</p>
+    <h1>{{ t().home.heading }}</h1>
+    <p class="hero__lede">{{ t().home.lede }}</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" [routerLink]="startPath()">{{ t().home.startCta }}</a>
+      <a class="btn" href="#path">{{ t().home.curriculumCta }}</a>
+    </div>
+  </div>
+
+  <figure class="hero__figure" aria-hidden="true">
+    <svg viewBox="0 0 340 150">
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <circle cx="26" cy="52" r="4" />
+        <path d="M30 52H96" />
+        <rect x="96" y="42" width="60" height="20" />
+        <path d="M156 52h154" />
+        <circle cx="314" cy="52" r="4" />
+        <path d="M212 52v22" />
+        <path d="M196 74h32M196 84h32" />
+        <path d="M212 84v20" />
+        <path d="M196 104h32M201 111h22M206 118h12" />
+      </g>
+      <g class="hero__labels">
+        <text x="120" y="34">R</text>
+        <text x="236" y="83">C</text>
+      </g>
+      <g class="hero__accent">
+        <text x="12" y="38">Vin</text>
+        <text x="288" y="38">Vout</text>
+        <text x="96" y="142">fc = 1 / (2πRC)</text>
+      </g>
+    </svg>
+  </figure>
+</section>
+
+<section class="free page">
+  <div class="free__inner">
+    <h2>{{ t().home.freeHeading }}</h2>
+    <p>{{ t().home.freeBody }}</p>
+  </div>
+</section>
+
+<section class="path page" id="path">
+  <header class="section-head">
+    <div class="section-rule"><span class="via"></span><span class="line"></span></div>
+    <h2>{{ t().home.pathHeading }}</h2>
+    <p>{{ t().home.pathLede }}</p>
+  </header>
+
+  <ol class="modules">
+    @for (module of modules(); track module.id) {
+      <li class="module">
+        <a [routerLink]="['/', lang(), module.slug]">
+          <span class="module__n">{{ module.number }}</span>
+          <span class="module__body">
+            <span class="module__title">{{ module.title }}</span>
+            <span class="module__summary">{{ module.summary }}</span>
+          </span>
+          <span class="module__state" [class.module__state--ready]="module.lessons.length > 0">
+            @if (module.lessons.length > 0) {
+              {{ module.lessons.length }} {{ t().home.lessonsReady }}
+            } @else {
+              {{ t().home.beingWritten }}
+            }
+          </span>
+        </a>
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="principles page">
+  <header class="section-head">
+    <div class="section-rule"><span class="via"></span><span class="line"></span></div>
+    <h2>{{ t().home.principleHeading }}</h2>
+  </header>
+  <div class="principles__grid">
+    @for (principle of t().home.principles; track principle.title) {
+      <article>
+        <h3>{{ principle.title }}</h3>
+        <p>{{ principle.body }}</p>
+      </article>
+    }
+  </div>
+</section>

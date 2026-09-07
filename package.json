@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:electronics": "node dist/electronics/server/server.mjs"
+    "content": "node tools/build-content.mjs",
+    "start": "node tools/build-content.mjs && ng serve",
+    "build": "node tools/build-content.mjs && ng build",
+    "watch": "node tools/build-content.mjs && ng build --watch --configuration development",
+    "test": "ng test"
   },
   "private": true,
   "packageManager": "pnpm@9.15.0",
@@ -30,7 +30,12 @@
     "@angular/compiler-cli": "^22.1.0",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "gray-matter": "^4",
+    "marked": "^16",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2"
+  },
+  "engines": {
+    "node": ">=22.22.3"
   }
 }
