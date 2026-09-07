@@ -27,6 +27,9 @@ Module and lesson identifiers stay language-neutral and English
 translated. Do not translate a folder name — that is what lets the language
 switcher map a page to its counterpart.
 
+For how the whole thing fits together — dependency-by-dependency, the frontend
+in detail, and what stands in for a backend — see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Stack
 
 - **Angular 22**, standalone + signals, zoneless. Node 22 (`.nvmrc`), pnpm 9.15.0.
