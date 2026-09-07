@@ -108,3 +108,18 @@ docker compose -f ~/docker/compose/electronics.yml up -d --build
 Behind cloudflared (`electronics.paisbru.com` → `http://electronics:80`), on
 `server-net`, with no host port. Changing the cloudflared config requires
 `up -d --force-recreate`, never `docker restart`.
+
+## License
+
+Two licenses, because the code and the teaching material are different things.
+
+- **Code — MIT** (`LICENSE`). The Angular application, the content build
+  pipeline, the schematic component library, the instruments, the styles and
+  the config. Do what you like with it.
+- **Course content — CC BY-SA 4.0** (`content/LICENSE`). The lesson prose in
+  `content/` and the UI copy in `src/app/i18n/`. Share and adapt it, including
+  commercially, with credit and under the same terms.
+
+The ShareAlike half is deliberate: translations into further languages are the
+derivative this project most wants to see, and they should stay as free as the
+original. The site itself carries no paid tier and never will.

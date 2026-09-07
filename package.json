@@ -2,7 +2,7 @@
   "name": "electronics",
   "version": "0.1.0",
   "description": "Workbench — a free, bilingual (EN/ES), interactive electronics course, from Ohm's law to PCB design.",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "engines": {

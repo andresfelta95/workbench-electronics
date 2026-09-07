@@ -72,7 +72,7 @@ export interface UiStrings {
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
   notFound: { heading: string; body: string; cta: string };
-  footer: { built: string; source: string; free: string };
+  footer: { built: string; source: string; license: string; free: string };
 }
 
 const en: UiStrings = {
@@ -173,7 +173,8 @@ const en: UiStrings = {
   },
   footer: {
     built: 'Built on a home server in Alberta.',
-    source: 'Corrections and mistakes',
+    source: 'Source on GitHub',
+    license: 'Code MIT · Content CC BY-SA 4.0',
     free: 'Free and open — no accounts, no paid tier, no tracking.',
   },
 };
@@ -276,7 +277,8 @@ const es: UiStrings = {
   },
   footer: {
     built: 'Hecho en un servidor casero en Alberta.',
-    source: 'Correcciones y erratas',
+    source: 'Código en GitHub',
+    license: 'Código MIT · Contenido CC BY-SA 4.0',
     free: 'Libre y abierto: sin cuentas, sin plan de pago, sin rastreo.',
   },
 };
