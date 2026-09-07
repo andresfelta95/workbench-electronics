@@ -8,6 +8,25 @@ see or hear at the same instant. Circuits are drawn as SVG components, not
 images, so values update live and the prose can highlight the part it is talking
 about.
 
+## Language policy
+
+**Everything that is not site content is written in English**: code, comments,
+commit messages, this README, config files, error messages, identifiers, and
+directory names.
+
+Spanish appears in exactly two places, and both are product rather than
+documentation:
+
+- `content/es/**` — the Spanish half of the lessons.
+- The `es` block in `src/app/i18n/ui.ts` — the Spanish UI strings.
+- (`src/app/pages/gate/language-gate.ts` also carries one Spanish line on
+  purpose: the site root greets both languages before it forwards.)
+
+Module and lesson identifiers stay language-neutral and English
+(`00-fundamentals/01-ohms-law`); only the URL slug in the front matter is
+translated. Do not translate a folder name — that is what lets the language
+switcher map a page to its counterpart.
+
 ## Stack
 
 - **Angular 22**, standalone + signals, zoneless. Node 22 (`.nvmrc`), pnpm 9.15.0.

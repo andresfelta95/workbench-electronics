@@ -1,6 +1,13 @@
 {
   "name": "electronics",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Workbench — a free, bilingual (EN/ES), interactive electronics course, from Ohm's law to PCB design.",
+  "license": "UNLICENSED",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.22.3"
+  },
   "scripts": {
     "ng": "ng",
     "content": "node tools/build-content.mjs",
@@ -9,8 +16,6 @@
     "watch": "node tools/build-content.mjs && ng build --watch --configuration development",
     "test": "ng test"
   },
-  "private": true,
-  "packageManager": "pnpm@9.15.0",
   "dependencies": {
     "@angular/common": "^22.1.0",
     "@angular/compiler": "^22.1.0",
@@ -34,8 +39,5 @@
     "marked": "^16",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2"
-  },
-  "engines": {
-    "node": ">=22.22.3"
   }
 }
