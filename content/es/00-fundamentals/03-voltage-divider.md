@@ -33,14 +33,19 @@ también.
 
 ## Qué pasa cuando le conectas algo
 
-Aquí está lo que importa. Pon la carga de abajo en «ninguna» y la fórmula se
-cumple exacta. Después conecta una carga y mira cómo se hunde la salida.
+Aquí está lo que importa. Con el interruptor «Carga» de abajo apagado, en
+«Ninguna», la fórmula se cumple exacta. Después enciéndelo y mira cómo se hunde
+la salida, y cómo la fórmula de la placa del instrumento pasa a la forma con
+carga mientras lo haces.
 
 ::widget{type="divider" vin="9" r1="10k" r2="10k"}
 
 No se ha roto nada. Una carga no es más que otra resistencia, y conectarla sobre
 R₂ la pone **en paralelo** con R₂: la regla de la lección anterior. El divisor
-sigue siendo un divisor; simplemente no es el divisor que dibujaste:
+sigue siendo un divisor; simplemente no es el divisor que dibujaste. Lee `∥`
+como «en paralelo con»: el `R2||RL` de la placa es la abreviatura del
+instrumento para R₂ ∥ R_carga, no un OR lógico de C. Escrita entera, la forma
+con carga es:
 
 `V_salida = V_entrada × (R₂ ∥ R_carga) / (R₁ + (R₂ ∥ R_carga))`
 

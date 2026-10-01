@@ -22,7 +22,12 @@ drives headless Microsoft Edge (`channel="msedge"`) on the Windows host, because
 WSL has no browser. The lesson header and the prose before the first instrument
 are hidden so the instrument sits under the masthead. Desktop shots are
 900 × 1000 px and phone shots are 375 × 1300 px, at device scale 1. "Dark" uses
-`prefers-color-scheme: dark` with no stored theme.
+`prefers-color-scheme: dark` with no stored theme. The six divider shots were
+retaken for the loaded nameplate and its reserved size (see
+[Nameplate formulas](#nameplate-formulas-the-loaded-divider)) with the same
+framing, but with the Playwright Chromium in `~/.a11y-tools` inside WSL (the
+one `tools/axe-check.mjs` uses), so their text antialiasing differs slightly
+from the two Edge shots of the other instruments.
 
 ---
 
@@ -31,7 +36,7 @@ are hidden so the instrument sits under the masthead. Desktop shots are
 | File | Role |
 |---|---|
 | `src/styles/_pixel.scss` | Tokens (palette, `--px`, type sizes, composite bevels) for all three theme states, slot layout for `[panelControls]` / `[panelReadouts]`, and the kit classes `pix-key`, `pix-segment`, `pix-switch`, `pix-rule`. Pulled in by `@use 'styles/pixel'` at the top of `src/styles.scss`. |
-| `src/app/ui/panel.ts` | Adds `host: { class: 'pix' }`, which is the scope root. Draws the case, nameplate, recessed screen, engraved groove and dithered readout bay, and lays them out with a container query on the panel's own width (see [Layout](#layout)). |
+| `src/app/ui/panel.ts` | Adds `host: { class: 'pix' }`, which is the scope root. Draws the case, nameplate, recessed screen, engraved groove and dithered readout bay, and lays them out with a container query on the panel's own width (see [Layout](#layout)). `heading` takes a string, or an array of `{ text, accent? }` runs where an accent run is set in inverse video. The optional `headingLabel` is the heading's spoken form: when set, the visible formula is `aria-hidden` and the label is read instead. The optional `headingAlt` is the heading's other form: both share one grid cell, the inactive one `visibility: hidden` and `aria-hidden`, so the strip always has the larger form's size and switching moves nothing. Without `headingAlt` nothing is reserved and the rendering is unchanged (a plain-string heading gains only a wrapper `<span>`). |
 | `src/app/ui/control.ts` | Pixel fader and LCD entry field. |
 | `src/app/ui/readout.ts` | LCD window plus a pixel glyph for each tone. |
 | `src/app/schematic/schematic.ts` | Crisp rendering, whole-unit strokes, square caps and mitred joins, square junctions and terminals, stepped current flow. |
@@ -118,6 +123,7 @@ boundaries and state indicators must reach 3:1.
 | Key text (raised) | `#1e1f1a` / `#f7f4ea` | 15.07 | `#dfe9e2` / `#38423c` | 8.39 | 4.5 |
 | Pressed key text | `#f7f4ea` / `#8a3f12` | 6.81 | `#1a1f1c` / `#ffb05c` | 9.24 | 4.5 |
 | Panel heading | `#f7f4ea` / `#24221d` | 14.44 | `#ffb05c` / `#0a0d0b` | 10.80 | 4.5 |
+| Accented heading run (inverse video) | `#24221d` / `#f7f4ea` | 14.44 | `#0a0d0b` / `#ffb05c` | 10.80 | 4.5 |
 | LCD value | `#17251a` / `#c4d1a8` | 9.90 | `#8cf5a8` / `#050a07` | 14.95 | 4.5 |
 | LCD label / note | `#3a4e33` / `#c4d1a8` | 5.62 | `#62a87a` / `#050a07` | 7.03 | 4.5 |
 | Tone accent | `#8a3f12` / `#c4d1a8` | 4.65 | `#ffb05c` / `#050a07` | 11.03 | 4.5 |
@@ -148,7 +154,8 @@ below 0.55.
 
 The layout and glyph changes in this revision add no new colours. The two
 dimmed rows are new pairs created by the `sch--dim` change (see
-[Motion and texture](#motion-and-texture)).
+[Motion and texture](#motion-and-texture)). The accented heading run swaps the
+nameplate's two existing colours, so it is a new pair but not a new colour.
 
 The bevel, dither, drop shadow, grille and LED are decoration and carry no
 information, so they have no contrast requirement. Text never sits on the
@@ -210,9 +217,11 @@ every Latin character and the two fallbacks only draw what VT323 lacks.
 - **Iosevka Charon Mono, for ∥, arrows and subscripts.** These glyphs only
   exist in Google's `math` and `symbols` slices, and no Google-hosted pixel or
   mono face with a small Greek slice serves them. Iosevka's `math` slice
-  (80 KiB) holds ∥ and ₀–₉, and its `symbols` slice (62 KiB) holds → and ←.
-  Each slice is fetched only when one of its glyphs is on screen. No module 00
-  instrument uses these glyphs, so today they are never fetched.
+  (81,740 bytes, measured) holds ∥ and ₀–₉, and its `symbols` slice
+  (63,372 bytes) holds → and ←. Each slice is fetched only when one of its
+  glyphs is on screen. No module 00 instrument uses these glyphs, so today they
+  are never fetched; the loaded divider writes `||` for that reason (see
+  [Nameplate formulas](#nameplate-formulas-the-loaded-divider)).
 - **IBM Plex Mono** (`--mono`) stays last, as the face used if the Google
   request fails altogether.
 
@@ -269,8 +278,62 @@ Guidance for instrument strings:
   small raised x. Keep × in accessible names (`aria-label`, `sch-canvas`
   `label`), because screen readers announce it as "times".
 - **∥ and arrows** work, but the first one on a page costs 62–80 KiB. In a
-  nameplate formula, `R2 || RL` in VT323 is a cheaper option and in keeping
-  with the terminal style.
+  nameplate formula, write `R2||RL` in VT323 instead, as the loaded divider
+  does, and spell the relation out in the spoken form (`headingLabel` and the
+  drawing's `label`). A screen reader reads `||` as "vertical bar vertical bar".
+
+### Nameplate formulas: the loaded divider
+
+With the load switched on, the divider's nameplate changes from the ideal
+formula to the loaded one, in the lesson's own shape
+(`V_out = V_in × (R₂ ∥ R_load) / (R₁ + (R₂ ∥ R_load))`):
+
+| State | Visible (VT323) | Spoken, EN | Spoken, ES |
+|---|---|---|---|
+| Load off | `Vout = Vin · R2 / (R1 + R2)` | Vout = Vin × R2 / (R1 + R2) | Vout = Vin × R2 / (R1 + R2) |
+| Load on | `Vout = Vin · (R2\|\|RL) / (R1 + (R2\|\|RL))` | Vout = Vin × (R2 in parallel with RL) / (R1 + (R2 in parallel with RL)) | Vout = Vin × (R2 en paralelo con RL) / (R1 + (R2 en paralelo con RL)) |
+
+The two `(R2||RL)` runs are accented in inverse video. The phrase comes from
+`widget.r2ParallelLoad` in `src/app/i18n/ui.ts`. The spoken form is both the
+nameplate's `headingLabel` and the drawing's accessible name.
+
+The options, and why `||` won:
+
+| Option | Bytes | Trade-off |
+|---|---|---|
+| `∥` (U+2225) | +81,740 (Iosevka `math`) the first time the load is switched on | The correct glyph, but a smooth face inside a pixel nameplate, an 80 KiB fetch for two characters, and a fallback swap (and possible reflow) while it loads. |
+| **`\|\|` in VT323** | **0** (VT323 `latin` is already loaded) | **Chosen.** Two full-height VT323 bars read as ∥ at 25 px, match the pixel face and the terminal style, and keep the formula in the lesson's shape. `R2\|\|RL` has no spaces, so it never breaks across lines. |
+| `Rp` defined nearby (`Vout = Vin · Rp / (R1 + Rp)`, `Rp = R2\|\|RL`) | 0 | Same length as the ideal formula, so no wrap, but it needs a second line or readout for the definition and no longer matches the prose. |
+
+Layout: the loaded formula is 39 cells against 27. It fits on one line at 900
+and 1280 px. At a viewport of 495 px or narrower it wraps once, always at a
+space and never inside `R2||RL` (the ideal formula alone would wrap at 365 px
+or narrower). At 375 px the break falls before `/ (R1 + (R2||RL))`.
+
+So the Load switch never moves under the reader's finger, the divider passes
+the inactive form as the Panel's `headingAlt`. Both forms sit in the same grid
+cell (`grid-area: 1 / 1`), and the inactive one is `visibility: hidden` and
+`aria-hidden`. The nameplate therefore always takes the larger form's size, at
+any width and in either language:
+
+- At 495 px and below the strip is two lines (62 px at 375 px) in both states.
+  The ideal form is centred vertically in it.
+- Above that it is one line in both states. The ideal form's strip reserves
+  the loaded form's width too, so the grille is 12 cells shorter than it was,
+  and its edge does not jump sideways on toggle either.
+- An earlier version let the strip grow from 37 to 62 px on toggle at 366–495 px,
+  which moved the switch 25 px (REVIEW m-1). That is fixed.
+
+The hidden form is not in the accessibility tree (one heading, named with the
+active spoken form) and `window.find()` does not match it, so find-in-page
+does not land on invisible text. Measured in Chromium, EN and ES: at 375, 393,
+430 and 480 px with the nameplate in view, the switch's `y` and the strip's
+height are identical with the load off, on and off again; no horizontal scroll
+and no clipped text at 320, 375, 900 or 1280 px in light and dark; forced
+colours and reduced motion keep the reserve hidden and the strip the same
+size; no Iosevka file is requested with the load on. Ohm's law and
+series/parallel, which pass no `headingAlt`, render byte-identically to
+`main`.
 
 ---
 
@@ -447,7 +510,9 @@ meaning.
 - `divider`: the load toggle is now a `pix-switch` (a native checkbox) sitting under a
   `pix-rule`. The local toggle and readout-strip CSS is gone. The nameplate reads
   `Vout = Vin · R2 / (R1 + R2)`. VT323's × rendered as a small raised x. The drawing's
-  accessible name keeps ×, so it is read as "times".
+  accessible name keeps ×, so it is read as "times". With the load on, the nameplate
+  shows the loaded form with `(R2||RL)` accented, and the spoken form spells out
+  "in parallel with" (see [Nameplate formulas](#nameplate-formulas-the-loaded-divider)).
 - `ohm-law`: "Solve for" is now a `pix-segment` of radio keys with LEDs. The local
   `.modes` / `.mode` / `.readouts` CSS (about 60 lines) is gone. The nameplate reads
   `V = I · R`, with × kept in the drawing's accessible name.

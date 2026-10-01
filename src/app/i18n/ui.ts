@@ -62,6 +62,8 @@ export interface UiStrings {
     arrangement: string;
     load: string;
     noLoad: string;
+    /** R2 ∥ RL in words, for the loaded divider's spoken formula. */
+    r2ParallelLoad: string;
     output: string;
     idealOutput: string;
     error: string;
@@ -158,6 +160,7 @@ const en: UiStrings = {
     arrangement: 'Arrangement',
     load: 'Load',
     noLoad: 'None',
+    r2ParallelLoad: 'R2 in parallel with RL',
     output: 'Output',
     idealOutput: 'Unloaded',
     error: 'Error',
@@ -263,6 +266,7 @@ const es: UiStrings = {
     arrangement: 'Conexión',
     load: 'Carga',
     noLoad: 'Ninguna',
+    r2ParallelLoad: 'R2 en paralelo con RL',
     output: 'Salida',
     idealOutput: 'En vacío',
     error: 'Error',
