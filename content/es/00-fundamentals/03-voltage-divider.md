@@ -16,7 +16,8 @@ bajo una condición que los libros suelen mencionar una vez y abandonar.
 
 La deducción ocupa una línea y merece hacerla una vez en lugar de memorizar el
 resultado. Las dos resistencias están en serie, así que las atraviesa la misma
-corriente:
+corriente (la ley de corrientes de Kirchhoff, que tiene su propia lección más
+adelante en este módulo):
 
 `I = V_entrada / (R₁ + R₂)`
 
@@ -35,7 +36,7 @@ también.
 Aquí está lo que importa. Pon la carga de abajo en «ninguna» y la fórmula se
 cumple exacta. Después conecta una carga y mira cómo se hunde la salida.
 
-::widget{type="divider" vin="9" r1="10k" r2="10k" load="none"}
+::widget{type="divider" vin="9" r1="10k" r2="10k"}
 
 No se ha roto nada. Una carga no es más que otra resistencia, y conectarla sobre
 R₂ la pone **en paralelo** con R₂: la regla de la lección anterior. El divisor
@@ -51,8 +52,8 @@ salida.**
 
 :::key
 La regla práctica: mantén las resistencias del divisor al menos diez veces *por
-debajo* de la impedancia de la carga y el error de carga se queda en torno al
-10 %. Para un uno por ciento, cien veces por debajo. Lo que pagas a cambio es
+debajo* de la impedancia de la carga y el error de carga se queda por debajo de
+un 10 %. Para un uno por ciento, cien veces por debajo. Lo que pagas a cambio es
 corriente: un divisor más «duro» desperdicia más potencia sin hacer nada.
 :::
 
@@ -76,8 +77,11 @@ esos dos números.
 
 **Leer una tensión demasiado alta para tu microcontrolador.** Una batería de
 12 V hacia una entrada de ADC de 3,3 V, a través de un divisor que la escala a
-3,0 V. La entrada del ADC es de alta impedancia —megaohmios— así que un divisor
-de 10 kΩ / 3,3 kΩ la carga de forma despreciable. Este es el uso de libro.
+3,0 V. El ADC apenas consume corriente continua, pero su condensador de muestreo
+quiere una impedancia de fuente por debajo de unos 10 kΩ (la hoja de datos del
+ATmega328P pide 10 kΩ o menos). Un divisor de 10 kΩ / 3,3 kΩ tiene unos 2,5 kΩ
+de impedancia de salida, holgadamente dentro de ese margen. Este es el uso de
+libro.
 
 **Fijar una referencia o un umbral.** Alimentar la entrada de un comparador o el
 pin de realimentación de un regulador, que casi no consumen corriente.

@@ -13,12 +13,12 @@ import { WidgetHost } from './widget-host';
           <div class="prose" [innerHTML]="block.html"></div>
         }
         @case ('callout') {
-          <aside class="callout" [attr.data-tone]="block.tone">
+          <div class="callout" role="note" [attr.data-tone]="block.tone">
             <p class="callout__label">
               {{ block.title || i18n.t().callout[block.tone] }}
             </p>
             <div class="prose callout__body" [innerHTML]="block.html"></div>
-          </aside>
+          </div>
         }
         @case ('widget') {
           <figure class="instrument">

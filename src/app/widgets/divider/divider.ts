@@ -17,7 +17,7 @@ import { Readout } from '../../ui/readout';
   template: `
     <app-panel [heading]="heading">
       <div panelFigure class="figure">
-        <sch-canvas [w]="31" [h]="16" [label]="heading">
+        <sch-canvas [w]="31" [h]="16" [label]="label">
           <svg:g schWire d="M40 30 H140" [flow]="flow()" />
           <svg:g schWire d="M40 75 V130 H140" [flow]="flow()" />
           <svg:g schWire d="M140 110 V130" [flow]="flow()" />
@@ -70,8 +70,8 @@ import { Readout } from '../../ui/readout';
           [(value)]="r2"
         />
 
-        <div class="load">
-          <label class="load__toggle" [class.load__toggle--on]="loaded()">
+        <div class="load pix-rule">
+          <label class="pix-switch" [class.pix-switch--on]="loaded()">
             <input type="checkbox" [checked]="loaded()" (change)="loaded.set(!loaded())" />
             {{ t().widget.load }}: {{ loaded() ? text(rLoad(), 'Ω') : t().widget.noLoad }}
           </label>
@@ -89,7 +89,7 @@ import { Readout } from '../../ui/readout';
         </div>
       </div>
 
-      <div panelReadouts class="readouts">
+      <div panelReadouts>
         <app-readout [label]="t().widget.output" [value]="text(vout(), 'V')" tone="accent" />
         <app-readout [label]="t().widget.idealOutput" [value]="text(videal(), 'V')" />
         <app-readout
@@ -115,44 +115,7 @@ import { Readout } from '../../ui/readout';
     .load {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      border-top: 1px solid var(--rule);
-      padding-top: 14px;
-    }
-
-    .load__toggle {
-      font-family: var(--mono);
-      font-size: 12px;
-      border: 1px solid var(--rule);
-      padding: 8px 11px;
-      cursor: pointer;
-      color: var(--muted);
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .load__toggle--on {
-      border-color: var(--copper);
-      color: var(--copper);
-      background: var(--copper-soft);
-    }
-
-    .load__toggle input {
-      accent-color: var(--copper);
-    }
-
-    .readouts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1px;
-      background: var(--rule);
-      border-top: 1px solid var(--rule);
-    }
-
-    .readouts > * {
-      flex: 1 1 150px;
+      gap: calc(6 * var(--px));
     }
   `,
 })
@@ -161,7 +124,10 @@ export class DividerWidget {
 
   private readonly i18n = inject(I18n);
   protected readonly t = this.i18n.t;
-  protected readonly heading = 'Vout = Vin × R2 / (R1 + R2)';
+  /** Nameplate text. VT323's × is a small raised x, so the plate uses the
+   *  middle dot; the drawing's accessible name keeps × so it is read as "times". */
+  protected readonly heading = 'Vout = Vin · R2 / (R1 + R2)';
+  protected readonly label = 'Vout = Vin × R2 / (R1 + R2)';
 
   protected readonly vin = linkedSignal(() => parseValue(this.props()['vin'], 9));
   protected readonly r1 = linkedSignal(() => parseValue(this.props()['r1'], 10000));

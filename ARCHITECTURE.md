@@ -25,7 +25,7 @@ no server-side search. What it buys:
 - **Indexability.** Search engines get complete HTML with the lesson text and
   the instrument's initial state already rendered, not an empty shell.
 - **Operational silence.** Nothing to crash at 3am, nothing to patch, nothing
-  to back up. The container is 128 MB of nginx serving 1.7 MB of output.
+  to back up. The container is 128 MB of nginx serving about 2 MB of output.
 - **Cost.** It runs in the noise of an existing home server.
 
 So when this document says "backend", it means the **build-time backend**: a
@@ -69,7 +69,9 @@ once the project committed to static output, because nothing imported them.
 
 **Nothing else.** No component library, no CSS framework, no state management
 library, no chart library, no icon package, no analytics, no font package. The
-design system is ~380 lines of CSS custom properties; the instruments draw
+design system is ~300 lines of global CSS custom properties and prose styles,
+plus a ~390-line pixel-art skin scoped to the instruments
+(`src/styles/_pixel.scss`, see `docs/DESIGN-PIXEL-ART.md`); the instruments draw
 themselves with SVG and arithmetic. The only external network request the site
 makes is to Google Fonts.
 
@@ -96,13 +98,17 @@ electronics/
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
 │
 ├── tools/
-│   └── build-content.mjs       ← the content compiler (311 lines)
+│   ├── build-content.mjs       ← the content compiler (311 lines)
+│   └── axe-check.mjs           ← axe over every prerendered route (needs AXE_TOOLS_DIR)
+│
+├── docs/                       ← roadmap, review, bibliography, pixel-art design notes
 │
 ├── src/
 │   ├── index.html              ← shell: fonts, theme pre-paint script
 │   ├── main.ts                 ← browser bootstrap
 │   ├── main.server.ts          ← prerender bootstrap
 │   ├── styles.scss             ← design tokens + prose typography (global)
+│   ├── styles/_pixel.scss      ← instrument skin, scoped to .pix
 │   │
 │   └── app/
 │       ├── app.ts/.html/.scss  ← shell: masthead, language switch, theme, footer
@@ -112,12 +118,12 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (538 lines)
-│       ├── i18n/ui.ts          ← every UI string, both languages (286 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (289 lines)
 │       ├── lesson/             ← the Markdown → components renderer (215 lines)
 │       ├── pages/              ← the five routed views (1046 lines)
-│       ├── schematic/          ← SVG symbol library (294 lines)
-│       ├── ui/                 ← panel, control, readout primitives (361 lines)
-│       ├── widgets/            ← the instruments (785 lines)
+│       ├── schematic/          ← SVG symbol library (327 lines)
+│       ├── ui/                 ← panel, control, readout primitives (548 lines)
+│       ├── widgets/            ← the instruments (663 lines)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── Dockerfile                  ← two stages: node builder, nginx runtime
@@ -126,7 +132,7 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 4,500 lines of source, plus ~5,300 words of lesson prose so far.
+Roughly 5,000 lines of source, plus ~5,600 words of lesson prose so far.
 
 ---
 
@@ -208,7 +214,7 @@ tag:
 | Block | Rendered as |
 |---|---|
 | `html` | `<div class="prose" [innerHTML]>` — Angular sanitises it |
-| `callout` | A styled `<aside>` with a tone: note, warning, key, safety |
+| `callout` | A styled `<div role="note">` with a tone: note, warning, key, safety (not `<aside>`, which axe rejects inside `<main>`) |
 | `widget` | `WidgetHost`, which resolves and instantiates the component |
 
 `WidgetHost` is the interesting one:
@@ -229,7 +235,7 @@ makes the prerenderer wait.
 
 The widget registry is a plain map of `type → () => import(...)`, so a lesson
 downloads only the instruments it references. Each instrument is its own lazy
-chunk of 6–8 kB.
+chunk of 5–6.5 kB.
 
 ### 4.4 The instruments
 
@@ -308,10 +314,12 @@ not injected after hydration.
 
 | | Raw | Gzipped |
 |---|---|---|
-| `main.js` | 297 kB | **95 kB** |
-| `styles.css` | 3.8 kB | 1.5 kB |
-| Per-lesson chunk | 5–7 kB | ~2 kB |
-| Per-instrument chunk | 6–8 kB | ~2 kB |
+| `main.js` | 312 kB | **87 kB** |
+| `styles.css` | 10.1 kB | 2.5 kB |
+| Per-lesson chunk | 5.5–7 kB | ~2 kB |
+| Per-instrument chunk | 5–6.5 kB | ~2 kB |
+
+Gzipped figures are the build's "estimated transfer size" (2026-10-01).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -455,7 +463,8 @@ follow from that. See `README.md`.
 **An instrument** is a standalone component taking `props`, registered in
 `lesson/widget-registry.ts` as a dynamic import. Reuse `Panel`, `Control` and
 `Readout`, draw with the `schematic/` symbols, and format numbers through
-`core/format.ts`.
+`core/format.ts`. Before building one, follow the "Adopting the skin in a new
+widget" checklist in `docs/DESIGN-PIXEL-ART.md`.
 
 Two rules that are not negotiable, because they are the point of the project:
 

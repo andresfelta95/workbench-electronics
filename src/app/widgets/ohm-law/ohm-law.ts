@@ -4,9 +4,13 @@ import { formatSI, parseValue } from '../../core/format';
 import { SCHEMATIC } from '../../schematic/schematic';
 import { Control } from '../../ui/control';
 import { Panel } from '../../ui/panel';
-import { Readout } from '../../ui/readout';
+import { Readout, type ReadoutTone } from '../../ui/readout';
 
 type Unknown = 'i' | 'v' | 'r';
+
+// Same scheme as Control's ids: a module counter gives every instance its own
+// radio group name, so two of these widgets on one page never merge groups.
+let nextId = 0;
 
 /**
  * V = I × R with one of the three held as the result. Fixing which quantity is
@@ -19,7 +23,7 @@ type Unknown = 'i' | 'v' | 'r';
   template: `
     <app-panel [heading]="heading">
       <div panelFigure class="figure">
-        <sch-canvas [w]="29" [h]="15" [label]="heading">
+        <sch-canvas [w]="29" [h]="15" [label]="label">
           <svg:g schWire d="M40 40 H100" [flow]="flow()" />
           <svg:g schWire d="M150 40 H250 V130 H40 V85" [flow]="flow()" />
           <svg:g schSource [x]="4" [y]="4" [value]="voltageText()" [highlight]="unknown() === 'v'" />
@@ -36,13 +40,13 @@ type Unknown = 'i' | 'v' | 'r';
       </div>
 
       <div panelControls>
-        <fieldset class="modes">
+        <fieldset class="pix-segment">
           <legend>{{ t().widget.solveFor }}</legend>
           @for (option of options; track option.key) {
-            <label class="mode" [class.mode--on]="unknown() === option.key">
+            <label class="pix-key" [class.pix-key--on]="unknown() === option.key">
               <input
                 type="radio"
-                name="ohm-unknown"
+                [name]="radioName"
                 [value]="option.key"
                 [checked]="unknown() === option.key"
                 (change)="setUnknown(option.key)"
@@ -84,7 +88,7 @@ type Unknown = 'i' | 'v' | 'r';
         }
       </div>
 
-      <div panelReadouts class="readouts">
+      <div panelReadouts>
         <app-readout
           [label]="t().widget.voltage"
           [value]="voltageText()"
@@ -104,7 +108,7 @@ type Unknown = 'i' | 'v' | 'r';
           [label]="t().widget.power"
           [value]="powerText()"
           [note]="powerNote()"
-          [tone]="power() > 0.25 ? 'danger' : 'signal'"
+          [tone]="powerTone()"
         />
       </div>
     </app-panel>
@@ -117,68 +121,6 @@ type Unknown = 'i' | 'v' | 'r';
     .figure {
       width: 100%;
     }
-
-    .modes {
-      border: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .modes legend {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 0 7px;
-    }
-
-    .mode {
-      font-family: var(--mono);
-      font-size: 12px;
-      border: 1px solid var(--rule);
-      padding: 6px 11px;
-      cursor: pointer;
-      color: var(--muted);
-      background: var(--bg);
-    }
-
-    .mode:hover {
-      border-color: var(--rule-strong);
-    }
-
-    .mode--on {
-      border-color: var(--copper);
-      color: var(--copper);
-      background: var(--copper-soft);
-    }
-
-    .mode input {
-      position: absolute;
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .mode:focus-within {
-      outline: 2px solid var(--copper);
-      outline-offset: 2px;
-    }
-
-    .readouts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1px;
-      background: var(--rule);
-      border-top: 1px solid var(--rule);
-    }
-
-    .readouts > * {
-      flex: 1 1 150px;
-    }
   `,
 })
 export class OhmLawWidget {
@@ -186,6 +128,8 @@ export class OhmLawWidget {
 
   private readonly i18n = inject(I18n);
   protected readonly t = this.i18n.t;
+
+  protected readonly radioName = `ohm-unknown-${nextId++}`;
 
   protected readonly unknown = signal<Unknown>('i');
 
@@ -213,7 +157,10 @@ export class OhmLawWidget {
 
   protected readonly power = computed(() => this.voltage() * this.current());
 
-  protected readonly heading = 'V = I \u00d7 R';
+  /** Nameplate uses the middle dot (VT323's multiply sign is a small raised
+   *  x); the drawing's accessible name keeps it, so it is read as "times". */
+  protected readonly heading = 'V = I \u00b7 R';
+  protected readonly label = 'V = I \u00d7 R';
 
   /**
    * Freezes what is on screen into state before changing which quantity is
@@ -240,6 +187,14 @@ export class OhmLawWidget {
     if (watts > 0.25) return '> 1/4 W';
     if (watts > 0.1) return '> 1/10 W';
     return '';
+  });
+
+  /** Same thresholds as the note: past 1/10 W is a warning, past 1/4 W is trouble. */
+  protected readonly powerTone = computed<ReadoutTone>(() => {
+    const watts = this.power();
+    if (watts > 0.25) return 'danger';
+    if (watts > 0.1) return 'warn';
+    return 'signal';
   });
 
   /** Log-scaled so the animation reads across five decades of current. */
