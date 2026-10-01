@@ -118,12 +118,12 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (538 lines)
-│       ├── i18n/ui.ts          ← every UI string, both languages (289 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (293 lines)
 │       ├── lesson/             ← the Markdown → components renderer (215 lines)
 │       ├── pages/              ← the five routed views (1046 lines)
 │       ├── schematic/          ← SVG symbol library (327 lines)
-│       ├── ui/                 ← panel, control, readout primitives (548 lines)
-│       ├── widgets/            ← the instruments (663 lines)
+│       ├── ui/                 ← panel, control, readout primitives (627 lines)
+│       ├── widgets/            ← the instruments (686 lines)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── Dockerfile                  ← two stages: node builder, nginx runtime
@@ -246,7 +246,12 @@ keeps the Markdown authorable.
 Three shared primitives under `ui/` mean a new instrument is mostly arithmetic:
 
 - **`Panel`** — the frame. Content-projects into four slots: `panelFigure`,
-  `panelControls`, `panelReadouts`, and an optional `panelAction`.
+  `panelControls`, `panelReadouts`, and an optional `panelAction`. Its
+  `heading` (the nameplate) takes a string or runs of text, any of them
+  accented, plus an optional `headingLabel` for the spoken form and an optional
+  `headingAlt` that reserves room for the other form, so the nameplate never
+  resizes (see "Nameplate formulas: the loaded divider" in
+  `docs/DESIGN-PIXEL-ART.md`).
 - **`Control`** — a labelled slider **paired with a text box**. The text box is
   not decoration: it is how a keyboard user operates the instrument, and how a
   reader reproduces the lesson's worked example exactly. It handles logarithmic

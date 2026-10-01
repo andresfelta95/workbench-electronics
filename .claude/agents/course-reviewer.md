@@ -43,9 +43,21 @@ only files you create or edit are `docs/REVIEW.md` and `docs/BIBLIOGRAPHY.md`.
 - **Record.** Add a new dated section directly under the title of
   `docs/REVIEW.md`, `## Verification: <change> (YYYY-MM-DD)`, and leave the
   earlier sections below it as history. It contains what changed, the checks
-  run and their results, a findings table (see Classification), "Fixed during
-  verification", and a final **Ready to merge: yes/no** line. It is "yes" only
-  with zero open Blocker, Major or Minor findings in the change's scope.
+  run and their results, a findings table (see Classification below), "Fixed
+  during verification", and a final **Ready to merge: yes/no** line. It is
+  "yes" only with zero open Blocker, Major or Minor findings in the change's
+  scope.
+
+## Classification
+
+This applies to both modes.
+
+Every finding gets:
+- **Severity**: Blocker / Major / Minor / Suggestion.
+- **Area**: Plan, Pedagogy, Technical accuracy, Design, Accessibility, Code,
+  Content parity, References.
+- **Location**: file and line, or roadmap section / lesson id.
+- **Recommendation**: one concrete action.
 
 ## Full review
 
@@ -71,17 +83,6 @@ only files you create or edit are `docs/REVIEW.md` and `docs/BIBLIOGRAPHY.md`.
    DOI/URL). Do not list anything you could not verify; mark uncertain items
    explicitly. Note Spanish-language editions where they exist, since half the
    readership is Spanish-speaking.
-
-### Classification
-
-This applies to both modes.
-
-Every finding gets:
-- **Severity**: Blocker / Major / Minor / Suggestion.
-- **Area**: Plan, Pedagogy, Technical accuracy, Design, Accessibility, Code,
-  Content parity, References.
-- **Location**: file and line, or roadmap section / lesson id.
-- **Recommendation**: one concrete action.
 
 ### Deliverables
 
