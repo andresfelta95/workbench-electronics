@@ -1,4 +1,16 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
+
+/** One run of nameplate text. An `accent` run is set in inverse video, to
+ *  point at the term that changed (the loaded divider's R2||RL, for one). */
+export interface PanelHeadingPart {
+  readonly text: string;
+  readonly accent?: boolean;
+}
+
+function toParts(heading: string | readonly PanelHeadingPart[]): readonly PanelHeadingPart[] {
+  if (typeof heading !== 'string') return heading;
+  return heading ? [{ text: heading }] : [];
+}
 
 /**
  * The shared frame every instrument sits in: caption, drawing, controls, readouts.
@@ -12,10 +24,26 @@ import { Component, input } from '@angular/core';
   host: { class: 'pix' },
   template: `
     <section class="panel">
-      @if (heading()) {
+      @if (parts().length) {
         <header class="panel__head">
           <span class="panel__led" aria-hidden="true"></span>
-          <h3>{{ heading() }}</h3>
+          <h3 [class.panel__stack]="altParts().length > 0">
+            @if (headingLabel()) {
+              <span class="panel__spoken">{{ headingLabel() }}</span>
+            }
+            <span [attr.aria-hidden]="headingLabel() ? 'true' : null">
+              @for (part of parts(); track $index) {
+                <span [class.panel__accent]="part.accent">{{ part.text }}</span>
+              }
+            </span>
+            @if (altParts().length) {
+              <span class="panel__reserve" aria-hidden="true">
+                @for (part of altParts(); track $index) {
+                  <span [class.panel__accent]="part.accent">{{ part.text }}</span>
+                }
+              </span>
+            }
+          </h3>
           <span class="panel__grille" aria-hidden="true"></span>
           <ng-content select="[panelAction]" />
         </header>
@@ -62,6 +90,40 @@ import { Component, input } from '@angular/core';
       font-size: var(--pix-text-lg);
       line-height: 1;
       letter-spacing: 0.02em;
+    }
+
+    /* With an alternate heading, both forms share one grid cell and the
+       inactive one is invisible, so the strip is always the size of the larger
+       form and switching between them moves nothing below it. */
+    .panel__stack {
+      display: grid;
+      align-items: center;
+    }
+
+    .panel__stack > :not(.panel__spoken) {
+      grid-area: 1 / 1;
+      min-width: 0;
+    }
+
+    .panel__reserve {
+      visibility: hidden;
+    }
+
+    /* Inverse video, the terminal way to mark a term. It swaps the plate's two
+       colours, so it has the heading's own contrast and needs no new token. */
+    .panel__accent {
+      background: var(--pix-plate-ink);
+      color: var(--pix-plate);
+    }
+
+    /* The spoken form replaces the visible formula for assistive tech only. */
+    .panel__spoken {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
 
     .panel__led {
@@ -170,9 +232,26 @@ import { Component, input } from '@angular/core';
       .panel__head {
         border-bottom: var(--px) solid CanvasText;
       }
+
+      .panel__accent {
+        forced-color-adjust: none;
+        background: CanvasText;
+        color: Canvas;
+      }
     }
   `,
 })
 export class Panel {
-  readonly heading = input('');
+  /** Nameplate text: a plain string, or runs of text when one should be accented. */
+  readonly heading = input<string | readonly PanelHeadingPart[]>('');
+  /** Optional spoken form of the heading, for a formula whose symbols a screen
+   *  reader would mangle. When set, the visible text is hidden from assistive tech. */
+  readonly headingLabel = input('');
+  /** Optional other form of the heading (the one not showing now). The strip
+   *  reserves room for it, invisibly and hidden from assistive tech, so
+   *  switching between the two never resizes the nameplate. */
+  readonly headingAlt = input<string | readonly PanelHeadingPart[]>('');
+
+  protected readonly parts = computed(() => toParts(this.heading()));
+  protected readonly altParts = computed(() => toParts(this.headingAlt()));
 }

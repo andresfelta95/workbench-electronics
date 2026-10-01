@@ -3,8 +3,20 @@ import { I18n } from '../../core/i18n';
 import { formatPercent, formatSI, parallel, parseValue } from '../../core/format';
 import { SCHEMATIC } from '../../schematic/schematic';
 import { Control } from '../../ui/control';
-import { Panel } from '../../ui/panel';
+import { Panel, type PanelHeadingPart } from '../../ui/panel';
 import { Readout } from '../../ui/readout';
+
+const IDEAL_HEADING = 'Vout = Vin · R2 / (R1 + R2)';
+
+/** The loaded nameplate, in the lesson's own shape:
+ *  Vout = Vin × (R2 ∥ Rload) / (R1 + (R2 ∥ Rload)). */
+const LOADED_HEADING: readonly PanelHeadingPart[] = [
+  { text: 'Vout = Vin · ' },
+  { text: '(R2||RL)', accent: true },
+  { text: ' / (R1 + ' },
+  { text: '(R2||RL)', accent: true },
+  { text: ')' },
+];
 
 /**
  * A voltage divider with an optional load, which is the whole point: the ideal
@@ -15,9 +27,9 @@ import { Readout } from '../../ui/readout';
   selector: 'app-divider',
   imports: [...SCHEMATIC, Panel, Control, Readout],
   template: `
-    <app-panel [heading]="heading">
+    <app-panel [heading]="heading()" [headingAlt]="headingAlt()" [headingLabel]="label()">
       <div panelFigure class="figure">
-        <sch-canvas [w]="31" [h]="16" [label]="label">
+        <sch-canvas [w]="31" [h]="16" [label]="label()">
           <svg:g schWire d="M40 30 H140" [flow]="flow()" />
           <svg:g schWire d="M40 75 V130 H140" [flow]="flow()" />
           <svg:g schWire d="M140 110 V130" [flow]="flow()" />
@@ -125,9 +137,20 @@ export class DividerWidget {
   private readonly i18n = inject(I18n);
   protected readonly t = this.i18n.t;
   /** Nameplate text. VT323's × is a small raised x, so the plate uses the
-   *  middle dot; the drawing's accessible name keeps × so it is read as "times". */
-  protected readonly heading = 'Vout = Vin · R2 / (R1 + R2)';
-  protected readonly label = 'Vout = Vin × R2 / (R1 + R2)';
+   *  middle dot. With the load on, R2 becomes R2 ∥ RL, written `||` because
+   *  VT323 has no ∥ and the only served ∥ costs an 80 KiB font slice; the
+   *  changed term is accented. The other form is passed as `headingAlt`, so
+   *  the plate keeps one size and the Load switch never moves when toggled.
+   *  See docs/DESIGN-PIXEL-ART.md, Nameplate formulas. */
+  protected readonly heading = computed(() => (this.loaded() ? LOADED_HEADING : IDEAL_HEADING));
+  protected readonly headingAlt = computed(() => (this.loaded() ? IDEAL_HEADING : LOADED_HEADING));
+  /** Spoken form, for the nameplate and the drawing: × is read as "times" and
+   *  the parallel relation is spelled out in the reader's language. */
+  protected readonly label = computed(() => {
+    if (!this.loaded()) return 'Vout = Vin × R2 / (R1 + R2)';
+    const rp = this.t().widget.r2ParallelLoad;
+    return `Vout = Vin × (${rp}) / (R1 + (${rp}))`;
+  });
 
   protected readonly vin = linkedSignal(() => parseValue(this.props()['vin'], 9));
   protected readonly r1 = linkedSignal(() => parseValue(this.props()['r1'], 10000));

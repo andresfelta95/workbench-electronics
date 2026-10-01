@@ -1,5 +1,147 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: divider loaded equation (2026-10-01)
+
+This is an independent check of branch `divider-loaded-equation`, an
+uncommitted working tree compared with `main` (`e9a8a37`). I re-ran every
+check myself and did not take the agents' reports on trust.
+
+**Ready to merge: yes** (after the second pass, below). The first pass found
+two Minor issues: a 25 px layout shift of the Load switch at narrow widths
+(m-1) and a missing key between the nameplate's `R2||RL` and the prose's
+`R₂ ∥ R_load` (m-2). It also made two Suggestions about the workflow docs
+(S1, S2). All four were addressed. I re-verified each fix myself, and no
+Blocker, Major or Minor finding is open. One new Suggestion (S3) does not
+block the merge.
+
+### Second pass: re-verification of the fixes
+
+What the fix round changed:
+
+- **m-1:** `Panel` has a new optional `headingAlt` input. When it is set, the
+  h3 gets `.panel__stack` (`display: grid`). The visible form and an
+  `aria-hidden`, `visibility: hidden` `.panel__reserve` copy of the other
+  form share `grid-area: 1 / 1`. The divider passes the inactive form, so
+  the strip is always the size of the larger form.
+- **m-2:** lesson 03 EN and ES now say "Read `∥` as "in parallel with": the
+  nameplate's `R2||RL` is the instrument's shorthand for R₂ ∥ R_load, not a
+  logical OR from C" (ES: «Lee `∥` como «en paralelo con»: el `R2||RL` de la
+  placa es la abreviatura del instrumento para R₂ ∥ R_carga, no un OR lógico
+  de C»).
+- **S1:** `.claude/agents/course-reviewer.md` has a new "Per-change
+  verification" mode.
+- **S2:** CLAUDE.md steps 3 and 4 now mention the private dist copy inside the
+  same `flock`, and throwaway Playwright tests.
+- Four more divider screenshots were retaken, six in all.
+
+| Check (second pass) | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/eqv-dist` inside the same lock) | Pass. 33 routes prerendered. `main` 312,388 B. No warnings. |
+| `tools/axe-check.mjs`, private copy | **0 violations**, 33 routes × 4 theme states = 132 pages. |
+| axe with the **load on** | **0 violations**: EN/ES × 4 theme states × 375/1280 px = 16 pages. The forced-colours emulation result is unchanged and is the same axe artefact that `main` shows (see the first pass). |
+| Keyboard only, EN and ES | Pass, same script as the first pass, extended. Tab to R2, type `4.7k`, Enter, Tab to Load, Space ×2. The visible form, the heading name and the drawing name all update. Focus stays on the switch. Readouts: 2.18 V / 2.88 V / -24.2% (ES 2,18 V / 2,88 V / -24,2 %), and back to unloaded. The reserve always holds the *inactive* form and is `visibility: hidden`. The accessibility tree has one heading, named with the active spoken form only. No console errors and no Iosevka request. |
+| **Switch stability (m-1)**: my own sweep with the nameplate in view, 80 px below the viewport top, toggled off → on → off | 15 widths (320, 360, 365, 366, 375, 393, 430, 480, 495, 496, 520, 600, 768, 900, 1280 px). Light and dark in EN and ES, plus forced colours and reduced motion in EN: **90 of 90 runs identical**. Switch `top`, strip height and grille left edge are unchanged to 0.01 px, `scrollY` is unchanged, there is no horizontal scroll and the h3 is not clipped. The strip is 62 px at ≤ 495 px and 37/43 px above that. In forced colours it is 64 px at ≤ 496 px and 39/46 px above, because of the extra border. |
+| Find-in-page | I enumerated every `window.find()` hit for `R2\|\|RL` (load off) and `R2 / (R1 + R2)` and `Vout = Vin` (load on). None lands in `.panel__reserve`. The hits are the visible nameplate, the sr-only spoken span and the prose code. |
+| Prerendered HTML | The visible form is the ideal one. The SSR markup now also contains the loaded form inside `.panel__reserve` (`aria-hidden`, hidden by the inlined component CSS). Only a browser with CSS off would show both forms. That is acceptable. |
+| Other instruments vs a fresh `main` build | `ohm-law` and `resistor-network` (series and parallel), EN/ES, 375/1280 px, light/dark: **24/24 head and 24/24 panel screenshots byte-identical**, with the same accessible names. The divider's ideal state now differs from `main` by design: a 62 px strip at 375 px and a grille 12 cells shorter at 1280 px. |
+| Diff review, `panel.ts` / `divider.ts` | `input()` and `computed()`, a pure `toParts()` helper, `[class.x]` bindings, native control flow, no `any`, no `standalone`, no explicit OnPush. A plain-string heading without `headingAlt` renders exactly as before. `IDEAL_HEADING` and `LOADED_HEADING` are module constants and do not depend on the language. Zero hits under `src/` for the banned patterns. |
+| m-2 prose | EN and ES say the same thing. `∥` is now defined, and `R2\|\|RL` is linked to R₂ ∥ R_load / R_carga, so `RL` ↔ `R_load` is covered too. The C logical-OR misreading is addressed explicitly. The UI strings quoted ("None", «Carga», «Ninguna») match the switch. |
+| DESIGN-PIXEL-ART | The "Layout" paragraph matches my measurements: 39 against 27 cells, wraps at ≤ 495 px, ideal alone at ≤ 365 px, 62 px strip in both states, ideal form centred, grille 12 cells shorter. The panel row in the file table and the screenshot note ("six divider shots", "two Edge shots of the other instruments") match `docs/design/`. One wording slip fixed (below). |
+| Screenshots | All six divider PNGs show the current UI. In the desktop and phone shots with the load off, the strip has the reserved size. The "with load" shots show the accented loaded form. |
+| Workflow docs | CLAUDE.md steps 3–4 and the new course-reviewer "Per-change verification" mode agree on `flock`, the private copy inside the same lock, the `axe-check` command, throwaway Playwright scripts outside the repo, trivial-fixes-only, the dated REVIEW section and the yes/no rule. The full-review build line now uses `flock`. See S3. |
+| Repo hygiene | `git diff --check` is clean. All 15 changed files are 644 and the text files are LF. No untracked files. `package.json` and `pnpm-lock.yaml` are unchanged. |
+
+### What changed (first pass)
+
+- **`CLAUDE.md`**: new section "Change workflow (mandatory for every
+  requested change)", 9 steps.
+- **`src/app/ui/panel.ts`**: `heading` now accepts a `string` or
+  `readonly PanelHeadingPart[]` (`{ text, accent? }`). An accent run is drawn
+  in inverse video, with a forced-colours rule. The new optional
+  `headingLabel` input holds the spoken form. When it is set, an sr-only span
+  carries it and the visible runs are `aria-hidden`.
+- **`src/app/widgets/divider/divider.ts`**: `heading` and `label` are now
+  `computed()` from `loaded()`. Visible text goes from
+  `Vout = Vin · R2 / (R1 + R2)` to
+  `Vout = Vin · (R2||RL) / (R1 + (R2||RL))`, with both `(R2||RL)` runs
+  accented. The spoken form, which serves as both the heading's name and the
+  drawing's name, uses the new i18n key `widget.r2ParallelLoad` ("R2 in
+  parallel with RL" / "R2 en paralelo con RL").
+- **`src/app/i18n/ui.ts`**: that key in EN and ES.
+- **Lesson 03 EN and ES** (`content/*/00-fundamentals/03-voltage-divider.md`):
+  the prose tells the reader to switch Load on and watch the nameplate
+  formula change. The prose formula is introduced as "Written out in full,
+  the loaded form on the nameplate is:" / «Escrita entera, la forma con carga
+  de la placa es:».
+- **`docs/DESIGN-PIXEL-ART.md`**: a new "Nameplate formulas" section, a new
+  contrast row, Iosevka slice sizes in bytes, and the two "with load"
+  screenshots retaken.
+
+### Checks run (first pass)
+
+| Check | Result |
+|---|---|
+| `pnpm build` (Node v22.23.2, inside `flock`) | Pass. "Prerendered 33 static routes". `main` 312.39 kB raw / 87.49 kB transfer. No warnings. |
+| `tools/axe-check.mjs`, default state, private copy `/tmp/eqv-dist` | **0 violations**: 33 routes × 4 theme states = 132 pages. |
+| axe with the **load on** (throwaway Playwright script, Chromium 1243 from `~/.a11y-tools`) | **0 violations**: divider page EN and ES × 4 theme states × 375 and 1280 px = 16 pages, with both accent runs present on every page. |
+| Accent colours (computed) | Light `#24221d` on `#f7f4ea`, dark `#0a0d0b` on `#ffb05c`. This is the plate pair swapped, so it has the same 14.44 and 10.80 ratios. Matches the new DESIGN-PIXEL-ART row. |
+| Forced colours (emulated) | The accent renders as Canvas on CanvasText (inverse) in light and dark. axe reports `color-contrast` on the nameplate text in forced-colours emulation on **both `main` and this branch**. This is an axe limitation: it does not model forced colours, and the screenshots show black on white. It is not caused by this change. |
+| Maths | R2 ∥ RL = 4.7k·10k/14.7k = 3.197 kΩ. Loaded Vout = 9 × 3.197/13.197 = **2.18 V**. Ideal = 9 × 4.7/14.7 = **2.88 V**. Error = 2.180/2.878 − 1 = **−24.2 %**. The loaded formula is the ideal divider with R2 replaced by R2 ∥ RL, which is correct. Both lessons quote the same 2.88 V, 3.20 kΩ, 2.18 V and 24 %. |
+| Readouts, worked example, typed from the keyboard | EN: Output 2.18 V, Unloaded 2.88 V, Error -24.2%, output impedance 3.2 kΩ, load current 218 µA. ES: 2,18 V / 2,88 V / -24,2 % / 3,2 kΩ / 218 µA. Default 10k/10k/10k: 3 V / 4.5 V / -33.3%. |
+| Keyboard only, EN and ES (1280 px) | Pass. I tabbed to the R2 box, typed `4.7k`, pressed Enter, tabbed to the Load switch and pressed Space twice. Each time the visible nameplate, the heading's accessible name and the drawing's `img` name all switched between the ideal and loaded forms. Focus stayed on the switch. The readouts went back to their unloaded values. No console errors or warnings, no page errors, and no Iosevka request with the load on. |
+| Prerendered HTML | EN and ES both ship the ideal form: sr-only `Vout = Vin × R2 / (R1 + R2)` plus the `aria-hidden` visible `Vout = Vin · R2 / (R1 + R2)`. There is no `R2||RL` in the static HTML, and there were no hydration errors. |
+| Other instruments (Panel backward compatibility) | Panel head and whole-panel screenshots of `ohm-law` and `resistor-network` (series and parallel) in EN and ES, at 375 and 1280 px, light and dark, are **byte-identical** to a `main` build. Accessible names are unchanged. The ideal divider is also byte-identical at 1280 px. At 375 px it differs only because the new prose above it moves the panel to a different sub-pixel `top`. Visually it is the same and the same height. Its heading name changes from `·` to `×` by design. |
+| Layout, 375/900/1280 px, EN/ES, light/dark | No horizontal scroll and no clipped heading in either state. The loaded form is one line at 900 and 1280 px and two lines at 375 px, where the strip goes from 37 to 62 px. At 320 px with the load on it is two lines, with no horizontal scroll. |
+| Wrap thresholds, fresh page per width | The loaded form wraps at a viewport of **≤ 495 px**, the ideal form at **≤ 365 px**. The shift therefore happens between 366 and 495 px. The design doc said 494 and 364; fixed below. |
+| Iosevka slice sizes (fetched from Google Fonts) | `math` 81,740 B and `symbols` 63,372 B. Matches the doc. |
+| CLAUDE.md Angular rules | `input()` and `computed()` are used, `[class.x]` bindings, native `@if`/`@for`. Zero hits under `src/` for `ngClass`, `ngStyle`, `HostBinding`, `HostListener`, `standalone: true`, `ChangeDetectionStrategy`, `any`, `@Input(`/`@Output(`, `*ngIf`/`*ngFor`, `console.log`. |
+| Repo hygiene | `git diff --check` is clean, all changed files are LF and 644, there are no untracked files, and `package.json` and `pnpm-lock.yaml` are unchanged. |
+| CLAUDE.md workflow vs tooling | Every path it names exists. `pnpm content`/`pnpm build`, `tools/axe-check.mjs` (all routes × 4 theme states), the CI `pnpm install --frozen-lockfile && pnpm build`, merge commits (PR #1) and the README compose deploy all match. See S1 and S2. |
+
+### Findings
+
+#### Resolution (second pass)
+
+| # | Severity | Status | Evidence |
+|---|---|---|---|
+| m-1 | Minor | **Resolved** | Option (a) was implemented (`headingAlt`, a shared grid cell, an invisible `aria-hidden` reserve). The switch `top`, strip height and grille edge are identical across off → on → off in 90 of 90 runs: 15 widths from 320 to 1280 px, EN/ES, light/dark/forced/reduced, nameplate in view. |
+| m-2 | Minor | **Resolved** | EN and ES now define `∥` and say that `R2\|\|RL` is shorthand for R₂ ∥ R_load / R_carga and not a C logical OR. |
+| S1 | Suggestion | **Resolved** | `course-reviewer.md` has a "Per-change verification" mode that matches CLAUDE.md step 4. Its edit restriction is now limited to the full review, and its build line uses `flock`. |
+| S2 | Suggestion | **Resolved** | CLAUDE.md steps 3 and 4 now say to copy `dist/electronics` inside the same `flock` and run axe on the copy. |
+| S3 | Suggestion | Open (new, does not block) | `.claude/agents/course-reviewer.md:75`: "### Classification" says "This applies to both modes", but it is nested under "## Full review", while the per-change section points to it ("see Classification"). Move Classification up to a top-level `##` section between the two modes, and leave Deliverables under Full review. |
+
+#### First-pass findings (as raised)
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-1 | Minor | Accessibility / Design | `src/app/ui/panel.ts` (h3), `src/app/widgets/divider/divider.ts` (`LOADED_HEADING`); trade-off recorded in `docs/DESIGN-PIXEL-ART.md` §Nameplate formulas | At viewports of 366–495 px the loaded form wraps, so switching the load on grows the nameplate by 25 px. Everything below it moves down 25 px, including the Load switch the reader just pressed (57 % of its 44 px height), and switching off moves it back up. Measured in Chromium: scroll anchoring cancels the shift only when the nameplate is above the viewport. When the nameplate is in view, which is the case the new prose asks for ("watch the formula … change as you do"), the switch moves 25 px. On 375×812 and 393×852 viewports, with the nameplate just under the masthead, the switch is on screen and moves on every toggle. WebKit was not tested. This is not a strict WCAG 2.2 AA failure, because it is user-initiated and not a change of context. It is still a regression from `main`, where toggling never moved the switch. **Fix (owner's choice): reserve the taller form's height so both states are the same size.** (a) Preferred: render both forms in the same grid cell (`display: grid` on the visible wrapper, both in `grid-area: 1 / 1`, the inactive one `visibility: hidden` and `aria-hidden`). The strip then always takes the height of the taller form at any width and language, with no magic numbers. This needs a backward-compatible Panel input for the alternate heading, and the ideal state gets the two-line strip only below 496 px. (b) Simpler: a container-query `min-height` of two lines on the divider's h3 at narrow panel widths. It hard-codes a threshold that depends on font metrics. (c) A visible loaded form short enough to stay on one line at 375 px, such as the `Rp` option in the design doc. It was rejected there because it no longer matches the prose. |
+| m-2 | Minor | Pedagogy / Content parity | `content/en/00-fundamentals/03-voltage-divider.md:42-45`, `content/es/00-fundamentals/03-voltage-divider.md:45-48` | The reader meets three notations for "in parallel" (the words, `∥` in the prose formula, `\|\|` on the nameplate) and two names for the load (`R_load`/`R_carga` in the prose, `RL` on the nameplate and the drawing). Nothing says they are the same thing. "Written out in full" implies it but does not state it. `∥` is not defined anywhere in the course, and `\|\|` means logical OR in C/Arduino, which this audience meets (the same lesson targets an ATmega328P ADC). Add one clause in both languages. EN: "Written out in full, the loaded form on the nameplate (where `R2\|\|RL` is the instrument's shorthand for R₂ ∥ R_load, R₂ in parallel with the load) is:". ES: «Escrita entera, la forma con carga de la placa (donde `R2\|\|RL` es la abreviatura del instrumento para R₂ ∥ R_carga, R₂ en paralelo con la carga) es:». |
+| S1 | Suggestion | Docs (workflow) | `CLAUDE.md` step 4 vs `.claude/agents/course-reviewer.md` | Step 4 names `course-reviewer.md` as the verifier's method and lets the verifier fix trivial issues. That file says it edits only `REVIEW.md`/`BIBLIOGRAPHY.md`, lists roadmap and bibliography deliverables, and builds without `flock`. Add a short "Per-change verification" section to `course-reviewer.md` that mirrors step 4, so the two instructions do not conflict. |
+| S2 | Suggestion | Docs (workflow) | `CLAUDE.md` step 3 | Step 3 wraps builds in `flock` but does not say to run axe on a private copy of `dist/electronics`, which the `tools/axe-check.mjs` header asks for whenever builds may run at the same time. Parallel agents make that likely. Add: "run axe on a private copy (`cp -r dist/electronics /tmp/<name>`, then `AXE_TOOLS_DIR=… node tools/axe-check.mjs /tmp/<name>/browser`)". |
+
+### Fixed during verification
+
+- `docs/DESIGN-PIXEL-ART.md` §Nameplate formulas, "Layout cost": the wrap
+  thresholds were 1 px off. "494 px" is now "495 px" and "364 px" is now
+  "365 px". I measured with a fresh page per viewport width (363–366 and
+  493–496 px) in the same Playwright Chromium, with identical results in EN
+  and ES. This edit only touches the doc. The build output is unaffected.
+- Second pass: in the `panel.ts` row of `docs/DESIGN-PIXEL-ART.md`'s file
+  table, "Without `headingAlt` the markup and rendering are unchanged" was not
+  accurate. Compared with `main`, a plain-string heading now sits in a wrapper
+  `<span>`, but it renders byte-identically. It now reads "nothing is reserved
+  and the rendering is unchanged (a plain-string heading gains only a wrapper
+  `<span>`)". This edit only touches the doc.
+
+### Ready to merge: yes
+
+First pass: no, because m-1 and m-2 were open. Second pass: **yes**. m-1, m-2,
+S1 and S2 are resolved and I re-verified each one. Build and axe pass with the
+load off and on. The keyboard and switch-stability tests pass in EN and ES.
+The other instruments are byte-identical to `main`. No Blocker, Major or Minor
+finding is open in this change's scope. S3 is a Suggestion and does not block
+the merge.
+
 ## 0. Verification pass (2026-10-01)
 
 This is an independent check of the fixes made after the original review

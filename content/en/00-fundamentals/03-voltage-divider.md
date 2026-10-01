@@ -31,14 +31,17 @@ divide by two, and so do 1 MΩ and 1 MΩ.
 
 ## What happens when you connect something
 
-Here is the part that matters. Set the load below to "none" and the formula
-holds exactly. Then connect a load and watch the output sag.
+Here is the part that matters. With the Load switch below off, reading "None",
+the formula holds exactly. Then switch it on and watch the output sag, and watch
+the formula on the instrument's nameplate change to the loaded form as you do.
 
 ::widget{type="divider" vin="9" r1="10k" r2="10k"}
 
 Nothing is broken. A load is just another resistor, and connecting it across R₂
 puts it **in parallel** with R₂ — the rule from the previous lesson. The divider
-is still a divider; it just is not the divider you drew:
+is still a divider; it just is not the divider you drew. Read `∥` as "in
+parallel with": the nameplate's `R2||RL` is the instrument's shorthand for
+R₂ ∥ R_load, not a logical OR from C. Written out in full, the loaded form is:
 
 `V_out = V_in × (R₂ ∥ R_load) / (R₁ + (R₂ ∥ R_load))`
 
