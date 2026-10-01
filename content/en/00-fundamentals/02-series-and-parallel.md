@@ -36,6 +36,14 @@ For exactly two resistors, the shortcut is easier:
 Here the **voltage is identical across every branch**, and the current divides in
 inverse proportion to resistance — the lower resistance takes the larger share.
 
+Both rules come from two deeper ones, **Kirchhoff's laws**. The current law: the
+currents flowing into any node add up to the currents flowing out, because
+charge does not pile up or vanish at a junction. The voltage law: the voltages
+around any closed loop add up to zero. The identical current in a series chain
+is the current law at work; the identical voltage across parallel branches is
+the voltage law. Kirchhoff's laws get a lesson of their own later in this
+module, for the networks that series and parallel cannot reduce.
+
 Build a network below and watch the equivalent value, the branch currents and
 the power in each part.
 
@@ -67,14 +75,18 @@ Two situations where these rules stop being academic:
 
 **Getting a value you do not have.** Resistors come in preferred series — E12,
 E24 — not in every value you might want. Need 15 kΩ and have a drawer of 10 kΩ
-and 33 kΩ? A 10 kΩ in series with a 4.7 kΩ gets you to 14.7 kΩ, inside the
-tolerance band of most jobs.
+and 33 kΩ? Two 10 kΩ in parallel make 5 kΩ, and a third 10 kΩ in series with
+that pair gets you to exactly 15 kΩ — both rules from this lesson, and nothing
+from outside the drawer.
 
-**Sharing current.** Two 1 Ω resistors in parallel are 0.5 Ω, but they also split
-the current in half — so each dissipates a *quarter* of the power a single
-0.5 Ω part would have to handle, since `P = I² × R` and the current through each
-one is halved. Paralleling parts to spread heat is standard practice in power
-circuits, and it works because of the square in that equation.
+**Sharing current.** Two 1 Ω resistors in parallel are 0.5 Ω, and they also
+split the current in half. Since `P = I² × R`, each one dissipates
+`(I/2)² × 1 Ω = I²/4`, while a single 0.5 Ω part carrying the whole current
+would dissipate `I² × 0.5 Ω = I²/2`. So each resistor handles *half* the power
+of the single part it replaces (and a quarter of what one 1 Ω resistor would
+carrying all the current). Paralleling identical parts to spread heat is
+standard practice in power circuits: the total power does not change, but each
+part only has to survive its share of it.
 
 ## Everything is in parallel with something
 
@@ -86,7 +98,8 @@ Connect a multimeter across a resistor and you have put the meter's input
 impedance — typically 10 MΩ — in parallel with it. Against a 1 kΩ resistor,
 10 MΩ in parallel changes the value by 0.01 %, which is invisible. Against a
 1 MΩ resistor it changes it by 9 %, and your measurement is now measuring your
-meter.
+meter. The multimeter gets its own lesson later in this module, including what
+it does to the circuit it measures.
 
 That effect — the act of connecting something changes the thing you connected it
 to — is called **loading**, and the next lesson is about the circuit where it

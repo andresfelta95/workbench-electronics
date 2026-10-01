@@ -8,6 +8,12 @@ import { Component, computed, Directive, input } from '@angular/core';
  * inherits `currentColor` — which means one drawing works in both themes.
  *
  * Symbols are attribute selectors on `svg:g` so they stay valid SVG.
+ *
+ * Pixel skin: the canvas renders with `crispEdges`, strokes are whole units
+ * with square caps and mitred joins, junctions and terminals are squares, and
+ * current flow moves in discrete steps. Colours come from the `--pix-*` tokens
+ * when the canvas sits inside a panel, and fall back to the prose tokens when
+ * it does not.
  */
 
 export const GRID = 10;
@@ -27,12 +33,13 @@ export const GRID = 10;
   styles: `
     :host {
       display: block;
-      color: var(--ink);
+      color: var(--pix-screen-ink, var(--ink));
     }
     svg {
       width: 100%;
       height: auto;
       overflow: visible;
+      shape-rendering: crispEdges;
     }
   `,
 })
@@ -63,36 +70,58 @@ const SYMBOL_STYLES = `
   :host {
     display: contents;
   }
-  .sch {
-    transition: opacity 160ms ease, color 160ms ease;
+  .stroke,
+  .fill {
+    transition: opacity 160ms steps(2, end);
   }
-  .sch--dim {
-    opacity: 0.28;
+  /* Dimming fades the drawing, never the text: dimmed strokes keep at least
+     3:1 on the screen, and dimmed labels switch to the muted ink (at least
+     6.5:1) instead of going transparent. */
+  .sch--dim .stroke,
+  .sch--dim .fill {
+    opacity: 0.55;
+  }
+  .sch--dim .label,
+  .sch--dim .accent {
+    fill: var(--pix-screen-muted, var(--muted));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stroke,
+    .fill {
+      transition: none;
+    }
   }
   .stroke {
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    stroke-width: 2;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
   }
+  .fill {
+    fill: currentColor;
+  }
+  .sch--hot {
+    color: var(--pix-hot, var(--copper));
+  }
+  /* 4, not 3: an even width on whole-unit coordinates keeps both edges on
+     unit boundaries, so crispEdges cannot round it to 2 or 4 unpredictably. */
   .sch--hot .stroke {
-    stroke: var(--copper);
-    stroke-width: 2.1;
+    stroke-width: 4;
+  }
+  .label,
+  .value {
+    font-family: var(--pix-font, var(--mono));
+    font-size: var(--pix-sch-text, 10px);
   }
   .label {
-    font-family: var(--mono);
-    font-size: 10px;
     fill: currentColor;
   }
   .value {
-    font-family: var(--mono);
-    font-size: 10px;
-    fill: var(--muted);
+    fill: var(--pix-screen-muted, var(--muted));
   }
-  .sch--hot .label,
   .sch--hot .value {
-    fill: var(--copper);
+    fill: currentColor;
   }
 `;
 
@@ -172,12 +201,12 @@ export class SchSource extends SchSymbol {
 })
 export class SchGround extends SchSymbol {}
 
-/** Open terminal: a labelled node you would clip a probe to. */
+/** Open terminal: a labelled node you would clip a probe to. Drawn as a hollow square pad. */
 @Component({
   selector: 'svg:g[schTerminal]',
   template: `
     <svg:g [attr.transform]="transform()" [attr.class]="klass()">
-      <svg:circle class="stroke" cx="0" cy="0" r="4" />
+      <svg:rect class="stroke" x="-4" y="-4" width="8" height="8" />
       <svg:text class="label" [attr.x]="right() ? 10 : -10" [attr.text-anchor]="right() ? 'start' : 'end'" y="4">
         {{ name() }}
       </svg:text>
@@ -190,12 +219,12 @@ export class SchTerminal extends SchSymbol {
   readonly right = input(false);
 }
 
-/** Solid dot marking a real electrical junction, as opposed to a crossing. */
+/** Solid dot (a square pixel block) marking a real electrical junction, as opposed to a crossing. */
 @Component({
   selector: 'svg:g[schJunction]',
   template: `
     <svg:g [attr.transform]="transform()" [attr.class]="klass()">
-      <svg:circle cx="0" cy="0" r="3" fill="currentColor" />
+      <svg:rect class="fill" x="-3" y="-3" width="6" height="6" />
     </svg:g>
   `,
   styles: SYMBOL_STYLES,
@@ -206,6 +235,10 @@ export class SchJunction extends SchSymbol {}
  * A wire. `d` is an ordinary SVG path in grid units multiplied by GRID by the
  * caller, and `flow` animates a dashed overlay along it at a speed proportional
  * to the current — the cheapest way to make a current path legible.
+ *
+ * The dashes are square blocks (4 on, 10 off, butt caps) that jump 4 units per
+ * step instead of gliding: steps(7) over a 28-unit cycle, i.e. two dash periods,
+ * so the loop is seamless.
  */
 @Component({
   selector: 'svg:g[schWire]',
@@ -225,12 +258,13 @@ export class SchJunction extends SchSymbol {}
     ${SYMBOL_STYLES}
     .flow {
       fill: none;
-      stroke: var(--copper);
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-dasharray: 1 13;
+      stroke: var(--pix-flow, var(--copper));
+      stroke-width: 4;
+      stroke-linecap: butt;
+      stroke-linejoin: miter;
+      stroke-dasharray: 4 10;
       animation-name: sch-flow;
-      animation-timing-function: linear;
+      animation-timing-function: steps(7, end);
       animation-iteration-count: infinite;
     }
     @keyframes sch-flow {
@@ -241,7 +275,6 @@ export class SchJunction extends SchSymbol {}
     @media (prefers-reduced-motion: reduce) {
       .flow {
         animation: none;
-        stroke-dasharray: 1 13;
       }
     }
   `,
@@ -269,9 +302,9 @@ export class SchWire extends SchSymbol {
   styles: `
     ${SYMBOL_STYLES}
     .accent {
-      font-family: var(--mono);
-      font-size: 10px;
-      fill: var(--copper);
+      font-family: var(--pix-font, var(--mono));
+      font-size: var(--pix-sch-text, 10px);
+      fill: var(--pix-hot, var(--copper));
     }
   `,
 })

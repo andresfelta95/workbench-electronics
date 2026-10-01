@@ -15,7 +15,8 @@ condition that textbooks tend to mention once and move on from.
 `V_out = V_in × R₂ / (R₁ + R₂)`
 
 The derivation takes one line and is worth doing once rather than memorising the
-result. The two resistors are in series, so the same current flows through both:
+result. The two resistors are in series, so the same current flows through both
+(Kirchhoff's current law, which gets its own lesson later in this module):
 
 `I = V_in / (R₁ + R₂)`
 
@@ -33,7 +34,7 @@ divide by two, and so do 1 MΩ and 1 MΩ.
 Here is the part that matters. Set the load below to "none" and the formula
 holds exactly. Then connect a load and watch the output sag.
 
-::widget{type="divider" vin="9" r1="10k" r2="10k" load="none"}
+::widget{type="divider" vin="9" r1="10k" r2="10k"}
 
 Nothing is broken. A load is just another resistor, and connecting it across R₂
 puts it **in parallel** with R₂ — the rule from the previous lesson. The divider
@@ -71,9 +72,11 @@ those two numbers.
 ## Where dividers are the right answer
 
 **Reading a voltage that is too high for your microcontroller.** A 12 V battery
-into a 3.3 V ADC input, through a divider that scales it to 3.0 V. The ADC input
-is high impedance — typically megohms — so a 10 kΩ / 3.3 kΩ divider loads
-negligibly. This is the textbook-correct use.
+into a 3.3 V ADC input, through a divider that scales it to 3.0 V. The ADC draws
+almost no DC current, but its sampling capacitor wants a source impedance below
+about 10 kΩ (the ATmega328P datasheet asks for 10 kΩ or less). A 10 kΩ / 3.3 kΩ
+divider has an output impedance of about 2.5 kΩ, comfortably inside that. This
+is the textbook-correct use.
 
 **Setting a reference or a threshold.** Feeding the input of a comparator or a
 regulator's feedback pin, both of which draw almost no current.

@@ -1,0 +1,387 @@
+/* ==========================================================================
+   Pixel instrument skin
+   --------------------------------------------------------------------------
+   The prose stays editorial; the instruments are 8/16-bit bench gear. Every
+   token here is scoped to `.pix`, the host class `app-panel` stamps on itself,
+   so nothing in this file can reach lesson prose, the masthead or the home
+   page. Same three theme states as the prose tokens in styles.scss: bare
+   light, `prefers-color-scheme: dark` guarded against an explicit light
+   choice, and an explicit `[data-theme='dark']` stamp.
+
+   One unit, `--px`, drives every border, bevel, offset and gap. Shadows are
+   hard offsets only: no blur, no border-radius anywhere under `.pix`.
+
+   See docs/DESIGN-PIXEL-ART.md for the palette, contrast ratios and the
+   checklist a new widget follows.
+   ========================================================================== */
+
+/* Light: a putty-cased bench meter with a green reflective LCD. */
+@mixin pix-light {
+  --pix-page: #eff1ef; // the prose --bg the panel sits on (reference only)
+  --pix-case: #e3dfcf;
+  --pix-hi: #f7f4ea;
+  --pix-lo: #b3ad97;
+  --pix-line: #24221d;
+  --pix-shadow: #9c9784;
+  --pix-ink: #1e1f1a;
+  --pix-muted: #4d4b40;
+
+  --pix-plate: #24221d;
+  --pix-plate-ink: #f7f4ea;
+  --pix-plate-dither: #4a463c;
+  --pix-led: #d9692a;
+
+  --pix-lcd: #c4d1a8;
+  --pix-lcd-shade: #b0bf93;
+  --pix-lcd-ink: #17251a;
+  --pix-lcd-muted: #3a4e33;
+
+  --pix-screen: #d6dec0;
+  --pix-screen-ink: #17251a;
+  --pix-screen-muted: #3a4e33;
+
+  --pix-accent: #8a3f12;
+  --pix-signal: #12544f;
+  --pix-warn: #764006;
+  --pix-danger: #9a2017;
+  --pix-hot: #8a3f12;
+  --pix-flow: #a24d17;
+  --pix-fill: #a24d17;
+  --pix-focus: #8a3f12;
+  --pix-key-on: #8a3f12;
+  --pix-key-on-ink: #f7f4ea;
+}
+
+/* Dark: its own palette, not an inversion. Gunmetal case, CRT phosphor on
+   black: green for values and drawings, amber for whatever is "live". */
+@mixin pix-dark {
+  --pix-page: #0f1313;
+  --pix-case: #1a1f1c;
+  --pix-hi: #38423c;
+  --pix-lo: #0a0d0b;
+  --pix-line: #718278;
+  --pix-shadow: #000000;
+  --pix-ink: #dfe9e2;
+  --pix-muted: #9db0a5;
+
+  --pix-plate: #0a0d0b;
+  --pix-plate-ink: #ffb05c;
+  --pix-plate-dither: #26302a;
+  --pix-led: #8cf5a8;
+
+  --pix-lcd: #050a07;
+  --pix-lcd-shade: #0f1a13;
+  --pix-lcd-ink: #8cf5a8;
+  --pix-lcd-muted: #62a87a;
+
+  --pix-screen: #07100b;
+  --pix-screen-ink: #8cf5a8;
+  --pix-screen-muted: #62a87a;
+
+  --pix-accent: #ffb05c;
+  --pix-signal: #62e0d4;
+  --pix-warn: #ffd75e;
+  --pix-danger: #ff8070;
+  --pix-hot: #ffb05c;
+  --pix-flow: #ffb05c;
+  --pix-fill: #ffb05c;
+  --pix-focus: #ffb05c;
+  --pix-key-on: #ffb05c;
+  --pix-key-on-ink: #1a1f1c;
+}
+
+/* Composite tokens. Declared once on `.pix`: a custom property resolves its
+   var() references against the declaring element's final values, so theme
+   and breakpoint overrides of the palette or --px flow through. A descendant
+   that overrides, say, --pix-hi must re-include this mixin. */
+@mixin pix-composites {
+  /* Raised: light top-left, dark bottom-right. Sunken is the reverse. */
+  --pix-raised:
+    inset var(--px) var(--px) 0 var(--pix-hi), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--pix-lo);
+  --pix-sunken:
+    inset var(--px) var(--px) 0 var(--pix-lo), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--pix-hi);
+  /* A one-unit outline drawn outside the box with the corners left out:
+     the classic notched pixel corner, without border-radius. */
+  --pix-edge:
+    0 calc(-1 * var(--px)) 0 0 var(--pix-line), 0 var(--px) 0 0 var(--pix-line),
+    calc(-1 * var(--px)) 0 0 0 var(--pix-line), var(--px) 0 0 0 var(--pix-line);
+  --pix-drop: calc(2 * var(--px)) calc(2 * var(--px)) 0 0 var(--pix-shadow);
+}
+
+.pix {
+  @include pix-light;
+  --px: 2px;
+
+  /* VT323 (as Google serves it: Latin only) for everything it has, which is
+     every digit, µ, ×, · and the Spanish accents. Greek (Ω τ β θ…) comes from
+     JetBrains Mono's 4 KiB Greek slice; ∥, arrows and subscripts from Iosevka
+     Charon Mono, whose slices are only fetched if such a glyph is on screen.
+     font-size-adjust below scales both to VT323's cell. See
+     docs/DESIGN-PIXEL-ART.md, "Glyph coverage". */
+  --pix-font: 'VT323', 'JetBrains Mono', 'Iosevka Charon Mono', var(--mono);
+  --pix-text-sm: 18px;
+  --pix-text: 20px;
+  --pix-text-lg: 25px;
+  --pix-text-xl: 32px;
+  --pix-sch-text: 14px;
+
+  @include pix-composites;
+
+  /* Scale every fallback face to VT323's x-height (0.40 em). This keeps a
+     Greek or symbol glyph the same size as the VT323 text around it, and stops
+     the panel reflowing if VT323 itself is late or blocked. */
+  font-size-adjust: 0.4;
+}
+
+@media (min-width: 1200px) {
+  .pix {
+    --px: 3px;
+  }
+}
+
+/* Phones: the drawing is at most ~340 px wide there, so 14-unit labels would
+   render near 13.5 px (and VT323 reads small for its size). */
+@media (max-width: 520px) {
+  .pix {
+    --pix-sch-text: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .pix {
+    @include pix-dark;
+  }
+}
+
+:root[data-theme='dark'] .pix {
+  @include pix-dark;
+}
+
+/* Focus: a square, one-unit ring in the focus colour, clear of the notched
+   edge. Overrides the global rounded :focus-visible inside instruments. */
+.pix :focus-visible {
+  outline: var(--px) solid var(--pix-focus);
+  outline-offset: calc(2 * var(--px));
+  border-radius: 0;
+}
+
+/* Slot layout -------------------------------------------------------------
+   The Panel projects these wrappers; laying them out here means a new widget
+   does not restate the same flex/grid boilerplate. */
+
+/* When the panel stacks (narrow), the screen spans the full width; cap the
+   drawing so it does not balloon to 600+ px and push the controls off screen. */
+.pix [panelFigure] {
+  width: 100%;
+  max-width: 480px;
+}
+
+.pix [panelControls] {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--px));
+}
+
+.pix [panelReadouts] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: calc(2 * var(--px));
+}
+
+/* Kit ----------------------------------------------------------------------
+   Hardware parts for widget-specific controls. Native elements underneath,
+   always: these only restyle buttons, radios and checkboxes. */
+
+/* Engraved separator between groups of controls. */
+.pix-rule {
+  border-top: var(--px) solid var(--pix-lo);
+  box-shadow: inset 0 var(--px) 0 var(--pix-hi);
+  padding-top: calc(5 * var(--px));
+}
+
+/* Keycap: a <button>, or a <label> wrapping a visually hidden radio. */
+.pix-key {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(3 * var(--px));
+  min-height: 44px;
+  padding: 0 calc(6 * var(--px));
+  border: 0;
+  border-radius: 0;
+  background: var(--pix-hi);
+  color: var(--pix-ink);
+  font-family: var(--pix-font);
+  font-size: var(--pix-text);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow:
+    var(--pix-raised),
+    var(--pix-edge),
+    0 calc(2 * var(--px)) 0 0 var(--pix-line);
+}
+
+.pix-key:hover:not(:disabled) {
+  background: var(--pix-case);
+}
+
+.pix-key:active:not(:disabled),
+.pix-key--on {
+  transform: translateY(var(--px));
+  box-shadow:
+    var(--pix-sunken),
+    var(--pix-edge),
+    0 var(--px) 0 0 var(--pix-line);
+}
+
+.pix-key--on,
+.pix-key--on:hover:not(:disabled) {
+  background: var(--pix-key-on);
+  color: var(--pix-key-on-ink);
+}
+
+.pix-key:disabled {
+  background: var(--pix-case);
+  color: var(--pix-muted);
+  cursor: not-allowed;
+  box-shadow: var(--pix-edge);
+}
+
+.pix-key input[type='radio'],
+.pix-key input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.pix-key:has(input:focus-visible) {
+  outline: var(--px) solid var(--pix-focus);
+  outline-offset: calc(2 * var(--px));
+}
+
+/* A row of keycaps for a radio group. The square LED is the non-colour cue:
+   hollow when off, filled when on. It is drawn with border and background
+   (not box-shadow) and opts out of forced colours, so the cue survives
+   Windows high-contrast mode in the system text colour. */
+.pix-segment {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(3 * var(--px)) calc(4 * var(--px));
+}
+
+.pix-segment > legend {
+  padding: 0 0 calc(3 * var(--px));
+  font-family: var(--pix-font);
+  font-size: var(--pix-text);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pix-muted);
+}
+
+.pix-segment .pix-key::before {
+  content: '';
+  flex: none;
+  box-sizing: border-box;
+  width: calc(3 * var(--px));
+  height: calc(3 * var(--px));
+  border: var(--px) solid currentColor;
+  forced-color-adjust: none;
+}
+
+.pix-segment .pix-key--on::before {
+  background: currentColor;
+}
+
+/* Toggle switch: a <label class="pix-switch"> around a native checkbox. The
+   knob position is the non-colour cue; the label text states the value. */
+.pix-switch {
+  display: flex;
+  align-items: center;
+  gap: calc(4 * var(--px));
+  min-height: 44px;
+  padding: calc(2 * var(--px)) calc(5 * var(--px));
+  background: var(--pix-hi);
+  color: var(--pix-ink);
+  font-family: var(--pix-font);
+  font-size: var(--pix-text);
+  line-height: 1.1;
+  cursor: pointer;
+  box-shadow: var(--pix-raised), var(--pix-edge);
+}
+
+.pix-switch--on {
+  box-shadow: var(--pix-sunken), var(--pix-edge);
+}
+
+.pix-switch input {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: none;
+  margin: 0;
+  width: calc(14 * var(--px));
+  height: calc(8 * var(--px));
+  cursor: pointer;
+  background:
+    linear-gradient(var(--pix-line) 0 0) calc(2 * var(--px)) center / calc(5 * var(--px))
+      calc(4 * var(--px)) no-repeat,
+    var(--pix-lcd);
+  box-shadow: inset 0 0 0 var(--px) var(--pix-line);
+}
+
+/* On: the knob jumps right and takes the pressed-key colours, so knob and
+   track keep at least 3:1 against each other in both states. */
+.pix-switch input:checked {
+  background:
+    linear-gradient(var(--pix-key-on-ink) 0 0) right calc(2 * var(--px)) center /
+      calc(5 * var(--px)) calc(4 * var(--px)) no-repeat,
+    var(--pix-key-on);
+}
+
+/* Accessibility fallbacks --------------------------------------------------- */
+
+@media (prefers-contrast: more) {
+  /* Selector list matches the specificity of every theme state above. */
+  :root .pix,
+  :root[data-theme] .pix,
+  :root:not([data-theme='light']) .pix {
+    --pix-muted: var(--pix-ink);
+    --pix-lcd-muted: var(--pix-lcd-ink);
+    --pix-screen-muted: var(--pix-screen-ink);
+  }
+}
+
+/* Forced colours drop every box-shadow, which is where the pixel borders
+   live. Put real borders back and hand native controls back to the system. */
+@media (forced-colors: active) {
+  .pix-key,
+  .pix-switch {
+    border: var(--px) solid ButtonText;
+  }
+
+  .pix-key--on {
+    outline: var(--px) solid Highlight;
+  }
+
+  /* The LED opts out of forcing, so paint it in the system text colour
+     explicitly (its inherited colour would be the unforced palette ink). */
+  .pix-segment .pix-key::before {
+    border-color: ButtonText;
+  }
+
+  .pix-segment .pix-key--on::before {
+    background: ButtonText;
+  }
+
+  .pix-switch input {
+    -webkit-appearance: auto;
+    appearance: auto;
+  }
+}

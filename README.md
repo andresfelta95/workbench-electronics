@@ -58,8 +58,8 @@ git-ignored. `pnpm content` recreates them.
    one to the other:
 
    ```
-   content/en/02-time-and-frequency/01-rc-transient.md
-   content/es/02-time-and-frequency/01-rc-transient.md
+   content/en/02-time-and-frequency/03-rc-transient.md
+   content/es/02-time-and-frequency/03-rc-transient.md
    ```
 
 2. Front matter (all fields required except `minutes`):

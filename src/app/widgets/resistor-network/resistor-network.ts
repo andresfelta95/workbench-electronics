@@ -1,4 +1,13 @@
-import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  type ElementRef,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { I18n } from '../../core/i18n';
 import { formatSI, parseValue } from '../../core/format';
 import { SCHEMATIC } from '../../schematic/schematic';
@@ -20,6 +29,10 @@ interface Placement {
 
 const MAX_RESISTORS = 4;
 const MIN_RESISTORS = 2;
+
+// Same scheme as Control's ids: a module counter gives every instance its own
+// radio group name, so two of these widgets on one page never merge groups.
+let nextId = 0;
 
 /**
  * Builds a network and redraws the schematic from it. Watching the equivalent
@@ -52,13 +65,13 @@ const MIN_RESISTORS = 2;
       </div>
 
       <div panelControls>
-        <fieldset class="modes">
+        <fieldset class="pix-segment">
           <legend>{{ t().widget.arrangement }}</legend>
           @for (option of modes; track option.key) {
-            <label class="mode" [class.mode--on]="mode() === option.key">
+            <label class="pix-key" [class.pix-key--on]="mode() === option.key">
               <input
                 type="radio"
-                name="network-mode"
+                [name]="radioName"
                 [checked]="mode() === option.key"
                 (change)="mode.set(option.key)"
               />
@@ -82,17 +95,29 @@ const MIN_RESISTORS = 2;
           />
         }
 
-        <div class="actions">
-          <button type="button" (click)="add()" [disabled]="values().length >= max">
+        <div class="actions pix-rule">
+          <button
+            #addButton
+            type="button"
+            class="pix-key"
+            (click)="add()"
+            [disabled]="values().length >= max"
+          >
             {{ t().widget.add }}
           </button>
-          <button type="button" (click)="remove()" [disabled]="values().length <= min">
+          <button
+            #removeButton
+            type="button"
+            class="pix-key"
+            (click)="remove()"
+            [disabled]="values().length <= min"
+          >
             {{ t().widget.remove }}
           </button>
         </div>
       </div>
 
-      <div panelReadouts class="readouts">
+      <div panelReadouts>
         <app-readout [label]="t().widget.equivalent" [value]="text(total(), 'Ω')" tone="accent" />
         <app-readout [label]="t().widget.current" [value]="text(supplyCurrent(), 'A')" />
         <app-readout [label]="t().widget.power" [value]="text(totalPower(), 'W')" tone="signal" />
@@ -115,89 +140,10 @@ const MIN_RESISTORS = 2;
       width: 100%;
     }
 
-    .modes {
-      border: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .modes legend {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 0 7px;
-    }
-
-    .mode {
-      font-family: var(--mono);
-      font-size: 12px;
-      border: 1px solid var(--rule);
-      padding: 6px 11px;
-      cursor: pointer;
-      color: var(--muted);
-      background: var(--bg);
-    }
-
-    .mode--on {
-      border-color: var(--copper);
-      color: var(--copper);
-      background: var(--copper-soft);
-    }
-
-    .mode input {
-      position: absolute;
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .mode:focus-within {
-      outline: 2px solid var(--copper);
-      outline-offset: 2px;
-    }
-
     .actions {
       display: flex;
-      gap: 8px;
-      border-top: 1px solid var(--rule);
-      padding-top: 14px;
-    }
-
-    .actions button {
-      font-family: var(--mono);
-      font-size: 12px;
-      border: 1px solid var(--rule);
-      background: var(--bg);
-      color: var(--ink);
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-
-    .actions button:hover:not(:disabled) {
-      border-color: var(--copper);
-      color: var(--copper);
-    }
-
-    .actions button:disabled {
-      color: var(--faint);
-      cursor: not-allowed;
-    }
-
-    .readouts {
-      display: flex;
       flex-wrap: wrap;
-      gap: 1px;
-      background: var(--rule);
-      border-top: 1px solid var(--rule);
-    }
-
-    .readouts > * {
-      flex: 1 1 150px;
+      gap: calc(4 * var(--px));
     }
   `,
 })
@@ -209,6 +155,11 @@ export class ResistorNetworkWidget {
 
   protected readonly max = MAX_RESISTORS;
   protected readonly min = MIN_RESISTORS;
+
+  protected readonly radioName = `network-mode-${nextId++}`;
+
+  private readonly addButton = viewChild.required<ElementRef<HTMLButtonElement>>('addButton');
+  private readonly removeButton = viewChild.required<ElementRef<HTMLButtonElement>>('removeButton');
 
   protected readonly mode = signal<Mode>('series');
   protected readonly supply = linkedSignal(() => parseValue(this.props()['supply'], 9));
@@ -292,12 +243,18 @@ export class ResistorNetworkWidget {
     this.values.update((values) => values.map((current, i) => (i === index ? value : current)));
   }
 
+  /**
+   * A button that disables itself would drop keyboard focus to <body>, so at
+   * the limit focus moves to its sibling, which is always enabled by then.
+   */
   protected add(): void {
     this.values.update((values) => (values.length >= MAX_RESISTORS ? values : [...values, 10000]));
+    if (this.values().length >= MAX_RESISTORS) this.removeButton().nativeElement.focus();
   }
 
   protected remove(): void {
     this.values.update((values) => (values.length <= MIN_RESISTORS ? values : values.slice(0, -1)));
+    if (this.values().length <= MIN_RESISTORS) this.addButton().nativeElement.focus();
   }
 
   protected text(value: number, unit: string): string {

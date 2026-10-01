@@ -68,6 +68,7 @@ export interface UiStrings {
     outputImpedance: string;
     drawnCurrent: string;
     wasted: string;
+    exactValue: string;
   };
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
@@ -163,6 +164,7 @@ const en: UiStrings = {
     outputImpedance: 'Output impedance',
     drawnCurrent: 'Load current',
     wasted: 'Wasted in the divider',
+    exactValue: 'exact value',
   },
   theme: { toggle: 'Switch theme', light: 'Light', dark: 'Dark' },
   langSwitch: { label: 'Language', other: 'Español' },
@@ -267,6 +269,7 @@ const es: UiStrings = {
     outputImpedance: 'Impedancia de salida',
     drawnCurrent: 'Corriente de carga',
     wasted: 'Desperdiciado en el divisor',
+    exactValue: 'valor exacto',
   },
   theme: { toggle: 'Cambiar tema', light: 'Claro', dark: 'Oscuro' },
   langSwitch: { label: 'Idioma', other: 'English' },

@@ -38,6 +38,15 @@ Aquí **la tensión es idéntica en todas las ramas**, y la corriente se reparte
 forma inversamente proporcional a la resistencia: la rama de menor resistencia se
 lleva la porción mayor.
 
+Las dos reglas salen de otras dos más profundas, las **leyes de Kirchhoff**. La
+ley de corrientes: las corrientes que entran en un nodo suman lo mismo que las
+que salen, porque la carga no se acumula ni desaparece en una unión. La ley de
+tensiones: las tensiones alrededor de cualquier lazo cerrado suman cero. Que la
+corriente sea idéntica en toda una cadena en serie es la ley de corrientes en
+acción; que la tensión sea idéntica en todas las ramas en paralelo es la ley de
+tensiones. Las leyes de Kirchhoff tienen su propia lección más adelante en este
+módulo, para las redes que la serie y el paralelo no pueden reducir.
+
 Monta una red abajo y observa el valor equivalente, la corriente de cada rama y
 la potencia en cada componente.
 
@@ -70,15 +79,19 @@ Dos situaciones en las que estas reglas dejan de ser académicas:
 
 **Conseguir un valor que no tienes.** Las resistencias vienen en series
 normalizadas —E12, E24—, no en cualquier valor que se te ocurra. ¿Necesitas 15 kΩ
-y tienes un cajón de 10 kΩ y 33 kΩ? Una de 10 kΩ en serie con una de 4,7 kΩ te
-deja en 14,7 kΩ, dentro de la banda de tolerancia de casi cualquier trabajo.
+y tienes un cajón de 10 kΩ y 33 kΩ? Dos de 10 kΩ en paralelo dan 5 kΩ, y una
+tercera de 10 kΩ en serie con esa pareja te deja en 15 kΩ exactos: las dos
+reglas de esta lección, y nada que no esté en el cajón.
 
-**Repartir corriente.** Dos resistencias de 1 Ω en paralelo son 0,5 Ω, pero
-además parten la corriente por la mitad, así que cada una disipa una *cuarta*
-parte de la potencia que tendría que aguantar una sola pieza de 0,5 Ω, porque
-`P = I² × R` y la corriente por cada una es la mitad. Poner piezas en paralelo
-para repartir calor es práctica habitual en circuitos de potencia, y funciona
-precisamente por ese cuadrado.
+**Repartir corriente.** Dos resistencias de 1 Ω en paralelo son 0,5 Ω, y además
+parten la corriente por la mitad. Como `P = I² × R`, cada una disipa
+`(I/2)² × 1 Ω = I²/4`, mientras que una sola pieza de 0,5 Ω con toda la
+corriente disiparía `I² × 0,5 Ω = I²/2`. Así que cada resistencia aguanta la
+*mitad* de la potencia de la pieza única a la que sustituye (y una cuarta parte
+de lo que aguantaría una sola de 1 Ω con toda la corriente). Poner piezas
+iguales en paralelo para repartir calor es práctica habitual en circuitos de
+potencia: la potencia total no cambia, pero cada pieza solo tiene que soportar
+su parte.
 
 ## Todo está en paralelo con algo
 
@@ -90,7 +103,8 @@ Conecta un multímetro sobre una resistencia y habrás puesto la impedancia de
 entrada del aparato —típicamente 10 MΩ— en paralelo con ella. Frente a una
 resistencia de 1 kΩ, esos 10 MΩ cambian el valor un 0,01 %, que es invisible.
 Frente a una de 1 MΩ lo cambian un 9 %, y tu medida ha pasado a medir tu
-multímetro.
+multímetro. El multímetro tiene su propia lección más adelante en este módulo,
+incluido lo que le hace al circuito que mide.
 
 Ese efecto —el hecho de conectar algo altera aquello a lo que lo conectas— se
 llama **carga** (*loading*), y la lección siguiente trata del circuito donde más

@@ -3,7 +3,12 @@
    Tokens are declared for all three theme states: bare :root (light),
    prefers-color-scheme dark guarded against an explicit light choice, and
    an explicit [data-theme="dark"] stamp. Components only ever read tokens.
+
+   The interactive instruments wear a separate pixel-art skin, scoped to
+   `.pix` and kept in its own partial so it can never leak into the prose.
    ========================================================================== */
+
+@use 'styles/pixel';
 
 :root {
   --bg: #eff1ef;
@@ -11,15 +16,15 @@
   --surface-2: #e6eae7;
   --ink: #14181a;
   --muted: #5c6668;
-  --faint: #8a9492;
+  --faint: #656e6d; /* lightest text tone: keep >= 4.5:1 on --bg and --surface */
   --rule: #cbd3cf;
   --rule-strong: #aab4b0;
-  --copper: #a85b2b;
+  --copper: #a5592a;
   --copper-ink: #8f4b21;
   --copper-soft: #f2e5db;
   --signal: #1b6763;
   --signal-soft: #dfebe9;
-  --warn: #9a5b12;
+  --warn: #995a12;
   --warn-soft: #f6e8d5;
   --danger: #a33227;
   --danger-soft: #f6e0dd;
@@ -50,7 +55,7 @@
     --surface-2: #1e2525;
     --ink: #e4eae7;
     --muted: #9aa5a3;
-    --faint: #6e7a78;
+    --faint: #798684;
     --rule: #2b3433;
     --rule-strong: #3d4847;
     --copper: #d9854d;
@@ -74,7 +79,7 @@
   --surface-2: #1e2525;
   --ink: #e4eae7;
   --muted: #9aa5a3;
-  --faint: #6e7a78;
+  --faint: #798684;
   --rule: #2b3433;
   --rule-strong: #3d4847;
   --copper: #d9854d;
