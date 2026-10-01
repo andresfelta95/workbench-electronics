@@ -1,8 +1,8 @@
 # Roadmap: finishing every chapter
 
 Status on 2026-10-01: module 00 has three lessons and three instruments
-(`ohm-law`, `resistor-network`, `divider`). The pixel-art skin (A6) is built on
-branch `pixel-art-and-roadmap`, with the REVIEW M-10 layout fix applied.
+(`ohm-law`, `resistor-network`, `divider`). The pixel-art skin (A6) is built,
+with the REVIEW M-10 layout fix applied, and was merged in PR #1.
 Modules 01–11 exist only as `_module.md` and render as "being written". This
 document plans the rest: the shared infrastructure the remaining modules depend
 on, the reference board for module 11, a repeatable per-chapter workflow with a
@@ -33,7 +33,7 @@ tables; "matrix" refers to its §4 readiness matrix.
 | New Track H: the module 11 reference board in `hardware/`, with an owner, milestones H0–H5 starting with module 01, schematic freeze after 07, tested board before 11. | M-07; matrix 11 (❌) |
 | A2, A3, A4 "done when" now require text equivalents; A3 has a hard level cap, a visible playing indicator and an on-screen mirror of every audible effect. | M-09; matrix 08 |
 | New A8: glyph decision (τ, β, θ, →, ←, ₁, ₂, ∥, ×) before module 02. | M-11 (plan part), m-14 (plan part); matrix 02, 03, 05, 10 |
-| A7 extended: axe gate on every route in three theme states, unknown widget props, glyph coverage, contrast-table script. | M-12 (plan part), m-11 (plan part), s-07 |
+| A7 extended: axe gate on every route in four theme states, unknown widget props, glyph coverage, contrast-table script. | M-12 (plan part), m-11 (plan part), s-07 |
 | A5: bibliography entries may carry an `es:` alternate edition. | s-08 |
 | One-question briefs written for `zener-clamp`, `boost`, `inrush`, `electret-bias`, `relay-driver`, `ground-loop`. `cap-charge` replaced by `cap-holdup`. `stackup` cut: lessons 11-02 and 11-04 merged into `11-02-return-paths`, whose instrument gains the 2-vs-4-layer toggle. | m-02; matrix 01, 03, 05, 07, 08, 09, 11 |
 | Overlaps given one home: reverse polarity in 05-05 only; bulk capacitance in 05-04, decoupling in 11-04; the inductive kick in 02-04, applied in 09-02. Flyback (09-02) now precedes the H-bridge (09-03). | m-03; matrix 05, 09 |
@@ -46,18 +46,18 @@ tables; "matrix" refers to its §4 readiness matrix.
 | Module 03 intro states that transistors are taught as switches and amplification is left to op-amps. | s-06 |
 | Source gaps listed per module in §5 (08, 09, 10 have unverified notes in BIBLIOGRAPHY §8). | matrix 08, 09, 10 |
 
-**Follow-ups outside this file** (owned by the content and design agents, not
-done here). All of them landed on the same branch; see REVIEW §0 for the
-evidence:
-- `07-buses-and-instruments/_module.md` summary (EN/ES) still promises "how to
-  use a scope and a multimeter"; reword to "logic analysers and probing".
-  `02-time-and-frequency/_module.md` should mention AC signals and the scope.
-- Published 00-02 uses Kirchhoff's laws unnamed: name them and point to 00-04.
-  Its meter-loading paragraph should point to 00-05.
-- README's example path `02-time-and-frequency/01-rc-transient.md` is now
-  `03-rc-transient`.
-- Content fixes M-01, M-02, m-08, m-09, m-10, m-11 and the M-10/M-12 layout and
-  prose fixes are preconditions for "00 finish" (§5) but are not plan items.
+**Follow-ups outside this file** (owned by the content and design agents). All
+of them are done and were merged in PR #1; REVIEW §0 has the evidence:
+- Done: the `07-buses-and-instruments/_module.md` summary (EN/ES) promises
+  logic analysers and probing, not a scope and multimeter course; the
+  `02-time-and-frequency/_module.md` summary mentions AC signals and the scope.
+- Done: published 00-02 names Kirchhoff's laws and points ahead to their own
+  lesson (00-04); its meter-loading paragraph points ahead to the multimeter
+  lesson (00-05).
+- Done: README's example path is `02-time-and-frequency/03-rc-transient.md`.
+- Done: content fixes M-01, M-02, m-08, m-09, m-10, m-11 and the M-10/M-12
+  layout and prose fixes, the preconditions for "00 finish" (§5) that were not
+  plan items.
 
 ---
 
@@ -98,7 +98,7 @@ reference board (§2).
 | A4 | **Logic-analyser primitive** (`app-logic-trace`): stacked digital lanes, decoded byte annotations | Module 06 (debounce, PWM) and all of 07 | UART/SPI/I²C frames render from a bit array; **decoded frames also available as text (a list or table), and the lane under the cursor announced through a visually hidden summary** |
 | A5 | **References in content**: a `references:` list in lesson front matter (ids into `content/bibliography.yaml`), rendered as a "Sources and further reading" block; the build fails on an unknown id | Every lesson needs citable sources; one shared bibliography avoids 69 copies of Horowitz & Hill | `pnpm content` validates ids; an entry may carry an `es:` alternate edition, rendered on ES pages (Boylestad, Floyd, Malvino, Sedra & Smith, Franco have one) |
 | A6 | **Pixel-art instrument skin** (see `docs/DESIGN-PIXEL-ART.md`) applied to `Panel`, `Control`, `Readout`, the schematic canvas and the three existing widgets | Every new instrument inherits it for free if it lands before the first new widget | Both themes, WCAG AA, keyboard and reduced-motion intact, `pnpm build` passes; drawing fills at least about 70 % of its screen (REVIEW M-10) |
-| A7 | **Quality gates**: `ng test` specs for `core/format.ts` and each widget's arithmetic; axe over every prerendered route in light, system-dark and explicit-dark as a **build gate**; a check in `build-content.mjs` that every `::widget` type is registered **and every prop is known to that widget**; a **glyph-coverage check** of instrument strings against the pixel font; a script that regenerates the contrast table from `_pixel.scss` | Sixty-nine lessons cannot be checked by eye | Scriptable, documented in README. The axe gate turns on once the pre-existing prose failures (REVIEW M-12) are fixed; until then it runs in report mode |
+| A7 | **Quality gates**: `ng test` specs for `core/format.ts` and each widget's arithmetic; axe over every prerendered route in four theme states (light, system-dark, explicit dark, explicit light on a dark OS) as a **build gate**; a check in `build-content.mjs` that every `::widget` type is registered **and every prop is known to that widget**; a **glyph-coverage check** of instrument strings against the pixel font; a script that regenerates the contrast table from `_pixel.scss` | Sixty-nine lessons cannot be checked by eye | Scriptable, documented in README. The pre-existing prose failures (REVIEW M-12) are fixed, so nothing holds the axe gate back: `tools/axe-check.mjs` already covers every route in all four states and exits 1 on any violation. Still open: running it automatically on every build |
 | A8 | **Glyph decision** for τ, β, θ, →, ←, ₁, ₂, ∥ and the small `×` (VT323 lacks them; IBM Plex Mono lacks τ, β, θ, Ω, ∥) | `rc-transient` (τ, module 02), `bjt-switch` (β), `ldo-thermal`/`power-dissipation` (θ), `thermistor-divider` (β) | Before module 02 starts: one option chosen (ASCII names in instruments, a pixel Greek fallback face, or SVG glyphs like the tone glyphs), recorded in DESIGN-PIXEL-ART.md §Font, and enforced by the A7 glyph check. 00-06 avoids θ in instrument strings until then. **Status (2026-10-01):** the font side is recorded in DESIGN-PIXEL-ART.md §Glyph coverage: `--pix-font` falls back to JetBrains Mono for Greek and Iosevka Charon Mono for ∥, arrows and subscripts, and visible text prefers `·` to `×` and `R1` to `R₁`. Still open: the A7 glyph check |
 
 **Symbols by first use** (A1). Prose never draws a symbol the library lacks.
@@ -406,7 +406,7 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 |---|---|---|---|---|
 | Phase A | 0 | 4 primitives (A2–A4, symbols A1) + skin, refs, gates, glyphs | — | Unblocks everything; A1–A4 and A8 only before their first user |
 | Track H | 0 | 0 | — | Reference board, parallel from module 01 |
-| 00 finish | 4 | 4 | A5, A6, A7; meter symbol | Reuses existing symbols; content fixes from REVIEW land first |
+| 00 finish | 4 | 4 | A5, A6, A7; meter symbol | Reuses existing symbols; the content fixes from REVIEW have landed (PR #1) |
 | 01 | 5 | 4 | A1 (inductor, potentiometer) | |
 | 02 | 7 | 7 | A2, A3, A8 | First user of `app-trace` and audio |
 | 03 | 6 | 6 | A1 semiconductors | Biggest symbol demand |
@@ -424,10 +424,10 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 - Every lesson: both languages, at least one instrument (except the three marked
   none), at least two references, worked example reproducible in the instrument,
   and every `:::safety` callout §3.1 requires.
-- Axe gate passes on every prerendered route in light, system-dark and
-  explicit-dark; keyboard-only walkthrough of every instrument; 375 px layout
-  checked; every trace and audio instrument has a text equivalent; the A7 glyph
-  check passes.
+- Axe gate passes on every prerendered route in all four theme states (light,
+  system-dark, explicit dark, explicit light on a dark OS); keyboard-only
+  walkthrough of every instrument; 375 px layout checked; every trace and audio
+  instrument has a text equivalent; the A7 glyph check passes.
 - The reference board is downloadable from `hardware/reference-board/` and
   matches module 11.
 - `docs/BIBLIOGRAPHY.md` generated from `content/bibliography.yaml`.

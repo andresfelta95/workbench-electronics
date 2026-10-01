@@ -101,6 +101,25 @@ written" rather than disappearing — the full path is public from day one.
 Reuse `app-panel`, `app-control` and `app-readout` from `src/app/ui/`, and the
 symbols in `src/app/schematic/`. Every instrument must be operable from the
 keyboard: `app-control` pairs its slider with a real text box for that reason.
+Before you start, work through the "Adopting the skin in a new widget" checklist
+in [docs/DESIGN-PIXEL-ART.md](docs/DESIGN-PIXEL-ART.md).
+
+## Checks
+
+`tools/axe-check.mjs` runs axe over every prerendered route in all four theme
+states and exits 1 on any violation. The repo does not depend on Playwright, so
+install it once in a folder outside the repo and point `AXE_TOOLS_DIR` at it:
+
+```bash
+export AXE_TOOLS_DIR=/path/to/a11y-tools    # any folder outside the repo
+(mkdir -p "$AXE_TOOLS_DIR" && cd "$AXE_TOOLS_DIR" && npm init -y &&
+  npm i playwright @axe-core/playwright && npx playwright install chromium)
+
+pnpm build
+node tools/axe-check.mjs [distDir] [--route=/en/...] [--verbose]
+```
+
+The script's header has the details, including the four theme states.
 
 ## Deploy
 

@@ -29,7 +29,7 @@
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { extname, join, resolve } from 'node:path';
+import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 const toolsDir = process.env.AXE_TOOLS_DIR;
 if (!toolsDir) {
@@ -56,7 +56,13 @@ if (!routesFile) {
   process.exit(2);
 }
 let routes = Object.keys(JSON.parse(readFileSync(routesFile, 'utf8')).routes);
-if (onlyRoute) routes = routes.filter((r) => r === onlyRoute);
+if (onlyRoute !== undefined) {
+  routes = routes.filter((r) => r === onlyRoute);
+  if (routes.length === 0) {
+    console.error(`--route=${onlyRoute} matches no prerendered route in ${routesFile}.`);
+    process.exit(2);
+  }
+}
 
 const types = {
   '.html': 'text/html; charset=utf-8',
@@ -69,9 +75,18 @@ const types = {
 };
 
 const server = createServer((request, response) => {
-  const path = decodeURIComponent(new URL(request.url, 'http://x').pathname);
+  let path;
+  try {
+    path = decodeURIComponent(new URL(request.url, 'http://x').pathname);
+  } catch {
+    response.writeHead(400).end();
+    return;
+  }
   let file = join(distDir, path);
-  if (!file.startsWith(distDir)) {
+  // Reject anything that resolves outside distDir, including siblings that
+  // merely share its prefix (dist/electronics/browser-x).
+  const rel = relative(distDir, file);
+  if (rel === '..' || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
     response.writeHead(403).end();
     return;
   }

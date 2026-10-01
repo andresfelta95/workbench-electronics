@@ -57,7 +57,7 @@ None of these blocks the merge.
   - Prose tokens: light `--faint` `#656e6d` gives 4.62 on `--bg` and 5.06 on
     `--surface`. Dark `#798684` gives 4.95 and 4.60. Light `--copper`
     `#a5592a` on `--bg`: 4.55. Light `--warn` `#995a12` on `--warn-soft`: 4.55.
-- **Playwright** (Chromium 1243 from `/home/server_pc/.a11y-tools`; a
+- **Playwright** (Chromium 1243 from `$AXE_TOOLS_DIR`; a
   throwaway script outside the repo, against a private copy of the build):
   - **Console and hydration, every route.** All 33 routes in light and dark:
     no console errors or warnings, no page errors, no duplicate `id`s, no
@@ -482,13 +482,13 @@ Reviewer: ____  Date: ____  Commit: ____
 - [ ] ES lessons cite the Spanish edition where one exists
 
 **Accessibility (instrument)**
-- [ ] axe: 0 violations on the lesson route in light, system-dark and explicit-dark
+- [ ] axe: 0 violations on the lesson route in all four theme states (light, system-dark, explicit dark, explicit light on a dark OS; `tools/axe-check.mjs`)
 - [ ] Keyboard-only: every control reachable and operable; visible focus on every stop; focus never lost to `<body>` (e.g. when a button disables)
 - [ ] 375 px: no horizontal scroll; tap targets ≥ 44 px; schematic labels legible
 - [ ] Tone changes have a non-colour cue; new colours added to both mixins with ratios in DESIGN-PIXEL-ART.md
 - [ ] Reduced motion, `prefers-contrast: more` and `forced-colors` checked
 - [ ] Traces/audio (A2–A4): text equivalent present; audio muted by default, level-capped, mirrored visually
-- [ ] All instrument strings render in VT323 without fallback (glyph check)
+- [ ] Every instrument string renders within the instrument font stack (VT323 → JetBrains Mono → Iosevka Charon Mono; Ω always comes from JetBrains Mono) and never reaches IBM Plex Mono or a system font (glyph check)
 
 **Design and code**
 - [ ] Uses `app-panel` / `app-control` / `app-readout` / `sch-*` / kit classes; no inline symbols; widget CSS reads only `--pix-*` and `--px`

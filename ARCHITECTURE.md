@@ -25,7 +25,7 @@ no server-side search. What it buys:
 - **Indexability.** Search engines get complete HTML with the lesson text and
   the instrument's initial state already rendered, not an empty shell.
 - **Operational silence.** Nothing to crash at 3am, nothing to patch, nothing
-  to back up. The container is 128 MB of nginx serving 1.7 MB of output.
+  to back up. The container is 128 MB of nginx serving about 2 MB of output.
 - **Cost.** It runs in the noise of an existing home server.
 
 So when this document says "backend", it means the **build-time backend**: a
@@ -122,7 +122,7 @@ electronics/
 │       ├── lesson/             ← the Markdown → components renderer (215 lines)
 │       ├── pages/              ← the five routed views (1046 lines)
 │       ├── schematic/          ← SVG symbol library (327 lines)
-│       ├── ui/                 ← panel, control, readout primitives (546 lines)
+│       ├── ui/                 ← panel, control, readout primitives (548 lines)
 │       ├── widgets/            ← the instruments (663 lines)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
@@ -132,7 +132,7 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 5,000 lines of source, plus ~5,300 words of lesson prose so far.
+Roughly 5,000 lines of source, plus ~5,600 words of lesson prose so far.
 
 ---
 
@@ -463,7 +463,8 @@ follow from that. See `README.md`.
 **An instrument** is a standalone component taking `props`, registered in
 `lesson/widget-registry.ts` as a dynamic import. Reuse `Panel`, `Control` and
 `Readout`, draw with the `schematic/` symbols, and format numbers through
-`core/format.ts`.
+`core/format.ts`. Before building one, follow the "Adopting the skin in a new
+widget" checklist in `docs/DESIGN-PIXEL-ART.md`.
 
 Two rules that are not negotiable, because they are the point of the project:
 

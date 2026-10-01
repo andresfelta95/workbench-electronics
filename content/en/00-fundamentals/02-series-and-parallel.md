@@ -84,9 +84,9 @@ split the current in half. Since `P = I² × R`, each one dissipates
 `(I/2)² × 1 Ω = I²/4`, while a single 0.5 Ω part carrying the whole current
 would dissipate `I² × 0.5 Ω = I²/2`. So each resistor handles *half* the power
 of the single part it replaces (and a quarter of what one 1 Ω resistor would
-carrying all the current). Paralleling identical parts to spread heat is
-standard practice in power circuits: the total power does not change, but each
-part only has to survive its share of it.
+dissipate carrying all the current). Paralleling identical parts to spread
+heat is standard practice in power circuits: the total power does not change,
+but each part only has to survive its share of it.
 
 ## Everything is in parallel with something
 
