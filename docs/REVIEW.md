@@ -1,5 +1,215 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: Kirchhoff lesson and plain-writing rewrite (2026-10-02)
+
+This is an independent check of branch `content/kirchhoff-plain-writing`. It
+is an uncommitted working tree compared with `main` (`3daedce`), and I
+included the untracked files. I re-ran every check myself and did not take
+the agents' reports on trust.
+
+**Ready to merge: yes** (third pass, below). n-1 is resolved, and I
+re-verified it. No Blocker, Major or Minor finding is open in this change's
+scope. S8 is out of scope and does not block the merge.
+
+Second pass: no. The first pass found six Minor findings (m-1 to m-6) and
+eight Suggestions (S1 to S8). The fix round resolved all six Minor findings
+and S1 to S7, and I re-verified each one in the working tree, applying two
+trivial fixes as I went. That left one new Minor finding (n-1): the skill's
+own rule says every device figure needs a BIBLIOGRAPHY entry, and three
+figures in 01 and 03 had none.
+
+### Third pass: n-1 (2026-10-02)
+
+| Check (third pass) | Result |
+|---|---|
+| n-1, resistor ratings | **Resolved.** There are two new `docs/BIBLIOGRAPHY.md` §4 entries, each with `00-01 (…)` in its Modules column and listed in the module 00 map row. I extracted the text from both PDFs. `yageo-cfr` is YAGEO's "Product specification – April 3, 2024 V.3": "-25 = 1/4W", and the power-rating row "at 70 °C" gives CFR-25 as 1/4 W. That supports kit through-hole resistors being "usually 1/4 W". `yageo-rc-l` is "Product specification – November 14, 2025 V.14": RC0603 at "1/10 W" and a "1/5 W" high-power option. That supports small surface-mount parts being "often 1/10 W". The entries' titles, versions, dates and URLs match the documents. |
+| n-1, Wi-Fi board | **Resolved.** EN 03:148 now reads "run a small board, such as a Wi-Fi board. Say it takes 100 mA. It cannot work." ES 03:157-158 reads «…como una placa wifi. Supón que consume 100 mA. No puede funcionar.» The 100 mA is now plainly a supposition and needs no source. The reasoning that follows (about 10 Ω resistors, several watts) is unchanged and still holds. |
+| EN/ES parity, 03 | Same callouts (key, warning), 6 headings, the same `::widget` line, and identical number multisets (ES decimal commas converted). |
+| `pnpm build` (inside `flock`, private copy) | Pass. 35 routes, no warnings. |
+| `tools/axe-check.mjs` on the private copy | **0 violations**: 35 routes × 4 theme states = 140 pages, on the final tree after my re-wrap. |
+| Repo hygiene | `git diff --check` is clean, the files are LF, and no lesson line exceeds 80 columns outside tables, front matter and widget lines. |
+
+**Fixed during verification (third pass):** `content/es/00-fundamentals/03-voltage-divider.md:156-164`.
+The new ES sentence left line 158 at 82 columns, so I re-wrapped that
+paragraph to 80 columns. This is a whitespace change only. The words and the
+rendered output are unchanged, and I rebuilt and re-ran axe afterwards.
+
+#### Ready to merge: yes (third pass)
+
+m-1 to m-6, n-1 and S1 to S7 are resolved, and I verified each one myself. No
+Blocker, Major or Minor finding is open in this change's scope. S8 (the
+`ohm-law` 48 V slider maximum, and «esquemático» in
+`content/es/11-pcb/_module.md`) is outside the change and does not block the
+merge.
+
+The first-pass verdict was also "no". Build, axe, the behaviour test, layout,
+maths, parity, slugs, navigation and the safety policy all passed. The
+maintainer's actual request was mostly met: impedance defined plainly at
+first use, the AI tells gone, the examples concrete and almost all true. Six
+Minor findings were open. Four were terms or claims a beginner would trip on:
+Σ on the new nameplate, "protected cell", "cell", and "most chargers". The
+other two were a sourcing rule in the skill that could not be followed yet,
+and stale bundle figures in ARCHITECTURE.
+
+### Second pass: re-verification of the fixes (2026-10-02)
+
+What the fix round changed (content agent: lessons 01–04 in EN and ES, and
+`glossary.md`; docs agent: `SKILL.md`, `docs/BIBLIOGRAPHY.md`, `docs/ROADMAP.md`
+§1, `ARCHITECTURE.md` §4.3/§4.8). No file under `src/` changed: every source
+file's modification time predates the first pass.
+
+| Check (second pass) | Result |
+|---|---|
+| `pnpm build --verbose` (inside `flock`, copied to `/tmp/verify-dist` inside the same lock), after my own fix (a) | Pass. 35 routes. `main` 314.31 kB / 88.03 kB transfer. Lesson chunks 6.90–11.42 kB raw / 2.31–3.87 kB. Instruments: `ohm-law` 5.30, `resistor-network` 6.17, `divider` 6.45, `kirchhoff` 8.51 kB (1.82–2.92 kB). No warnings. |
+| `tools/axe-check.mjs` on the private copy | **0 violations**: 35 routes × 4 theme states = 140 pages, on both second-pass builds (before and after my fix (a)). |
+| Behaviour test, keyboard only, EN and ES (same script as the first pass, on the new build) | Same results as the first pass. Defaults VA 5 V, I3 1 mA. V2 = 3 gives I3 -1 mA "from A to V2" / «de A hacia V2», Power V2 -3 mW "absorbing (being charged)", KCL 0 A (in 5 mA = out 5 mA). V2 = 4.5 / 4,5 gives I3 0 A "no current" / «sin corriente». The slider works by arrow key. No page errors. |
+| Layout 375/900/1280 px, lessons 01–04 EN/ES, module pages, home pages | No horizontal scroll and no element outside the viewport on any of the 36 page/width pairs. The only "clipped" element is the intended sr-only `.panel__spoken`. |
+| Maths of touched numbers | The fixes added no numbers. The only number-bearing edits are the Uno note in 03 (5 V and 3.3 V, both true; the 10 kΩ limit does not depend on supply) and my fix (a), which keeps 11 V, so 11 × 2.7/12.7 = 2.34 V and the 11–14.4 V bench range still hold. Number multisets match between EN and ES in all four lessons (ES decimal commas converted). |
+| EN/ES parity | Same callouts and tones, heading counts (5/6/6/8) and `::widget` lines (byte-identical between languages, and to `main` for 01–03). Slugs unchanged. No decimal points in ES prose, no em dashes anywhere. |
+| Glossary consistency | New rows `cell` / «pila (también celda)» (00-01), `protected cell` / «celda protegida» (00-04) and `Σ (sigma)` (00-04) match the lesson wording word for word. The LED row says "many chargers". The Spanish term decisions gain the «pila»/«celda» rule, which 01 ES («Una **pila** AA (una sola unidad de batería, también llamada **celda**)») and 04 ES follow. No row mentions lead-acid any more. |
+| New BIBLIOGRAPHY entries (7) | All exist and support the cited figures. `yuasa-powersports-manual`: text extracted from the PDF has "12.6 volts … or higher" (fully charged), "< 11.80v" at 0 %, "fully discharged when the voltage reaches 10.5 volts" (capacity test), "between 13.0 and 14.5 volts" (working charging system), "between 14.0 and 14.8 volts" (AGM), "Reaches 14.4 volt peak" (its charger). `bu-403`: "2.30V to 2.45V per cell", float "2.25V to 2.27V/cell", "2.10V … about 90 percent", updated 8 Dec 2023. `kingbright-wp7113id`: Spec DSAF0012 Rev V.14A, high-efficiency red, V_F 1.9 V typ. / 2.3 V max. at I_F = 10 mA. `fluke-11x-manual`: DC volts input impedance > 10 MΩ, < 100 pF. `fender-tm-twin-reverb`: Input 1 1 MΩ, Input 2 136 kΩ. `energizer-alkaline-ais`: "not designed for recharging … leakage or, in some cases, high pressure rupture". `usb-if-usb2` §7.2.1: a bus-powered hub's controller and downstream ports are fed from V_BUS on its upstream port. The Yuasa manual is for powersports batteries; it is cited for 12 V lead-acid chemistry, which a car battery shares, and BU-403 backs the same figures, so this is acceptable. |
+| SKILL.md | §4 now has the interim rule (source each device figure in BIBLIOGRAPHY by lesson id, list new entries in the PR body, move them to `references:` when A5 lands, and "a figure with no entry is a review finding"). §7 and the §8 checklist point to it. The humanizer attribution now separates its voice "calibration" from §2's "calibrate, do not over-correct". |
+| ROADMAP / ARCHITECTURE | ROADMAP §1 records the exception: 00-04 shipped before A5/A7 at the maintainer's request, with the BIBLIOGRAPHY interim rule as the bridge. ARCHITECTURE §4.3 ("5.3–8.5 kB") and §4.8 (314/88 kB; lessons 6.9–11.4 kB / 2.3–3.9 kB; instruments 5.3–8.5 kB / 1.8–2.9 kB; dated 2026-10-02) match this build when rounded. |
+| Remaining tells | The three S5 sentences are gone ("This lesson explains…", "Thinking in conductance…", "…nothing in the circuit would look broken"). There are no hits for exactly/entire/instantly/crucial/worth/simply in the EN lessons, and none for "lead-acid", "most chargers" or "(lesson 01)" in any lesson. |
+| Repo hygiene | `git diff --check` is clean, every changed and new file is LF, and the untracked files are only the skill, the two 04 lessons and the widget folder. The lessons now keep to the 80-column wrap (S7). |
+
+#### Resolution
+
+| # | Severity | Status | Evidence |
+|---|---|---|---|
+| m-1 | Minor | **Resolved** | EN 04:82-83 "The formula at the top of the instrument, `ΣI = 0, ΣV = 0`, is both laws in short: Σ (the Greek letter sigma) means "add up all the", each with its sign." ES 04 the same («la suma de todas las», cada una con su signo). Glossary row added. |
+| m-2 | Minor | **Resolved** | EN 04:133-135 "Use only a protected cell: one with a small built-in circuit that cuts it off if it is overcharged, run flat or has its + and − terminals joined directly." ES matches («celda protegida: una con un pequeño circuito interno…»). It is still inside the `:::safety` callout and still in line with §3.1. Glossary row added. |
+| m-3 | Minor | **Resolved** | EN 01:30 "An AA **cell** (a single battery unit) gives 1.5 V". ES 01 defines «pila» and says it is also called «celda», which 04 ES then uses. Glossary row and ES term rule added. |
+| m-4 | Minor | **Resolved** | EN 01:25 "many chargers", ES 01 «muchos cargadores», glossary LED row likewise. |
+| m-5 | Minor | **Resolved**, but see n-1 | The skill's interim rule exists and is followable. The 14/14.4 V, 12.6 V, about 11 V, 1 MΩ, 10 MΩ, about 2 V, 5 V and alkaline figures are now sourced, and ROADMAP §1 records the A5/A7 exception. |
+| m-6 | Minor | **Resolved** | ARCHITECTURE §4.3/§4.8 match this build (see the table). |
+| S1 | Suggestion | **Resolved** | "(lesson 01)" / «(lección 01)» removed from 04's electron-drift sentence. |
+| S2 | Suggestion | **Resolved** | EN 01:23 "Current flowing through a part is what makes it do something." ES «La corriente que atraviesa una pieza es lo que la hace funcionar.» |
+| S3 | Suggestion | **Resolved** | "lead-acid" / «plomo-ácido» removed from 03 and 04 ("a car's 12 V battery", "typical figures for a 12 V car battery"). |
+| S4 | Suggestion | **Resolved** | EN 03:127-128 "The Uno runs this chip at 5 V, so its input reads up to 5 V. The 10 kΩ limit is the same when the chip runs at 3.3 V." ES the same. True: the datasheet's 10 kΩ figure does not depend on the supply. |
+| S5 | Suggestion | **Resolved** | All three sentences cut or rewritten (01 opening now "One equation links them with a third quantity, resistance."). |
+| S6 | Suggestion | **Resolved** | SKILL.md Sources reworded, as above. |
+| S7 | Suggestion | **Resolved** | No lesson line over 80 columns outside tables, front matter and widget lines. I rewrapped ROADMAP:14 myself (below). |
+| S8 | Suggestion | Open (out of scope, does not block) | Unchanged: the `ohm-law` slider maximum of 48 V, and «esquemático» in `content/es/11-pcb/_module.md`. |
+| n-1 | Minor | **Resolved in the third pass** (raised in the second) | See below and "Third pass". |
+
+#### New finding
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| n-1 | Minor | References | `content/en/00-fundamentals/01-ohms-law.md:97-99` (and ES 01:105-107): kit resistors "usually 1/4 W", surface-mount "often 1/10 W"; `content/en/00-fundamentals/03-voltage-divider.md:148` (ES 03:157-158): "a Wi-Fi board, that takes 100 mA"; `docs/BIBLIOGRAPHY.md:13-18` | SKILL.md §4 now says "every quantitative claim about a real device … needs an entry … A figure with no entry is a review finding", and the BIBLIOGRAPHY's interim-rule paragraph says the 00-01 to 00-04 entries were added and checked. These three device figures have no entry. Add two resistor datasheets under §4, for example Yageo's CFR carbon-film series (through-hole, 1/4 W) and RC_L chip series (0603 at 1/10 W, at 70 °C), each with `00-01 (…)` in the Modules column and in the module map. For the Wi-Fi board, either cite a module datasheet that supports about 100 mA (for example Espressif's), or make the number plainly a supposition ("say it takes 100 mA" / «supón que consume 100 mA»), which needs no source. |
+
+#### Fixed during verification (second pass)
+
+- **(a) "about 11 V when nearly flat"**, `content/en/00-fundamentals/03-voltage-divider.md:110-112`
+  and `content/es/00-fundamentals/03-voltage-divider.md:116-118`. On its own
+  this was not true: Yuasa gives under 11.8 V at rest for a 0 % battery and
+  10.5 V as fully discharged under a test load, so about 11 V is a reading
+  under load. EN now reads "It reads about 11 V when it is nearly flat and
+  powering a load, and up to about 14.4 V while the engine charges it
+  (typical figures)". ES reads «Marca unos 11 V cuando está casi descargada y
+  alimentando una carga, y hasta unos 14,4 V…». "Load" / «carga» is
+  defined earlier in the same lesson. The 11 V arithmetic (2.34 V) and the
+  11–14.4 V bench-supply range are unchanged. I rebuilt and re-ran axe after
+  this edit.
+- **(b) ARCHITECTURE lesson-chunk range**: I checked it against the final
+  build (6.90–11.42 kB raw, 2.31–3.87 kB transfer). The docs agent's
+  "6.9–11.4 kB" and "2.3–3.9 kB" already match when rounded, so no edit was
+  needed.
+- `docs/ROADMAP.md:14`: rewrapped the over-long line left over from S7. This
+  is a whitespace change only.
+
+#### Ready to merge: no (second pass)
+
+m-1 to m-6 and S1 to S7 are resolved, and I verified each one in the working
+tree. n-1 is open. It is a small References fix: two resistor datasheet
+entries and either a source or a "say it takes" rewording for the Wi-Fi board,
+which goes to the docs agent (plus the content agent if the wording changes).
+S8 is out of scope and does not block the merge.
+
+### What changed
+
+- **New project skill** `.claude/skills/course-writing/SKILL.md` (voice, ten
+  AI tells, first-use definitions, real examples, structure, Spanish rules,
+  course invariants, self-check, sources) and `glossary.md` (every module 00
+  term with its status and its EN/ES definition). `CLAUDE.md` gains a
+  "Writing lessons" section that points to both.
+- **New instrument** `kirchhoff`. It has two sources, three resistors and
+  node A, and shows KCL at A, KVL around both loops, source power with
+  delivering/absorbing status, and direction arrows. It is made of
+  `kirchhoff.ts`, the pure `kirchhoff-math.ts` and `kirchhoff-math.spec.ts`.
+  It adds a new `schCurrent` arrow symbol and fixes a resistor lead gap
+  (the horizontal body is now 30 units, so lead and body meet) in
+  `schematic.ts`. It also adds a registry entry, 16 new EN/ES `widget` keys,
+  and 12 ES wording fixes in `ui.ts` (agregar, sitios, archivos, esquemas,
+  «Agregar resistor», «en preparación»…).
+- **Rewrites** of lessons 01–03 and `_module.md` for module 00, in EN and ES.
+- **New lesson** `content/{en,es}/00-fundamentals/04-kirchhoff.md`.
+- **ROADMAP**: the module 00 status and every count (4 of 7, 65/62 to write,
+  totals still 69/66).
+
+### Checks run
+
+| Check | Result |
+|---|---|
+| `pnpm build` (Node v22.23.2, inside `flock`, copied to `/tmp/verify-dist` inside the same lock) | Pass. **35 routes** prerendered (33 + 04 in two languages). `main` 314.31 kB raw / 88.02 kB transfer. `kirchhoff` chunk 8.51 kB. No warnings. |
+| `tools/axe-check.mjs` on the private copy | **0 violations**: 35 routes × 4 theme states = 140 pages (light 0, system-dark 0, dark 0, light-forced 0). |
+| Instrument maths | `kirchhoff-math.spec.ts` run through a throwaway node harness: **10/10 pass**. Independent check: I solved the same network by mesh analysis (2×2 Cramer) for 20,000 random cases (0–24 V, 10 Ω–100 kΩ). The worst relative error was 1.6e-12, and KCL and both KVL sums came out exactly 0 every time. Closed form VA = (V1/R1 + V2/R3)/(1/R1 + 1/R2 + 1/R3) is correct. P1 = V1·I1 and P2 = V2·I3 are correct for the stated sign convention. |
+| Behaviour test, keyboard only (Playwright, 1280 px), EN and ES | Pass. Defaults: VA 5 V; I1 4 mA from V1 to A; I2 5 mA from A to ground; I3 1 mA from V2 to A; P1 36 mW and P2 6 mW, both delivering; KCL 0 A "in 5 mA = out 5 mA"; KVL "9 V - 4 V - 5 V" = 0 V and "6 V - 1 V - 5 V" = 0 V. I tabbed to the V2 box (9 Tabs), typed `3` and pressed Enter. VA 4 V; **I3 -1 mA "from A to V2"**; **Power V2 -3 mW "absorbing (being charged)"**, warn tone; **KCL 0 A**, in 5 mA = out 5 mA; right loop "3 V + 1 V - 4 V" = 0 V. The I3 arrow flips (`rotate(0)`) and turns hot, and V2 is highlighted. With V2 = `4.5` (ES `4,5`): **I3 0 A "no current"**, its arrowhead is dropped, Power V2 0 W "neither (no power)". The V2 slider moves by arrow key (4.5 → 4.56 V), its focus ring is a solid 3 px outline, and KCL stays 0 A. The drawing's `aria-label` summary updates with each change. There were no page or console errors. ES gives the same values with decimal commas («de A hacia V2», «absorbiendo (se está cargando)», «LCK en A», «LVK lazo derecho»). |
+| Layout 375/900/1280 px: lessons 01–04, EN/ES, module pages, home pages | No horizontal scroll on any of the 36 page/width pairs, and no element outside the viewport. The only "clipped" element is the intended sr-only `.panel__spoken`. Screenshots checked: at 375 px the kirchhoff panel stacks drawing → controls → sign-convention note → readouts two per row, and nothing overlaps. At 900 and 1280 px the readouts sit two per row under the screen. Long labels ("KVL LEFT LOOP: V1 - I1·R1 - I2·R2", «LVK LAZO IZQUIERDO…») wrap inside their cells. The resistor lead-gap fix renders correctly in `ohm-law` and `resistor-network`. The divider uses vertical resistors and is unchanged. |
+| Lesson maths (every number recomputed, then compared with the widget's displayed precision) | All correct. 01: 9/470 = 19.1 mA; 3.0/220 = 13.6 mA; 40.9 mW; 22/220 = 100 mA, 2.2 W ≈ 8.8× 1/4 W. 02: 5.7 kΩ, 1.58 mA (screenshot: 1.58 mA); 1k ∥ 4.7k = 825 Ω; 10 MΩ across 1 kΩ is 0.01 %, across 1 MΩ is 9.1 %; the 15 kΩ build; the I²/4 vs I²/2 heat split; 10 × 1 kΩ = 100 Ω and 0.01 S. 03: 3 V and 4.48 V loaded; quiescent 4.05 mW and 405 mW (the widget computes V²/(R1+R2), independent of load, so these hold with the load on); Z_out 5 kΩ, 4.5 × 10/15 = 3 V, 5 kΩ halves, 500 kΩ ≈ 1 %; 3.06 V, 2.34 V, 15.5 V; 10k ∥ 2.7k = 2.13 kΩ; 24 V gives 5.1 V; 2.88 V, 3.20 kΩ, 2.18 V, 24.2 %. The 10×/100× key rule is conservative and true: equal resistors 10× below the load give ≤ 5 % error, and 100× gives ≤ 0.5 %. 04: VA 5 V, 4/1/5 mA, both loops; V2 = 3 gives 4 V, −1 mA, −3 mW, "3 V + 1 V - 4 V"; the 4.5 V turning point; LED loop 5 − 2 − 3 = 0. Readout quotes match what the widget shows, character for character, including its ASCII `-`. |
+| EN/ES parity | Same headings (5/6/6/8), same callouts and tones (01 key+note, 02 key, 03 key+warning, 04 key+safety+note), byte-identical `::widget` lines, same numbers. ES uses decimal commas throughout (no `d.d` outside widget lines), «…» quotes, tú, agregar/computadora/auto, «en el LED caen», «tierra», «lazo» (with «malla» named once in 04), «LVK»/«LCK» explained in 04. ES 04 has two term sentences EN does not need (malla, ley de voltajes); the skill requires them. UI labels quoted in prose (Solve for/«Calcular», Arrangement/«Conexión», Parallel/«Paralelo», Load/«Carga», None/«Ninguna», «Desperdiciado en el divisor», Error, KCL at A/«LCK en A», V2 box) all exist in `ui.ts`. |
+| Published ids, slugs, widget lines | Slugs of 01–03 and `_module.md` are unchanged in both languages (`ohms-law`/`ley-de-ohm`, `series-and-parallel`/`serie-y-paralelo`, `voltage-divider`/`divisor-de-tension`, `fundamentals`/`fundamentos`). Every 01–03 `::widget` line is byte-identical to `main`. |
+| Navigation and language switch | Prev/next is 01 → 02 → 03 → 04 in both languages. 03 "Next" → Kirchhoff's Laws / Las leyes de Kirchhoff; 04 has only "Previous" (05 is unpublished). The 04 switcher goes to `/es/fundamentos/leyes-de-kirchhoff` and back to `/en/fundamentals/kirchhoff`. hreflang en/es/x-default is correct. Both module pages list 00.1–00.4. |
+| §3.1 safety policy | Pass. 04 carries `:::safety` for batteries (alkaline charging, loose cells in parallel, mixing cells, NiMH charger, Li-ion only with a ready-made charger and a protected cell), and it is the same in EN and ES. The car battery appears only as a real-world example. 03 tells the reader to use a bench supply at 11–14.4 V, "not a car battery", and 04 says "Try the reversal in the instrument, not with real batteries". Every suggested build stays ≤ 24 V. The instrument clamps presets and controls to 0–24 V. No mains appliance is used as an example. |
+| CLAUDE.md Angular rules (new widget, symbol) | Pass. `input()`, `linkedSignal()`, `computed()`, `model()` via `[(value)]`, native `@for`, inline template, `inject()`. No `standalone`, OnPush, `ngClass`/`ngStyle`, `@HostBinding`, `any` or `mutate`. The arithmetic is in a pure function with a spec (ROADMAP §3 step 4). Widget CSS reads only `--pix-*` tokens. The new symbol uses even 2-unit stair steps and `class="fill"`. `unbroken()` really inserts U+00A0 (checked byte-wise). |
+| First-use definitions (01 → 04, EN and ES, read in order) | Impedance is now defined plainly at first use (03 §"Output impedance", EN and ES), along with DC/continua, Z_out and input impedance. Before that point, 03 says "impedance" nowhere. Every `glossary.md` row marked "defined in 00-0N" is defined in that lesson, and the "not used yet" rows are really unused (pull-up, signal, short, network, polarity, PCB). Gaps found: m-1, m-2, m-3, S3. |
+| AI tells (SKILL.md §2) | No em dashes in any of the ten files. No inflated vocabulary, no "not X, but Y" reversals, no bolded slogans (bold is only on defined terms and list lead-ins). Average sentence length is 14.6–17.9 words in every file (target < 20). The few sentences over 30 words are definitions with parentheses. Remaining mild cases are in S5. The growth (01 +41 %, 02 +30 %, 03 +57 % in EN; 04 is 1,443 words) comes from first-use definitions and examples, not padding. The instrument walkthroughs are kept to what the reader must type and what to look for. |
+| Real examples, fact checks | True: the ATmega328P datasheet's "output impedance of approximately 10 kΩ or less" (§ADC, BIBLIOGRAPHY `microchip-atmega328p`); a resting 12 V lead-acid battery at about 12.6 V and alternator charging at about 13.7–14.7 V (14 / 14.4 V as "typical"); a typical 10 MΩ DMM input; guitar amp inputs of about 1 MΩ (Fender's high input 1 MΩ); a red LED at about 2 V; USB power meters reading a shunt; a bus-powered USB hub as KCL; a TV remote's two AA cells in series; headlights in parallel; a car USB charger using a regulator; the alkaline-charging hazard (gas, then leaking caustic KOH or rupture; manufacturers warn against charging and against mixing old and new cells). One overclaim: m-4. |
+| The skill itself | Concrete and checkable: ten numbered tells with bad/good pairs, a term-status method, numeric targets, and a self-check list. Its Spanish rules agree with the lessons and `ui.ts` (lazo, LVK/LCK, tierra, resistor vs resistencia: the part is «resistor» everywhere, including «Agregar resistor»). Sources exist and say what is claimed: WP:AISIGNS (negative parallelisms, rule of three, em dashes, boldface, AI vocabulary, section summaries), blader/humanizer ("staging instead of stating", rhythm, read-aloud check), the Federal Plain Language Guidelines 2011 (average 15–20 words, one idea per sentence), digital.gov (active voice, "you"), the Google style guide (define jargon at first use), and Guía SAIJ (sujeto + verbo + complementos, voz activa). Issues: m-5, S6. |
+| Docs consistency | README is still accurate. ROADMAP: the module 00 table, counts and §5 totals are correct (4 + 65 = 69, 4 + 62 = 66), and I fixed the A1 symbol list (below). ARCHITECTURE: I fixed the route count, directory map, line counts and word count (below). Bundle figures remain stale: m-6. DESIGN-PIXEL-ART has no widget or symbol list that needs `kirchhoff`, and the new widget follows its "Adopting the skin" checklist. |
+| Repo hygiene | `git diff --check` is clean. All changed and new text files are LF. There are no stray scratch lessons or files: the untracked files are exactly the skill folder, the two 04 lessons and the widget folder. `package.json` and the lockfile are unchanged. Some reflowed Markdown lines exceed the usual wrap (S7). |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-1 | Minor | Pedagogy | `src/app/widgets/kirchhoff/kirchhoff.ts:267` (nameplate `ΣI = 0, ΣV = 0`); `content/en/00-fundamentals/04-kirchhoff.md` §"The current law"…`:::key`; ES the same | The nameplate shows Σ, which no lesson defines. This is the same situation as the `∥`/`R2\|\|RL` notation REVIEW m-2 required 03 to explain. In EN and ES 04, add one sentence after the `:::key` callout. EN: "The instrument's nameplate writes the two laws as `ΣI = 0, ΣV = 0`: Σ (the Greek letter sigma) means "add up all the"." ES: «La placa del instrumento escribe las dos leyes como `ΣI = 0, ΣV = 0`: Σ (la letra griega sigma) significa «la suma de todas las».» Then add a `glossary.md` row. |
+| m-2 | Minor | Pedagogy / Safety | `content/en/00-fundamentals/04-kirchhoff.md:129-130`, `content/es/00-fundamentals/04-kirchhoff.md:139-142` | The safety callout tells the reader what to use ("a ready-made charger board with a protected cell" / «una celda protegida») but never says what a protected cell is, so the reader cannot follow it. Define it in the same sentence. EN: "a protected cell (one with a small built-in circuit that cuts it off if it is overcharged, run flat or shorted)". ES to match. Then add a `glossary.md` row. |
+| m-3 | Minor | Pedagogy / Content parity | `content/en/00-fundamentals/01-ohms-law.md:30` (first "AA cell"), `02-series-and-parallel.md:29`; `content/es/00-fundamentals/04-kirchhoff.md:139-141` («celdas», «celda») | EN uses "cell" from 01 on, and 04's safety callout depends on it ("loose cells", "a fresher cell beside it"), but no lesson says that a cell is one single battery unit. ES uses «pila» everywhere until 04 switches to «celda» for Li-ion without explaining it. EN 01: "An AA cell (a single battery unit) gives 1.5 V". ES 04: introduce «celda» once («las celdas, es decir, las pilas, de litio-ion…») or keep «pila». Record both in `glossary.md`. |
+| m-4 | Minor | Technical accuracy | `content/en/00-fundamentals/01-ohms-law.md:25` "like the power light on most chargers"; `content/es/00-fundamentals/01-ohms-law.md:26-27` «casi cualquier cargador» | This overstates the facts. Most phone chargers, such as the common USB wall adapters, have no power light. The example itself (an LED as a power light) is real, so this is Minor, not Major. Write "many chargers" / «muchos cargadores», or use a specific true case such as "the power light on a laptop charger or a USB hub". |
+| m-5 | Minor | References / Plan | `.claude/skills/course-writing/SKILL.md` §4 ("Quantitative claims also need a source in `references:`") and §7; `docs/ROADMAP.md` §1 (A5/A7 gate "00 finish (04–07)") | No author can follow the skill's sourcing rule today: A5 is not built, `content/bibliography.yaml` does not exist, and `build-content.mjs` knows nothing of `references:`. So 03 and 04 now carry new quantitative figures with no traceable source: about 14 V/14.4 V charging, 12.6 V resting, 11 V flat, about 1 MΩ amp input. ROADMAP also gates 00-04 on A5/A7, and 04 shipped ahead of that gate without a recorded exception. Do three things. (1) In SKILL.md §4 and §8, say: "until A5 lands, add each figure's source to `docs/BIBLIOGRAPHY.md` (module map row) and list it in the PR body". (2) Add verified BIBLIOGRAPHY entries for the lead-acid/alternator voltages and the guitar-amp input impedance (the ATmega328P entry already exists). (3) Add one line to ROADMAP §1 or §5: "04 shipped before A5/A7 at the maintainer's request; its `references:` are owed when A5 lands". |
+| m-6 | Minor | Docs | `ARCHITECTURE.md` §4.3 ("lazy chunk of 5–6.5 kB") and §4.8 table ("312 kB / 87 kB", "Per-lesson chunk 5.5–7 kB", "Per-instrument chunk 5–6.5 kB", dated 2026-10-01) | This build gives `main` 314.31 kB / 88.02 kB, lesson chunks 6.95–11.30 kB raw (2.32–3.85 kB transfer), and the `kirchhoff` chunk 8.51 kB / 2.92 kB, so both ranges are out of date. Update them from a `pnpm build --verbose` run, which lists every chunk, and re-date the line. I did not do this myself because the default output hides the `ohm-law` chunk. |
+| S1 | Suggestion | Pedagogy | `content/en/00-fundamentals/04-kirchhoff.md:38-39`, ES `:42-43` | "electrons, which drift the other way (lesson 01)": lesson 01 covers their slow drift, not their direction. Make it "(lesson 01 showed how slowly they drift)", or drop the pointer. |
+| S2 | Suggestion | Technical accuracy | `content/en/00-fundamentals/01-ohms-law.md:23`, ES `:24` | "Current is what does the work in a circuit" sits uneasily with the lesson's own "what gets used up is energy". Consider "Current flowing through a part is what makes it do something: it warms a wire…". |
+| S3 | Suggestion | Pedagogy | `03-voltage-divider.md:110`, `04-kirchhoff.md:120` (EN and ES) | "lead-acid" / «plomo-ácido» is used without a gloss. Add "(the usual rechargeable car battery)" at first use, or drop the word, since the argument does not need it. |
+| S4 | Suggestion | Technical accuracy | `content/en/00-fundamentals/03-voltage-divider.md:8-9, 124-125`, ES `:8-10, 133-134` | The opening microcontroller reads 0–3.3 V. The ADC requirement then cites the ATmega328P "on an Arduino Uno", whose ADC reads 0–5 V at the Uno's 5 V supply. Nothing stated is false, but an Uno owner may infer a 3.3 V range. Add "(at 3.3 V; an Uno runs it at 5 V)", or name a 3.3 V board. |
+| S5 | Suggestion | Pedagogy (style) | `01-ohms-law.md:9-11` "This lesson explains both, adds resistance, and shows the equation…"; `02-series-and-parallel.md:89-90` "Thinking in conductance makes parallel sums easy."; `03-voltage-divider.md:172-173` "…and nothing in the circuit would look broken." (and ES counterparts) | These are the last mild tells: an announcement, a summary closer, and a punchline closer (SKILL.md §1, §2.7, §2.9). Each one is tolerable alone. Cut or merge them if the content agent touches these paragraphs again. |
+| S6 | Suggestion | References | `.claude/skills/course-writing/SKILL.md:253-254` | blader/humanizer's "calibration" means matching a sample of the user's own voice, not "do not over-correct", which is how §2 uses the word. Reword it as "(staging instead of stating, rhythm by rule, the read-aloud check)", and keep the calibration idea as the skill's own. |
+| S7 | Suggestion | Code (hygiene) | `content/en/00-fundamentals/02-series-and-parallel.md:52`, `03-voltage-divider.md:125`; `content/es/00-fundamentals/02-series-and-parallel.md:54`, `03-voltage-divider.md:108,122,134`; `docs/ROADMAP.md:14` | Reflowed lines overrun the 80-column wrap the rest of the files use. This is cosmetic only: re-wrap them. |
+| S8 | Suggestion | Plan (out of scope) | `src/app/widgets/ohm-law/ohm-law.ts` (Voltage slider max 48 V); `content/es/11-pcb/_module.md:3` («Del esquemático a la PCB») | These predate the change. The `ohm-law` slider goes above the §3.1 24 V ceiling. It is a simulation, but the new `kirchhoff` widget clamps to 24 V for this reason. The module 11 title uses «esquemático» where the skill and 00-01 use «esquema». Align both in a later change. |
+
+### Fixed during verification
+
+- `ARCHITECTURE.md` §3: added `04-kirchhoff.md` to the directory map. Updated
+  the line counts to the working tree: `i18n/ui.ts` 293 → 349,
+  `lesson/` 215 → 216, `schematic/` 327 → 374, `widgets/` 686 → "1215 lines,
+  plus a 107-line spec". Prose went from "~5,600" to "~11,200" words, using
+  the same method that gives 5,617 on `main`: body words of every `.md`, EN +
+  ES, excluding front matter and widget lines.
+- `ARCHITECTURE.md` §5.2: "33 prerendered routes" → "35" (from this build).
+- `docs/ROADMAP.md` A1 row: the "today" symbol list now includes
+  "current arrow" (`schCurrent`).
+
+These edits only touch docs. The build output is unaffected.
+
+### Ready to merge: no
+
+m-1 to m-6 are open. Each one is small: four are one-sentence prose or
+glossary edits in EN and ES (content agent), one is a SKILL.md, BIBLIOGRAPHY
+and ROADMAP note (docs agent), and one is a refresh of the bundle figures
+(docs agent). S1–S8 do not block the merge.
+
 ## Verification: divider loaded equation (2026-10-01)
 
 This is an independent check of branch `divider-loaded-equation`, an

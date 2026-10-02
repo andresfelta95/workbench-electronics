@@ -71,6 +71,24 @@ export interface UiStrings {
     drawnCurrent: string;
     wasted: string;
     exactValue: string;
+    /** Kirchhoff instrument. The formulas themselves are built in the widget. */
+    kirchhoffSpoken: string;
+    kirchhoffCircuit: string;
+    nodeVoltage: string;
+    /** Direction words, composed as "<from> V1 <to> A". */
+    from: string;
+    to: string;
+    ground: string;
+    noCurrent: string;
+    delivering: string;
+    absorbing: string;
+    noPower: string;
+    kcl: string;
+    kvlLeft: string;
+    kvlRight: string;
+    currentIn: string;
+    currentOut: string;
+    signConvention: string;
   };
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
@@ -168,6 +186,25 @@ const en: UiStrings = {
     drawnCurrent: 'Load current',
     wasted: 'Wasted in the divider',
     exactValue: 'exact value',
+    kirchhoffSpoken:
+      'Currents into a node add up to zero, and voltages around a loop add up to zero',
+    kirchhoffCircuit:
+      'V1 through R1 and V2 through R3 both feed node A, and R2 runs from A to ground.',
+    nodeVoltage: 'Voltage at A',
+    from: 'from',
+    to: 'to',
+    ground: 'ground',
+    noCurrent: 'no current',
+    delivering: 'delivering',
+    absorbing: 'absorbing (being charged)',
+    noPower: 'neither (no power)',
+    kcl: 'KCL at A',
+    kvlLeft: 'KVL left loop',
+    kvlRight: 'KVL right loop',
+    currentIn: 'in',
+    currentOut: 'out',
+    signConvention:
+      'Signs: I1 and I3 count positive flowing into A, I2 flowing from A to ground. Power counts positive when current leaves a source by its + terminal (delivering) and negative when current is forced in there (absorbing). The arrows show the real direction.',
   },
   theme: { toggle: 'Switch theme', light: 'Light', dark: 'Dark' },
   langSwitch: { label: 'Language', other: 'Español' },
@@ -190,24 +227,24 @@ const es: UiStrings = {
   htmlTitleSuffix: 'Banco de Trabajo',
   nav: {
     curriculum: 'Temario',
-    about: 'Sobre esto',
+    about: 'Acerca de',
     skipToContent: 'Ir al contenido',
     menu: 'Menú',
   },
   home: {
     eyebrow: 'Curso interactivo de electrónica',
     heading: 'Cada idea trae un control que puedes mover.',
-    lede: 'Un curso completo de electrónica: desde qué es realmente la tensión, pasando por operacionales y control de motores, hasta una placa que puedes mandar a fabricar. Nada se explica solo con palabras: cada concepto lleva un instrumento que arrastras y una consecuencia que ves u oyes en el mismo instante.',
+    lede: 'Un curso completo de electrónica: desde qué es realmente la tensión, pasando por amplificadores operacionales y controladores de motores, hasta una placa que puedes mandar a fabricar. Nada se explica solo con palabras: cada concepto lleva un instrumento que arrastras y una consecuencia que ves u oyes en el mismo instante.',
     startCta: 'Empezar por la ley de Ohm',
     curriculumCta: 'Ver la ruta completa',
     freeHeading: 'Todo, gratis, siempre.',
     freeBody:
-      'Casi todas las webs te enseñan lo básico y dejan detrás de un muro de pago justo la parte que necesitabas. Aquí no hay plan de pago y no lo va a haber. El módulo de PCB —ancho de pista, caminos de retorno, impedancia, los ficheros que pide un fabricante— es lo más difícil de encontrar bien escrito, y está en la misma página abierta que la primera lección.',
+      'Casi todos los sitios te enseñan lo básico y dejan detrás de un muro de pago justo la parte que necesitabas. Aquí no hay plan de pago y no lo va a haber. El módulo de PCB —ancho de pista, caminos de retorno, impedancia, los archivos que pide un fabricante— es lo más difícil de encontrar bien escrito, y está en la misma página abierta que la primera lección.',
     pathHeading: 'La ruta',
     pathLede:
       'Doce módulos en orden estricto: cada uno usa lo que construyó el anterior. La numeración es dependencia, no decoración.',
     lessonsReady: 'lecciones listas',
-    beingWritten: 'en escritura',
+    beingWritten: 'en preparación',
     principleHeading: 'Cómo está hecho',
     principles: [
       {
@@ -215,19 +252,19 @@ const es: UiStrings = {
         body: 'Un osciloscopio, un diagrama de Bode, un analizador lógico, una calculadora de ancho de pista. Herramientas de verdad que manejas, dibujadas en vivo a partir de los valores que pones, no capturas del banco de otro.',
       },
       {
-        title: 'Esquemáticos que puedes interrogar',
-        body: 'Cada circuito se dibuja con símbolos vectoriales, no como una imagen plana. El texto resalta el componente del que está hablando, la corriente se anima por los cables y los valores cambian cuando tú los cambias.',
+        title: 'Esquemas que puedes explorar',
+        body: 'Cada circuito se dibuja con símbolos vectoriales, no como una imagen plana. El texto resalta la pieza de la que habla, una animación muestra la corriente recorriendo los cables y los valores se actualizan mientras los cambias.',
       },
       {
         title: 'Escrito para quien ya sabe programar',
-        body: 'No te asusta una fórmula ni un cursor, así que el ritmo lo da por hecho. Lo que no da por hecho es que sepas qué es un camino de retorno, ni por qué se te hunde el divisor.',
+        body: 'No te asusta una fórmula ni un control deslizante, así que el ritmo lo da por hecho. Lo que no da por hecho es que sepas qué es un camino de retorno, ni por qué baja la salida de tu divisor.',
       },
     ],
   },
   module: {
     label: 'Módulo',
     lessons: 'Lecciones',
-    noLessonsYet: 'En escritura',
+    noLessonsYet: 'En preparación',
     noLessonsBody:
       'Este módulo está planificado y acotado, pero sus lecciones todavía no están publicadas. Las de los módulos anteriores sí, y van primero por algo.',
     backToCurriculum: 'Todos los módulos',
@@ -256,7 +293,7 @@ const es: UiStrings = {
     resistance: 'Resistencia',
     power: 'Potencia',
     solveFor: 'Calcular',
-    add: 'Añadir resistencia',
+    add: 'Agregar resistor',
     remove: 'Quitar',
     series: 'Serie',
     parallel: 'Paralelo',
@@ -274,12 +311,31 @@ const es: UiStrings = {
     drawnCurrent: 'Corriente de carga',
     wasted: 'Desperdiciado en el divisor',
     exactValue: 'valor exacto',
+    kirchhoffSpoken:
+      'Las corrientes que entran en un nodo suman cero, y las tensiones alrededor de un lazo suman cero',
+    kirchhoffCircuit:
+      'V1 a través de R1 y V2 a través de R3 alimentan el nodo A, y R2 va de A a tierra.',
+    nodeVoltage: 'Tensión en A',
+    from: 'de',
+    to: 'hacia',
+    ground: 'tierra',
+    noCurrent: 'sin corriente',
+    delivering: 'entregando',
+    absorbing: 'absorbiendo (se está cargando)',
+    noPower: 'ni entrega ni absorbe',
+    kcl: 'LCK en A',
+    kvlLeft: 'LVK lazo izquierdo',
+    kvlRight: 'LVK lazo derecho',
+    currentIn: 'entra',
+    currentOut: 'sale',
+    signConvention:
+      'Signos: I1 e I3 son positivas cuando entran en A, e I2 cuando va de A a tierra. La potencia de una fuente es positiva cuando la corriente sale por su terminal + (entrega) y negativa cuando la corriente se ve obligada a entrar por él (absorbe). Las flechas muestran el sentido real.',
   },
   theme: { toggle: 'Cambiar tema', light: 'Claro', dark: 'Oscuro' },
   langSwitch: { label: 'Idioma', other: 'English' },
   notFound: {
     heading: 'Circuito abierto',
-    body: 'No hay ninguna página en esta dirección. La conexión no lleva a ningún sitio.',
+    body: 'No hay ninguna página en esta dirección. La conexión no lleva a ninguna parte.',
     cta: 'Volver al temario',
   },
   footer: {

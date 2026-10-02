@@ -57,6 +57,16 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Prefer the `@Service` decorator over `@Injectable({providedIn: 'root'})` for new singleton services (Angular v22+)
 - Use the `inject()` function instead of constructor injection
 
+## Writing lessons
+
+Any content work in `content/en` or `content/es` (new lessons, rewrites,
+translations, `_module.md` files) must follow
+`.claude/skills/course-writing/SKILL.md`: plain voice, no AI tells, every term
+defined on first use, a real example for each concept, and the course
+invariants. The author keeps `.claude/skills/course-writing/glossary.md` up to
+date with every term the lesson defines. Every content agent's brief points to
+the skill.
+
 ## Change workflow (mandatory for every requested change)
 
 Every change the maintainer requests, however small, goes through this
