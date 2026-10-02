@@ -1,19 +1,19 @@
 # Roadmap: finishing every chapter
 
-Status on 2026-10-01: module 00 has three lessons and three instruments
-(`ohm-law`, `resistor-network`, `divider`). The pixel-art skin (A6) is built,
-with the REVIEW M-10 layout fix applied, and was merged in PR #1.
+Status on 2026-10-01: module 00 has four lessons and four instruments
+(`ohm-law`, `resistor-network`, `divider`, `kirchhoff`). The pixel-art skin
+(A6) is built, with the REVIEW M-10 layout fix applied, and was merged in PR #1.
 Modules 01–11 exist only as `_module.md` and render as "being written". This
 document plans the rest: the shared infrastructure the remaining modules depend
 on, the reference board for module 11, a repeatable per-chapter workflow with a
 safety policy, and a lesson-by-lesson outline for every module.
 
 Lesson ids are language-neutral and final once published (they key the language
-switcher). Module folder ids (`00-fundamentals` … `11-pcb`) and the three
+switcher). Module folder ids (`00-fundamentals` … `11-pcb`) and the four
 published lessons (`00-fundamentals/01-ohms-law`, `02-series-and-parallel`,
-`03-voltage-divider`) never change. Every other id below is unpublished and may
-still move. Titles here are working titles; slugs are chosen per language when
-the lesson is written.
+`03-voltage-divider`, `04-kirchhoff`) never change. Every other id below is
+unpublished and may still move. Titles here are working titles; slugs are
+chosen per language when the lesson is written.
 
 ---
 
@@ -77,6 +77,11 @@ reference board (§2).
 
 - **00 finish runs in parallel with A1–A4.** Lessons 04–07 reuse existing
   symbols plus one meter symbol drawn in 00's step 3, and use no traces or audio.
+- **Exception: 00-04 shipped before A5 and A7** at the maintainer's request
+  (2026-10-02). The bridge is the interim rule in
+  `.claude/skills/course-writing/SKILL.md` §4: the figures in 00-01 to 00-04
+  are sourced in `docs/BIBLIOGRAPHY.md` by lesson id, and their `references:`
+  are owed when A5 lands.
 - **01–07 are sequential**: each module's prose leans on the vocabulary of the
   one before it (a filter needs reactance, a MOSFET switch needs Ohm's law and
   power, a bus needs logic levels and pull-ups).
@@ -92,7 +97,7 @@ reference board (§2).
 
 | # | Work item | Why it blocks chapters | Done when |
 |---|---|---|---|
-| A1 | **Schematic symbols v2** in `src/app/schematic/`, per the table below | Every module from 01 on draws parts the library lacks (today: canvas, resistor, capacitor, source, ground, terminal, junction, wire, label) | The 01–04 rows exist before module 01. Later rows are built in step 3 of their module, from this list, never inline. Each symbol on the 10-unit grid, inherits `currentColor`, supports `highlight`/`dim`, shown on a symbol gallery route or spec |
+| A1 | **Schematic symbols v2** in `src/app/schematic/`, per the table below | Every module from 01 on draws parts the library lacks (today: canvas, resistor, capacitor, source, ground, terminal, junction, current arrow, wire, label) | The 01–04 rows exist before module 01. Later rows are built in step 3 of their module, from this list, never inline. Each symbol on the 10-unit grid, inherits `currentColor`, supports `highlight`/`dim`, shown on a symbol gallery route or spec |
 | A2 | **`app-trace` plot primitive** in `src/app/ui/`: time-domain (scope) and frequency-domain (Bode, log axes) traces as SVG polylines, cursors, labelled axes, two channels | Modules 02, 03, 04, 05, 06, 07, 08 are mostly "watch the waveform change" | Renders 2k-point traces without jank; keyboard-movable cursor; axis text through `formatSI`; **key values (cursor time/frequency, value per channel, and the widget's headline numbers) exposed through `app-readout` or a visually hidden summary that updates on cursor move (WCAG 1.1.1)** |
 | A3 | **`AudioOut` service** wrapping Web Audio: oscillator/noise source → `BiquadFilterNode` → gain, muted by default, explicit play button, ramped gain | Module 02 promises "a filter you can hear"; module 08 is about sound | Never autoplays; global mute; SSR-safe (no-op on the server); **hard output cap enforced in the service, not per widget (master gain ceiling about −12 dBFS, default lower); visible "playing" indicator while sound is on; stops on Escape and when the tab is hidden; every audible effect is also shown on screen (trace or readout)** |
 | A4 | **Logic-analyser primitive** (`app-logic-trace`): stacked digital lanes, decoded byte annotations | Module 06 (debounce, PWM) and all of 07 | UART/SPI/I²C frames render from a bit array; **decoded frames also available as text (a list or table), and the lane under the cursor announced through a visually hidden summary** |
@@ -219,14 +224,14 @@ Instrument names are proposed `::widget` types. ★ marks the module's signature
 instrument, the one worth over-investing in. Each instrument's consequence (the
 answer to its one question) is given after the colon.
 
-### 00: Fundamentals (3 of 7 done)
+### 00: Fundamentals (4 of 7 done)
 
 | Id | Lesson | Instrument |
 |---|---|---|
 | 01-ohms-law | Ohm's law ✅ | `ohm-law` ✅ |
 | 02-series-and-parallel | Series and parallel ✅ | `resistor-network` ✅ |
 | 03-voltage-divider | The voltage divider and loading ✅ | `divider` ✅ |
-| 04-kirchhoff | Kirchhoff's laws: nothing is lost at a node or around a loop | `kirchhoff`: two sources and three resistors that series/parallel cannot reduce; node currents and loop voltages always sum to zero, and one source can be forced to absorb current |
+| 04-kirchhoff | Kirchhoff's laws ✅ | `kirchhoff` ✅ |
 | 05-multimeter | Using a multimeter: volts, amps, ohms, and what the meter does to the circuit | `meter-loading`: the voltmeter's 10 MΩ across a divider and the ammeter's shunt (burden voltage) in series with a load; reading vs true value |
 | 06-power-and-heat | Power, heat and thermal resistance | ★ `power-dissipation`: resistor that visibly heats past its rating; ¼ W vs 1 W package; temperature rise = P × θ, the model 03-06 and 05-01 reuse |
 | 07-real-sources | Real sources: internal resistance and Thévenin | `thevenin`: battery with internal R, load sweep, maximum-power point; open-circuit and loaded readings as you would take them with the 00-05 meter |
@@ -236,7 +241,7 @@ lesson only needs the series rule, and 04 names what 02 and 03 used implicitly.
 The multimeter follows Kirchhoff because voltage is measured across (KVL) and
 current in series (KCL), and meter loading is the divider's loading again.
 
-**Count:** 7 lessons (3 done, 4 to write) · 7 instruments (3 built, 4 new) · 0 without instrument.
+**Count:** 7 lessons (4 done, 3 to write) · 7 instruments (4 built, 3 new) · 0 without instrument.
 
 ### 01: Passive Components
 
@@ -393,7 +398,7 @@ stays because fast bus edges are where probe technique first matters.
 
 **Count:** 6 lessons · 4 instruments (4 new) · 2 without instrument (01, 06).
 
-**Total: 69 lessons (3 done, 66 to write) · 66 instruments (3 built, 63 new) ·
+**Total: 69 lessons (4 done, 65 to write) · 66 instruments (4 built, 62 new) ·
 3 lessons without an instrument (01-05, 11-01, 11-06).**
 Lessons: 7 + 5 + 7 + 6 + 5 + 5 + 6 + 4 + 6 + 7 + 5 + 6 = 69.
 Instruments: 7 + 4 + 7 + 6 + 5 + 5 + 6 + 4 + 6 + 7 + 5 + 4 = 66.
@@ -406,7 +411,7 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 |---|---|---|---|---|
 | Phase A | 0 | 4 primitives (A2–A4, symbols A1) + skin, refs, gates, glyphs | — | Unblocks everything; A1–A4 and A8 only before their first user |
 | Track H | 0 | 0 | — | Reference board, parallel from module 01 |
-| 00 finish | 4 | 4 | A5, A6, A7; meter symbol | Reuses existing symbols; the content fixes from REVIEW have landed (PR #1) |
+| 00 finish | 3 | 3 | A5, A6, A7; meter symbol | Reuses existing symbols; the content fixes from REVIEW have landed (PR #1) |
 | 01 | 5 | 4 | A1 (inductor, potentiometer) | |
 | 02 | 7 | 7 | A2, A3, A8 | First user of `app-trace` and audio |
 | 03 | 6 | 6 | A1 semiconductors | Biggest symbol demand |
@@ -416,7 +421,7 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 | 07 | 4 | 4 | A4 | |
 | 08 / 09 / 10 | 6 / 7 / 5 | 6 / 7 / 5 | A3 (08) | Run in parallel. Close source gaps (BIBLIOGRAPHY §8) in step 7: electret note (08-01), optocoupler and stepper/servo notes (09), strain-gauge note (10-02) |
 | 11 | 6 | 4 | H4 | Told over the tested reference board |
-| **Total** | **66** | **63** | | Plus 3 lessons and 3 instruments already done: 69 and 66 |
+| **Total** | **65** | **62** | | Plus 4 lessons and 4 instruments already done: 69 and 66 |
 
 ## 6. Definition of done for the course
 

@@ -126,8 +126,10 @@ const SYMBOL_STYLES = `
 `;
 
 /**
- * IEC box resistor, 6 grid units wide, pins on the left and right edges of the
- * cell at y = 0.
+ * IEC box resistor. Horizontal: 5 grid units long, pins at (0, 0) and (50, 0),
+ * a 30 × 18 body from x = 10 to 40. Vertical: 4 grid units long, pins at (0, 0)
+ * and (0, 40), an 18 × 20 body from y = 10 to 30. Each lead ends on the grid
+ * line where the body's edge starts, so lead and body always meet.
  */
 @Component({
   selector: 'svg:g[schResistor]',
@@ -138,8 +140,8 @@ const SYMBOL_STYLES = `
         <svg:text class="label" x="14" y="17">{{ name() }}</svg:text>
         <svg:text class="value" x="14" y="29">{{ value() }}</svg:text>
       } @else {
-        <svg:text class="label" x="30" y="-14" text-anchor="middle">{{ name() }}</svg:text>
-        <svg:text class="value" x="30" y="26" text-anchor="middle">{{ value() }}</svg:text>
+        <svg:text class="label" x="25" y="-14" text-anchor="middle">{{ name() }}</svg:text>
+        <svg:text class="value" x="25" y="26" text-anchor="middle">{{ value() }}</svg:text>
       }
     </svg:g>
   `,
@@ -153,7 +155,7 @@ export class SchResistor extends SchSymbol {
   protected readonly path = computed(() =>
     this.vertical()
       ? 'M0 0 v10 M-9 10 h18 v20 h-18 z M0 30 v10'
-      : 'M0 0 h10 M10 -9 h20 v18 h-20 z M40 0 h10',
+      : 'M0 0 h10 M10 -9 h30 v18 h-30 z M40 0 h10',
   );
 }
 
@@ -230,6 +232,50 @@ export class SchTerminal extends SchSymbol {
   styles: SYMBOL_STYLES,
 })
 export class SchJunction extends SchSymbol {}
+
+export type SchDirection = 'right' | 'down' | 'left' | 'up';
+
+const ROTATION: Record<SchDirection, number> = { right: 0, down: 90, left: 180, up: 270 };
+
+/**
+ * Current arrow: a pixel arrowhead sat on a wire, pointing the way
+ * conventional current actually flows, with its name beside it. Place it on
+ * the wire at (x, y); a widget flips `dir` with the sign of the current, so
+ * the drawing never claims a direction the numbers contradict.
+ *
+ * The head is a 12 × 12 staircase of 2-unit columns, so it stays crisp at any
+ * of the four quarter turns. `off` (no current) drops the head and keeps the
+ * name, because a branch with no current has no direction to show.
+ */
+@Component({
+  selector: 'svg:g[schCurrent]',
+  template: `
+    <svg:g [attr.transform]="transform()" [attr.class]="klass()">
+      @if (!off()) {
+        <svg:path
+          class="fill"
+          [attr.transform]="'rotate(' + rotation() + ')'"
+          d="M-6 -6h2v12h-2z M-4 -5h2v10h-2z M-2 -4h2v8h-2z M0 -3h2v6h-2z M2 -2h2v4h-2z M4 -1h2v2h-2z"
+        />
+      }
+      @if (vertical()) {
+        <svg:text class="label" x="10" y="5">{{ name() }}</svg:text>
+      } @else {
+        <svg:text class="label" x="0" y="-12" text-anchor="middle">{{ name() }}</svg:text>
+      }
+    </svg:g>
+  `,
+  styles: SYMBOL_STYLES,
+})
+export class SchCurrent extends SchSymbol {
+  readonly dir = input<SchDirection>('right');
+  readonly name = input('I');
+  readonly off = input(false);
+
+  protected readonly rotation = computed(() => ROTATION[this.dir()]);
+  /** A vertical wire takes its label to the right; a horizontal one, above. */
+  protected readonly vertical = computed(() => this.dir() === 'up' || this.dir() === 'down');
+}
 
 /**
  * A wire. `d` is an ordinary SVG path in grid units multiplied by GRID by the
@@ -322,6 +368,7 @@ export const SCHEMATIC = [
   SchGround,
   SchTerminal,
   SchJunction,
+  SchCurrent,
   SchWire,
   SchLabel,
 ] as const;

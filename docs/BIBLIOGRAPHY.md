@@ -10,8 +10,17 @@ This file is hand-written for now. ROADMAP §6 expects it to be generated
 from `content/bibliography.yaml` once Phase A5 exists. The ids in the first
 column are proposed keys for that file.
 
+**Interim rule (until A5).** Lessons cannot carry `references:` yet. Until
+they can, every quantitative claim a lesson makes about a real device has an
+entry here whose Modules column names the lesson and the figure, as
+`.claude/skills/course-writing/SKILL.md` §4 requires. These entries move into
+the lessons' `references:` when A5 lands. The entries for lessons 00-01 to
+00-04 were added and checked on 2026-10-02.
+
 **Entry format:** Author(s). *Title*. Edition. Publisher, year. Identifier.
-**Modules:** two-digit module numbers. **ES** marks a Spanish-language edition.
+**Modules:** two-digit module numbers, or a lesson id with the figure it
+supports, e.g. `00-04 (12.6 V resting)`. **ES** marks a Spanish-language
+edition.
 
 ---
 
@@ -54,6 +63,7 @@ column are proposed keys for that file.
 | `ti-sloa119` | Texas Instruments. "Class-D LC Filter Design." Application Report SLOA119, 2006, rev. 2008. https://www.ti.com/lit/pdf/sloa119 | 08 (class D) |
 | `whitlock-an004` | Whitlock, B. "Hum & Buzz in Unbalanced Interconnect Systems." Jensen Transformers Application Note AN-004. https://www.jensen-transformers.com/wp-content/uploads/2014/08/an004.pdf | 08 (hum, ground loops) |
 | `kitchin-counts-2006` | Kitchin, C.; Counts, L. *A Designer's Guide to Instrumentation Amplifiers*. 3rd ed. Analog Devices, 2006. https://www.analog.com/media/en/training-seminars/design-handbooks/designers-guide-instrument-amps-TOC-bib.pdf | 10 (in-amps, bridges) |
+| `yuasa-powersports-manual` | Yuasa Battery, Inc. *Technical Manual: Powersports Batteries*. Undated (file published 2017). https://www.yuasabatteries.com/wp-content/uploads/2017/07/TechManual.x78244.pdf | 00-03, 00-04 (12 V lead-acid: a fully charged conventional battery rests at 12.6 V, 11.8 V or less at rest is 0 %, "fully discharged" at 10.5 V in a capacity test; a working charging system holds 13.0–14.5 V, AGM batteries need 14.0–14.8 V, Yuasa's charger peaks at 14.4 V) |
 | `ti-slay054` | Texas Instruments. "Temperature Sensing with Thermistors" (Rev. A). SLAY054. https://www.ti.com/lit/pdf/slay054 | 10 (thermistors), 00-03 cross-link |
 | `steinhart-hart-1968` | Steinhart, J. S.; Hart, S. R. "Calibration curves for thermistors." *Deep Sea Research and Oceanographic Abstracts* 15 (4): 497–503, 1968. DOI 10.1016/0011-7471(68)90057-0. | 10 |
 
@@ -65,14 +75,21 @@ column are proposed keys for that file.
 | `ipc-2152` | IPC. *IPC-2152, Standard for Determining Current Carrying Capacity in Printed Board Design*. 2009. | 11 (trace width). See REVIEW m-06 on licensing. |
 | `ipc-2221b` | IPC. *IPC-2221B, Generic Standard on Printed Board Design*. 2012. Superseded by IPC-2221C (2023). | 11 |
 | `nxp-um10204` | NXP Semiconductors. *UM10204, I²C-bus specification and user manual*. Rev. 7.0, 1 Oct. 2021. https://www.nxp.com/docs/en/user-guide/UM10204.pdf | 06, 07 |
+| `usb-if-usb2` | USB Implementers Forum. *Universal Serial Bus Specification*. Revision 2.0, 27 Apr. 2000 (USB-IF document library package dated 3 June 2025). https://www.usb.org/document-library/usb-20-specification | 00-01 (a USB port gives 5 V), 00-04 (bus-powered hub: the current in the upstream cable feeds the hub and its ports, §7.2.1) |
 | `ucamco-gerber` | Ucamco. *The Gerber Layer Format Specification*. Revision 2026.05 (19 May 2026); previous revision 2024.05. https://www.ucamco.com/en/gerber/downloads | 11 (fab files) |
 
-## 4. Datasheets
+## 4. Datasheets and product manuals
 
 | Id | Entry | Modules |
 |---|---|---|
 | `ti-ne555` | Texas Instruments. *xx555 Precision Timers* (NA555, NE555, SA555, SE555). Datasheet SLFS022. https://www.ti.com/lit/ds/symlink/ne555.pdf | 04 (555) |
 | `microchip-atmega328p` | Microchip Technology. *ATmega48A/PA/88A/PA/168A/PA/328/P Data Sheet*. DS40002061, 2018. https://www.microchip.com/en-us/product/atmega328p | 00-03 (ADC source impedance, REVIEW m-08), 06, 10 |
+| `yageo-cfr` | YAGEO Corporation. *Carbon Film Resistors, General Purpose, CFR Series* (through-hole). Product specification V.3, 3 Apr. 2024. https://www.yageogroup.com/content/Resource%20Library/Datasheet/YAGEO-CFR_DATASHEET.pdf | 00-01 (1/4 W through-hole: CFR-25 power rating 1/4 W at 70 °C, Table 1) |
+| `yageo-rc-l` | YAGEO Corporation. *General Purpose Chip Resistors, RC_L series* (surface-mount, sizes 0075 to 2512). Product specification V.14, 14 Nov. 2025. https://yageogroup.com/content/datasheet/asset/file/PYU-RC_GROUP_51_ROHS_L | 00-01 (1/10 W surface-mount: RC0603 rated power 1/10 W at 70 °C; a high-power 0603 option is 1/5 W) |
+| `kingbright-wp7113id` | Kingbright. *WP7113ID T-1 3/4 (5mm) Solid State Lamp* (high-efficiency red LED). Spec No. DSAF0012, Rev. V.14A, 2026. https://www.kingbrightusa.com/images/catalog/spec/wp7113id.pdf | 00-01, 00-04 (a red LED takes about 2 V: V_F 1.9 V typ., 2.3 V max. at 10 mA) |
+| `fluke-11x-manual` | Fluke Corporation. *110/113/114/115/117 True-rms Multimeter Users Manual*. March 2020. https://media.fluke.com/5e1db354-3a6e-49cf-9edd-b10800c0e608_original%20file.pdf (the copy Fluke hosts is labelled Simplified Chinese; the specification tables are in English) | 00-02, 00-03 (a typical multimeter has 10 MΩ: Volts DC input impedance > 10 MΩ, < 100 pF, Table 7) |
+| `fender-tm-twin-reverb` | Fender Musical Instruments Corporation. *Tone Master Twin Reverb Owner's Manual* (type PR 5184). https://www.fmicassets.com/Damroot/Original/10001/OM_22742XX000_Tone_Master_Twin_Reverb-Amp_USplus5.pdf | 00-03 (guitar amps have about 1 MΩ input impedance: Input 1 is 1 MΩ, Input 2 is 136 kΩ) |
+| `energizer-alkaline-ais` | Energizer Brands, LLC. *Alkaline Manganese Dioxide-Zinc Batteries*, Article Information Sheet, document 0318-Alk, March 2018 (marked valid until March 2021; still the version Energizer serves on 2026-10-02). https://data.energizer.com/pdfs/alkaline_ais.pdf | 00-04 safety callout (alkaline cells are "not designed for recharging. Recharging can cause battery leakage or, in some cases, high pressure rupture"; do not mix with other battery types; replace all batteries at the same time) |
 
 ## 5. Online courses, references and tools
 
@@ -80,6 +97,7 @@ column are proposed keys for that file.
 |---|---|---|
 | `kuphaldt-liec` | Kuphaldt, T. R. *Lessons in Electric Circuits*, vols. I–VI. Design Science License; maintained by All About Circuits. https://www.allaboutcircuits.com/textbook/ | 00–07 |
 | `mit-6002-2007` | Agarwal, A.; Lang, J. *6.002 Circuits and Electronics*, Spring 2007. MIT OpenCourseWare. https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/ | 00, 02, 03, 06 |
+| `bu-403` | Battery University (Cadex Electronics). "BU-403: Charging Lead Acid." Updated 8 Dec. 2023. https://www.batteryuniversity.com/article/bu-403-charging-lead-acid/ | 00-03, 00-04 (lead-acid charge limit 2.30–2.45 V per cell, 13.8–14.7 V for six cells; float 2.25–2.27 V per cell; 2.10 V per cell, 12.6 V, is about 90 % charged) |
 | `kicad-9-docs` | KiCad Project. *KiCad 9.0 Documentation*: Schematic Editor, PCB Editor, Getting Started. https://docs.kicad.org/9.0/ | 11 |
 
 ## 6. Spanish-language resources
@@ -105,7 +123,7 @@ module. Italic marks a Spanish-language source.
 
 | Module | Sources |
 |---|---|
-| 00 Fundamentals | **horowitz-hill-2015** ch. 1; scherz-monk-2016; floyd-buchla-2019; agarwal-lang-2005; kuphaldt-liec vol. I; mit-6002-2007; ti-spra953 (thermal resistance for 00-06); fluke-abc-safety (00-05 multimeter); microchip-atmega328p (divider into an ADC); *boylestad-2017-es*; *floyd-2007-es*; *openstax-fisica-u2-es*; *hyperphysics-es*; *phet-cck-es* |
+| 00 Fundamentals | **horowitz-hill-2015** ch. 1; scherz-monk-2016; floyd-buchla-2019; agarwal-lang-2005; kuphaldt-liec vol. I; mit-6002-2007; ti-spra953 (thermal resistance for 00-06); fluke-abc-safety (00-05 multimeter); microchip-atmega328p (divider into an ADC); device figures in 00-01 to 00-04: yageo-cfr, yageo-rc-l, kingbright-wp7113id, usb-if-usb2, fluke-11x-manual, fender-tm-twin-reverb, yuasa-powersports-manual, bu-403, energizer-alkaline-ais; *boylestad-2017-es*; *floyd-2007-es*; *openstax-fisica-u2-es*; *hyperphysics-es*; *phet-cck-es* |
 | 01 Passives | **horowitz-hill-2015** ch. 1 and appendices; fortunato-5527; iec-60063-2015; wurth-trilogy-2018; scherz-monk-2016; *boylestad-2017-es* |
 | 02 Time and frequency | **horowitz-hill-2015** ch. 1; floyd-buchla-2019; agarwal-lang-2005; tek-xyz; kuphaldt-liec vol. II; *openstax-fisica-u2-es* ch. 10, 14, 15; *boylestad-2017-es*; *phet-cck-es* (AC) |
 | 03 Semiconductors | **sedra-smith-2020**; horowitz-hill-2015 ch. 2, 3, 9; ti-slua618; ti-spra953; *boylestad-nashelsky-2009-es*; *malvino-bates-2007-es*; *sedra-smith-2006-es* |

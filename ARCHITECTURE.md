@@ -93,7 +93,8 @@ electronics/
 │   │   ├── _module.md          ← module title, slug, summary
 │   │   ├── 01-ohms-law.md
 │   │   ├── 02-series-and-parallel.md
-│   │   └── 03-voltage-divider.md
+│   │   ├── 03-voltage-divider.md
+│   │   └── 04-kirchhoff.md
 │   ├── es/00-fundamentals/     ← same ids, translated slugs and prose
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
 │
@@ -118,12 +119,12 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (538 lines)
-│       ├── i18n/ui.ts          ← every UI string, both languages (293 lines)
-│       ├── lesson/             ← the Markdown → components renderer (215 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (349 lines)
+│       ├── lesson/             ← the Markdown → components renderer (216 lines)
 │       ├── pages/              ← the five routed views (1046 lines)
-│       ├── schematic/          ← SVG symbol library (327 lines)
+│       ├── schematic/          ← SVG symbol library (374 lines)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
-│       ├── widgets/            ← the instruments (686 lines)
+│       ├── widgets/            ← the instruments (1215 lines, plus a 107-line spec)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── Dockerfile                  ← two stages: node builder, nginx runtime
@@ -132,7 +133,7 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 5,000 lines of source, plus ~5,600 words of lesson prose so far.
+Roughly 5,000 lines of source, plus ~11,200 words of lesson prose so far.
 
 ---
 
@@ -235,7 +236,7 @@ makes the prerenderer wait.
 
 The widget registry is a plain map of `type → () => import(...)`, so a lesson
 downloads only the instruments it references. Each instrument is its own lazy
-chunk of 5–6.5 kB.
+chunk of 5.3–8.5 kB.
 
 ### 4.4 The instruments
 
@@ -319,12 +320,13 @@ not injected after hydration.
 
 | | Raw | Gzipped |
 |---|---|---|
-| `main.js` | 312 kB | **87 kB** |
+| `main.js` | 314 kB | **88 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
-| Per-lesson chunk | 5.5–7 kB | ~2 kB |
-| Per-instrument chunk | 5–6.5 kB | ~2 kB |
+| Per-lesson chunk | 6.9–11.4 kB | 2.3–3.9 kB |
+| Per-instrument chunk | 5.3–8.5 kB | 1.8–2.9 kB |
 
-Gzipped figures are the build's "estimated transfer size" (2026-10-01).
+Gzipped figures are the build's "estimated transfer size" (2026-10-02, from
+`pnpm build --verbose`, which lists every lazy chunk).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -391,7 +393,7 @@ the parameterised ones from the generated curriculum:
 
 Adding a lesson to `content/` is therefore all it takes to get a new static
 page — the route list is derived, never hand-maintained. The current build
-produces **33 prerendered routes**.
+produces **35 prerendered routes**.
 
 `lessonResolver` matters here. Loading the lesson in a resolver rather than
 inside the component makes the router *wait* for the content chunk, which is what

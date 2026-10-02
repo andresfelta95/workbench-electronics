@@ -1,106 +1,127 @@
 ---
 slug: series-and-parallel
 title: Series and Parallel
-summary: Two rules that collapse any resistor network into one number — and the reason your circuit's behaviour changes when you connect something to it.
-minutes: 8
+summary: Two rules that turn any group of resistors into one value, and why connecting something changes a circuit.
+minutes: 9
 ---
 
-Real circuits contain more than one resistance. Two rules reduce any combination
-of them to a single equivalent value, and once a network is a single value, Ohm's
-law works on it directly.
+You need a 15 kΩ resistor and your kit does not have one. The "k" stands for
+kilo-, a thousand, so 15 kΩ is 15 000 Ω. You can build that value from
+resistors you do have, once you know how resistors combine.
+
+Parts connect in two basic ways: in series and in parallel. Each way has a rule
+that turns a group of resistors into one **equivalent resistance**: the single
+resistor that would take the same current from the same supply. Once a group
+is one value, Ohm's law works on it directly.
 
 ## Series: one path
 
-Components are **in series** when they share a single path — all the current that
-goes through one must go through the next, because it has nowhere else to go.
+Parts are **in series** when they connect end to end on one path. All the
+current that goes through one must go through the next, because it has nowhere
+else to go. So the same current flows through every part in a series chain.
 
 `R_total = R₁ + R₂ + R₃ + …`
 
-Resistances add. The consequence that matters more than the formula: **the
-current is identical everywhere in a series chain**, and the supply voltage
-divides across the components in proportion to their resistance. A 1 kΩ and a
-9 kΩ in series across 10 V give you 1 V and 9 V respectively — which is the
-entire idea behind the next lesson.
+The supply voltage splits between the resistors, and the bigger resistor gets
+the bigger share. A 1 kΩ and a 9 kΩ in series across 10 V get 1 V and 9 V. The
+next lesson builds on this.
 
-## Parallel: multiple paths
+The two AA cells in a TV remote are in series: 1.5 V plus 1.5 V gives 3 V, and
+the same current flows through both. The LED and its resistor in the last
+lesson were in series too.
 
-Components are **in parallel** when they share both connection points, so
-current splits between them.
+## Parallel: more than one path
+
+Parts are **in parallel** when both their ends connect to the same two points.
+Each separate path is called a **branch**. Every branch has the same voltage
+across it, and the current splits between the branches. The branch with the
+lower resistance takes the bigger share of the current.
 
 `1 / R_total = 1 / R₁ + 1 / R₂ + …`
 
-For exactly two resistors, the shortcut is easier:
+For two resistors, this shortcut is easier:
 
 `R_total = (R₁ × R₂) / (R₁ + R₂)`
 
-Here the **voltage is identical across every branch**, and the current divides in
-inverse proportion to resistance — the lower resistance takes the larger share.
+A car's headlights are wired in parallel across its 12 V system. Each one gets
+the full 12 V, and if one fails, the other stays on.
 
-Both rules come from two deeper ones, **Kirchhoff's laws**. The current law: the
-currents flowing into any node add up to the currents flowing out, because
-charge does not pile up or vanish at a junction. The voltage law: the voltages
-around any closed loop add up to zero. The identical current in a series chain
-is the current law at work; the identical voltage across parallel branches is
-the voltage law. Kirchhoff's laws get a lesson of their own later in this
-module, for the networks that series and parallel cannot reduce.
+## Where the rules come from
 
-Build a network below and watch the equivalent value, the branch currents and
-the power in each part.
+Both rules come from two more general ones, **Kirchhoff's laws**. These use
+two new words. A **node** is a point where two or more parts connect. All the
+wire joining them counts as one node, and some books call it a junction. A
+**loop** is any path around a circuit that ends where it started.
+
+- **The current law:** the current flowing into a node equals the current
+  flowing out. Charge does not pile up or vanish at a node.
+- **The voltage law:** the voltages around any loop add up to zero. The rise
+  across the supply equals the drops across the parts added together.
+
+The same current in a series chain is the current law at work. The same voltage
+across parallel branches is the voltage law. Kirchhoff's laws get their own
+lesson later in this module, for circuits that the series and parallel rules
+cannot reduce.
+
+Build a group of resistors below. Use Arrangement to switch between series and
+parallel, and watch the equivalent resistance, the current in each branch and
+the power in each resistor. It starts with 1 kΩ and 4.7 kΩ in series, which
+make 5.7 kΩ and take 1.58 mA from the 9 V supply.
 
 ::widget{type="resistor-network" supply="9"}
 
-## The two sanity checks
+## Two quick checks
 
-You should never need to trust arithmetic you can check by eye:
-
-- **Series total is always larger than the largest resistor.** You added a
-  constriction to the path.
-- **Parallel total is always smaller than the smallest resistor.** You added
+- **A series total is always larger than the largest resistor.** You made the
+  one path harder to get through.
+- **A parallel total is always smaller than the smallest resistor.** You added
   another path, so more current gets through for the same push.
 
-If your answer breaks either rule, the arithmetic is wrong. Two equal resistors
-in parallel give exactly half the value — the single most common case, and worth
-recognising instantly.
+If your answer breaks either rule, the arithmetic is wrong. In the instrument,
+switch the starting pair to Parallel: the total drops to 825 Ω, below the
+smaller 1 kΩ. Two equal resistors in parallel give half the value of one. You
+will meet this case often.
 
 :::key
-Ten 1 kΩ resistors in parallel are 100 Ω. A hundred of them are 10 Ω. Adding
-paths adds conductance, and conductance — not resistance — is the thing that
-adds linearly in parallel. Thinking in conductance (`G = 1/R`, in siemens) makes
-parallel networks trivial and is worth the ten minutes it takes to get used to.
+Ten 1 kΩ resistors in parallel make 100 Ω. A hundred of them make 10 Ω. In
+parallel, conductances add. Resistances do not. **Conductance** is how easily
+current gets through: `G = 1/R`, measured in siemens (S). Each 1 kΩ resistor
+has 0.001 S, so ten of them have 0.01 S, which is 100 Ω.
 :::
 
-## Why this is not an exercise
+## Where you use these rules
 
-Two situations where these rules stop being academic:
+**Making a value you do not have.** Resistors are sold in standard lists of
+values. The E12 list has 12 values in each factor of ten: 10, 12, 15, 18, 22,
+27, 33, 39, 47, 56, 68 and 82, then 100, 120 and so on. Kit values usually
+come from it. Say you need 15 kΩ and your drawer only has 10 kΩ and
+33 kΩ. Two 10 kΩ in parallel make 5 kΩ. A third 10 kΩ in series with that pair
+brings the total to 15 kΩ.
 
-**Getting a value you do not have.** Resistors come in preferred series — E12,
-E24 — not in every value you might want. Need 15 kΩ and have a drawer of 10 kΩ
-and 33 kΩ? Two 10 kΩ in parallel make 5 kΩ, and a third 10 kΩ in series with
-that pair gets you to exactly 15 kΩ — both rules from this lesson, and nothing
-from outside the drawer.
+**Sharing the heat.** Two 1 Ω resistors in parallel make 0.5 Ω, and each one
+carries half the current. Since `P = I² × R`, each one turns
+`(I/2)² × 1 Ω = I²/4` into heat. A single 0.5 Ω resistor carrying all the
+current would turn `I² × 0.5 Ω = I²/2` into heat. So each resistor in the pair
+takes *half* the heat of the single part it replaces. This is a common fix when
+one resistor's power rating is too low: two equal 1/4 W resistors in parallel
+can share 1/2 W between them.
 
-**Sharing current.** Two 1 Ω resistors in parallel are 0.5 Ω, and they also
-split the current in half. Since `P = I² × R`, each one dissipates
-`(I/2)² × 1 Ω = I²/4`, while a single 0.5 Ω part carrying the whole current
-would dissipate `I² × 0.5 Ω = I²/2`. So each resistor handles *half* the power
-of the single part it replaces (and a quarter of what one 1 Ω resistor would
-dissipate carrying all the current). Paralleling identical parts to spread
-heat is standard practice in power circuits: the total power does not change,
-but each part only has to survive its share of it.
+## Connecting a meter adds a parallel path
 
-## Everything is in parallel with something
+When you connect anything between two nodes, you put it in parallel with
+whatever is already between those nodes, even by accident.
 
-The rule that changes how you read a schematic: whenever you connect anything
-across an existing pair of nodes, you have created a parallel combination,
-whether you meant to or not.
+A **multimeter** is the handheld meter that measures volts, amps and ohms. When
+it measures volts, it puts its own resistance between its two probes (the
+leads you touch to the circuit). This is its **input resistance**, and a
+typical multimeter has 10 MΩ. The "M" stands for mega-, a million, so 10 MΩ is
+ten million ohms.
 
-Connect a multimeter across a resistor and you have put the meter's input
-impedance — typically 10 MΩ — in parallel with it. Against a 1 kΩ resistor,
-10 MΩ in parallel changes the value by 0.01 %, which is invisible. Against a
-1 MΩ resistor it changes it by 9 %, and your measurement is now measuring your
-meter. The multimeter gets its own lesson later in this module, including what
-it does to the circuit it measures.
+Across a 1 kΩ resistor, that 10 MΩ in parallel changes the resistance by
+0.01 %, too little to notice. Across a 1 MΩ resistor it changes it by 9 %, so
+the meter itself throws the reading off. The multimeter gets its own lesson
+later in this module, including what it does to the circuit it measures.
 
-That effect — the act of connecting something changes the thing you connected it
-to — is called **loading**, and the next lesson is about the circuit where it
-bites hardest.
+This effect is called **loading**: connecting something changes the circuit you
+connect it to. The next lesson shows a circuit where loading matters a lot,
+the voltage divider.
