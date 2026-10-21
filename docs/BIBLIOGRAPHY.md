@@ -6,16 +6,20 @@ publisher, the issuing organisation, Crossref, or a library or bookseller
 catalogue that shows the ISBN. Anything that could not be confirmed is listed
 in §8, not here.
 
-This file is hand-written for now. ROADMAP §6 expects it to be generated
-from `content/bibliography.yaml` once Phase A5 exists. The ids in the first
-column are proposed keys for that file.
+**Ids and the build.** The ids in the first column are the keys of
+`content/bibliography.yaml`, which is what the build reads: lessons cite them
+in their `references:` front matter, and `pnpm content` fails on an id that is
+not there. This file is still hand-written (it also holds the verification
+notes, the module map and §8); ROADMAP §6 expects it to be generated from the
+YAML later. Until then the two must agree: a new source is added to both
+files, with the same id, in the same change.
 
-**Interim rule (until A5).** Lessons cannot carry `references:` yet. Until
-they can, every quantitative claim a lesson makes about a real device has an
-entry here whose Modules column names the lesson and the figure, as
-`.claude/skills/course-writing/SKILL.md` §4 requires. These entries move into
-the lessons' `references:` when A5 lands. The entries for lessons 00-01 to
-00-04 were added and checked on 2026-10-02.
+**Rule.** Every quantitative claim a lesson makes about a real device is cited
+in that lesson's `references:` (EN and ES cite the same ids), and its entry
+here has a Modules column that names the lesson and the figure, as
+`.claude/skills/course-writing/SKILL.md` §4 requires. The entries for lessons
+00-01 to 00-04 were added and checked on 2026-10-02 and are cited in those
+lessons since A5 (2026-10-21).
 
 **Entry format:** Author(s). *Title*. Edition. Publisher, year. Identifier.
 **Modules:** two-digit module numbers, or a lesson id with the figure it
@@ -64,7 +68,7 @@ edition.
 | `whitlock-an004` | Whitlock, B. "Hum & Buzz in Unbalanced Interconnect Systems." Jensen Transformers Application Note AN-004. https://www.jensen-transformers.com/wp-content/uploads/2014/08/an004.pdf | 08 (hum, ground loops) |
 | `kitchin-counts-2006` | Kitchin, C.; Counts, L. *A Designer's Guide to Instrumentation Amplifiers*. 3rd ed. Analog Devices, 2006. https://www.analog.com/media/en/training-seminars/design-handbooks/designers-guide-instrument-amps-TOC-bib.pdf | 10 (in-amps, bridges) |
 | `yuasa-powersports-manual` | Yuasa Battery, Inc. *Technical Manual: Powersports Batteries*. Undated (file published 2017). https://www.yuasabatteries.com/wp-content/uploads/2017/07/TechManual.x78244.pdf | 00-03, 00-04 (12 V lead-acid: a fully charged conventional battery rests at 12.6 V, 11.8 V or less at rest is 0 %, "fully discharged" at 10.5 V in a capacity test; a working charging system holds 13.0–14.5 V, AGM batteries need 14.0–14.8 V, Yuasa's charger peaks at 14.4 V) |
-| `ti-slay054` | Texas Instruments. "Temperature Sensing with Thermistors" (Rev. A). SLAY054. https://www.ti.com/lit/pdf/slay054 | 10 (thermistors), 00-03 cross-link |
+| `ti-slay054` | Texas Instruments. "Temperature Sensing with Thermistors" (Rev. A). SLAY054. https://www.ti.com/lit/pdf/slay054 | 10 (thermistors) |
 | `steinhart-hart-1968` | Steinhart, J. S.; Hart, S. R. "Calibration curves for thermistors." *Deep Sea Research and Oceanographic Abstracts* 15 (4): 497–503, 1968. DOI 10.1016/0011-7471(68)90057-0. | 10 |
 
 ## 3. Standards and specifications

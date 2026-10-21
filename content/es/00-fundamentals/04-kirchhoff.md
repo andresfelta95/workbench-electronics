@@ -3,6 +3,21 @@ slug: leyes-de-kirchhoff
 title: Las leyes de Kirchhoff
 summary: "En cada nodo entra tanta corriente como sale, y alrededor de cada lazo las tensiones suman cero: dos reglas que resuelven circuitos que serie y paralelo no pueden."
 minutes: 11
+references:
+  - id: usb-if-usb2
+    note: "Un puerto USB da 5 V. En un hub alimentado por el bus, la corriente del cable que viene de la computadora alimenta el hub y sus puertos (sección 7.2.1)."
+  - id: kingbright-wp7113id
+    note: "En un LED rojo caen unos 2 V: 1,9 V típicos y 2,3 V como máximo a 10 mA."
+  - id: yuasa-powersports-manual
+    note: "Una batería de plomo-ácido de 12 V cargada está a 12,6 V en reposo, y un sistema de carga que funciona la mantiene entre 13,0 y 14,5 V."
+  - id: bu-403
+    note: "Una batería de plomo-ácido de seis celdas a 12,6 V tiene alrededor del 90 % de carga; el límite de carga es de 13,8 a 14,7 V."
+  - id: energizer-alkaline-ais
+    note: "Las pilas alcalinas no están hechas para recargarse: recargarlas puede hacer que pierdan líquido o revienten. No mezcles tipos de pila y cambia todas las pilas a la vez."
+  - id: horowitz-hill-2015
+    note: "Capítulo 1."
+  - id: kuphaldt-liec
+    note: "Volumen I (corriente continua). Gratis en línea, en inglés."
 ---
 
 Un auto con el motor en marcha tiene dos fuentes conectadas a los mismos

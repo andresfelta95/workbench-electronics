@@ -3,6 +3,21 @@ slug: kirchhoff
 title: Kirchhoff's Laws
 summary: "At every node, current in equals current out, and around every loop the voltages add up to zero: two rules that solve circuits series and parallel cannot."
 minutes: 11
+references:
+  - id: usb-if-usb2
+    note: "A USB port gives 5 V. In a bus-powered hub, the current in the cable from the computer feeds the hub and its ports (section 7.2.1)."
+  - id: kingbright-wp7113id
+    note: "A red LED takes about 2 V: 1.9 V typical, 2.3 V maximum at 10 mA."
+  - id: yuasa-powersports-manual
+    note: "A charged 12 V lead-acid battery rests at 12.6 V, and a working charging system holds 13.0 to 14.5 V."
+  - id: bu-403
+    note: "A six-cell lead-acid battery at 12.6 V is about 90 % charged; the charging limit is 13.8 to 14.7 V."
+  - id: energizer-alkaline-ais
+    note: "Alkaline cells are not made to be recharged: recharging can make them leak or burst. Do not mix battery types, and replace all cells at the same time."
+  - id: horowitz-hill-2015
+    note: "Chapter 1."
+  - id: kuphaldt-liec
+    note: "Volume I (DC). Free online."
 ---
 
 A car with its engine running has two power sources on the same wires. One is

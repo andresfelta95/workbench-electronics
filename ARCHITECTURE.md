@@ -96,10 +96,11 @@ electronics/
 │   │   ├── 03-voltage-divider.md
 │   │   └── 04-kirchhoff.md
 │   ├── es/00-fundamentals/     ← same ids, translated slugs and prose
+│   ├── bibliography.yaml       ← every source, keyed by id; lessons cite ids
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
 │
 ├── tools/
-│   ├── build-content.mjs       ← the content compiler (311 lines)
+│   ├── build-content.mjs       ← the content compiler (545 lines)
 │   └── axe-check.mjs           ← axe over every prerendered route (needs AXE_TOOLS_DIR)
 │
 ├── docs/                       ← roadmap, review, bibliography, pixel-art design notes
@@ -118,10 +119,10 @@ electronics/
 │       ├── app.config.ts       ← providers
 │       ├── app.config.server.ts
 │       │
-│       ├── core/               ← services and pure logic (538 lines)
-│       ├── i18n/ui.ts          ← every UI string, both languages (349 lines)
-│       ├── lesson/             ← the Markdown → components renderer (216 lines)
-│       ├── pages/              ← the five routed views (1046 lines)
+│       ├── core/               ← services and pure logic (575 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (357 lines)
+│       ├── lesson/             ← the Markdown → components renderer (347 lines)
+│       ├── pages/              ← the five routed views (1051 lines)
 │       ├── schematic/          ← SVG symbol library (374 lines)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
 │       ├── widgets/            ← the instruments (1215 lines, plus a 107-line spec)
@@ -217,6 +218,11 @@ tag:
 | `html` | `<div class="prose" [innerHTML]>` — Angular sanitises it |
 | `callout` | A styled `<div role="note">` with a tone: note, warning, key, safety (not `<aside>`, which axe rejects inside `<main>`) |
 | `widget` | `WidgetHost`, which resolves and instantiates the component |
+
+After the body, a lesson with `references:` gets a "Sources and further
+reading" block ("Fuentes y lecturas recomendadas" in Spanish), built from the
+entries the compiler resolved out of `content/bibliography.yaml`. On ES pages an
+entry with a Spanish edition adds an "En español: …" line.
 
 `WidgetHost` is the interesting one:
 
@@ -322,11 +328,12 @@ not injected after hydration.
 |---|---|---|
 | `main.js` | 314 kB | **88 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
-| Per-lesson chunk | 6.9–11.4 kB | 2.3–3.9 kB |
+| Per-lesson chunk | 7.8–14.0 kB | 2.7–4.8 kB |
 | Per-instrument chunk | 5.3–8.5 kB | 1.8–2.9 kB |
 
 Gzipped figures are the build's "estimated transfer size" (2026-10-02, from
-`pnpm build --verbose`, which lists every lazy chunk).
+`pnpm build --verbose`, which lists every lazy chunk; per-lesson row updated
+2026-10-21, when the lessons gained `references:`).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -357,12 +364,23 @@ runs before every build.
 4. **Cross-checks the languages.** If `en` and `es` disagree about which modules
    or lessons exist, the build fails. A half-translated lesson cannot ship, and
    the language switcher can never point at a page that does not exist.
-5. Emits three things into `src/app/content-generated/`:
+5. **Resolves references.** It loads `content/bibliography.yaml` (one entry per
+   source, keyed by id; unknown keys or a missing `title` fail; `modules` and
+   `comment` are bookkeeping and never rendered; an optional `titleStyle`,
+   `italic` or `quoted`, overrides the section's default title style), checks
+   that `section: es` and `lang: es` go together (each requires the other)
+   and that every `es:` link points
+   at an entry with `lang: es`, and resolves each lesson's
+   `references:` (an id or `{ id, note }`) into the lesson data. It fails on an
+   unknown or duplicate id, a malformed item, or EN and ES citing different
+   ids. `docs/BIBLIOGRAPHY.md` is still hand-written and must be kept in step
+   with the YAML.
+6. Emits three things into `src/app/content-generated/`:
    - `lessons/{lang}.{moduleId}.{lessonId}.ts` — one TypeScript module per
      lesson, exporting a typed `Lesson`.
    - `loaders.ts` — a `route key → dynamic import` map.
    - `curriculum.ts` — the metadata index (no lesson bodies).
-6. Writes `public/sitemap.xml`.
+7. Writes `public/sitemap.xml`.
 
 **Why TypeScript modules and not JSON served over HTTP.** The obvious design is
 JSON in `public/` fetched with `HttpClient`. It was rejected because HTTP during
@@ -463,9 +481,10 @@ manage and no firewall rule to get wrong.
 Two extension points, both deliberately narrow.
 
 **A lesson** is two Markdown files — one per language, same directory, same
-filename — with `slug`, `title`, `summary` and `minutes` in the front matter.
-Run `pnpm content`. Routing, navigation, prev/next, sitemap and prerendering all
-follow from that. See `README.md`.
+filename — with `slug`, `title`, `summary` and `minutes` in the front matter,
+plus `references:` ids from `content/bibliography.yaml` (the same ids in both
+languages). Run `pnpm content`. Routing, navigation, prev/next, sitemap and
+prerendering all follow from that. See `README.md`.
 
 **An instrument** is a standalone component taking `props`, registered in
 `lesson/widget-registry.ts` as a dynamic import. Reuse `Panel`, `Control` and

@@ -62,7 +62,8 @@ git-ignored. `pnpm content` recreates them.
    content/es/02-time-and-frequency/03-rc-transient.md
    ```
 
-2. Front matter (all fields required except `minutes`):
+2. Front matter (`slug`, `title` and `summary` required; `minutes` and
+   `references` optional):
 
    ```yaml
    ---
@@ -70,8 +71,43 @@ git-ignored. `pnpm content` recreates them.
    title: The RC transient
    summary: One sentence, used on the module page and as the meta description.
    minutes: 9
+   references:               # ids from content/bibliography.yaml
+     - horowitz-hill-2015
+     - id: fluke-11x-manual
+       note: "DC volts input impedance above 10 MΩ (Table 7)."
    ---
    ```
+
+   Each `references` item is an id, or `{ id, note }` with a note in the
+   lesson's language (use it to name the figure the source backs). EN and ES of
+   a lesson must cite the same ids. The page renders them after the body as
+   "Sources and further reading" ("Fuentes y lecturas recomendadas"); on ES
+   pages an entry with a Spanish edition adds an "En español: …" line.
+
+   Sources live in `content/bibliography.yaml`, a mapping keyed by id:
+
+   ```yaml
+   fluke-11x-manual:
+     section: "datasheet"    # textbook | note | standard | datasheet | web | es
+     authors: "Fluke Corporation"
+     title: "110/113/114/115/117 True-rms Multimeter Users Manual"
+     year: "March 2020"
+     url: "https://media.fluke.com/5e1db354-3a6e-49cf-9edd-b10800c0e608_original%20file.pdf"
+     modules: ["00-02", "00-03"]   # bookkeeping only, not rendered
+     comment: "Hosted copy labelled Simplified Chinese; tables in English."
+   ```
+
+   Values are double-quoted strings (or lists of strings). `section` and
+   `title` are required; the other fields are `authors`, `container`,
+   `edition`, `publisher`, `year`, `identifier`, `url`, `lang` (`en` by
+   default, or `es`; `section: "es"` and `lang: "es"` go together, each
+   requires the other), `es` (the id of a
+   Spanish edition, which must have `lang: "es"`) and `titleStyle` (`"italic"`
+   or `"quoted"`, overriding the section default: italic for textbook,
+   standard, datasheet and es; quoted for note and web). Two fields are never
+   rendered: `modules` (which lessons use the source) and `comment` (editorial
+   or verification remarks). Unknown keys fail the build. A new source also
+   goes in `docs/BIBLIOGRAPHY.md`, under the same id, in the same change.
 
 3. Write the prose. Two directives are available:
 
@@ -84,7 +120,10 @@ git-ignored. `pnpm content` recreates them.
    ```
 
 4. `pnpm content`. The build fails loudly if the two languages disagree about
-   which modules or lessons exist, so a half-translated lesson cannot ship.
+   which modules or lessons exist, so a half-translated lesson cannot ship. It
+   also fails on an unknown or duplicate reference id, a malformed
+   `references` item or bibliography entry, an `es:` link to a missing or
+   non-Spanish entry, and EN and ES citing different ids.
 
 Modules themselves are defined by `_module.md` in each module folder, with
 `slug`, `title` and `summary`. A module with no lessons renders as "being

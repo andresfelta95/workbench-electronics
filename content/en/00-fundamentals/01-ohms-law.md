@@ -3,6 +3,19 @@ slug: ohms-law
 title: Ohm's Law
 summary: How voltage, current and resistance are linked, and how to check that a resistor can take the heat.
 minutes: 10
+references:
+  - id: usb-if-usb2
+    note: "A USB port gives 5 V."
+  - id: kingbright-wp7113id
+    note: "A red LED takes about 2 V: 1.9 V typical, 2.3 V maximum at 10 mA."
+  - id: yageo-cfr
+    note: "Resistors with wire legs are often 1/4 W: the CFR-25 is rated 1/4 W at 70 °C (Table 1)."
+  - id: yageo-rc-l
+    note: "Tiny surface-mount resistors are often 1/10 W: the RC0603 is rated 1/10 W at 70 °C."
+  - id: horowitz-hill-2015
+    note: "Chapter 1."
+  - id: kuphaldt-liec
+    note: "Volume I (DC). Free online."
 ---
 
 A phone charger's label might say "5 V 2 A". The first number is the voltage

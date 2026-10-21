@@ -20,6 +20,26 @@
  *   :::note Optional title
  *   body markdown
  *   :::
+ *
+ * Front matter. `_module.md`: slug, title, summary (all required); it never
+ * takes `references:`. Each lesson: slug, title, summary (required), minutes
+ * (optional, default 5) and `references:` (optional), a list of ids into the
+ * shared `content/bibliography.yaml`, each either a bare id or
+ * `{ id, note }` where the note is in the lesson's language:
+ *
+ *   references:
+ *     - horowitz-hill-2015
+ *     - id: yageo-cfr
+ *       note: "tolerance and power rating of carbon-film resistors"
+ *
+ * The build fails on an unknown or duplicated id, a malformed item, a
+ * malformed bibliography entry (missing title, unknown key or section, a bad
+ * `titleStyle:` or url, `section: es` without `lang: es` or the reverse, an
+ * `es:` alternate that is missing or not `lang: es`), or when the EN and ES
+ * versions of a lesson cite different id sets. Only the cited entries are
+ * resolved into each lesson module (ES lessons also get the `es:` alternate),
+ * so no YAML is parsed at runtime. The bibliography's `modules` and `comment`
+ * fields are bookkeeping and never reach the generated data.
  */
 import { readdir, readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -118,6 +138,193 @@ function toBlocks(markdown, ctx) {
   return blocks;
 }
 
+/* References ------------------------------------------------------------- */
+
+const BIB_FILE = path.join(CONTENT_DIR, 'bibliography.yaml');
+// BIBLIOGRAPHY.md §1–§6.
+const BIB_SECTIONS = new Set(['textbook', 'note', 'standard', 'datasheet', 'web', 'es']);
+const BIB_TEXT_FIELDS = [
+  'authors',
+  'title',
+  'container',
+  'edition',
+  'publisher',
+  'year',
+  'identifier',
+  'url',
+];
+// `modules` and `comment` are editorial bookkeeping: validated, never shipped.
+const BIB_KEYS = new Set([
+  'section',
+  'lang',
+  'es',
+  'titleStyle',
+  'modules',
+  'comment',
+  ...BIB_TEXT_FIELDS,
+]);
+// Sections whose titles default to italics; the rest default to quotes.
+// `titleStyle:` overrides it, e.g. a book or course listed under note/web.
+const ITALIC_SECTIONS = new Set(['textbook', 'standard', 'datasheet', 'es']);
+const TITLE_STYLES = new Set(['italic', 'quoted']);
+const REF_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+/**
+ * Loads and validates `content/bibliography.yaml`. A missing file is an empty
+ * bibliography, so any lesson that cites something then fails.
+ * Returns a Map of id -> entry (without the bookkeeping `modules` and `comment` fields).
+ */
+async function loadBibliography() {
+  const bib = new Map();
+  if (!existsSync(BIB_FILE)) return bib;
+
+  const file = 'content/bibliography.yaml';
+  let raw;
+  try {
+    raw = matter.engines.yaml.parse(await readFile(BIB_FILE, 'utf8'));
+  } catch (err) {
+    throw new Error(`${file}: invalid YAML: ${err.message}`);
+  }
+  if (raw === null || raw === undefined) return bib;
+  if (!isPlainObject(raw)) throw new Error(`${file}: must be a mapping of id -> entry`);
+
+  for (const [id, data] of Object.entries(raw)) {
+    const ctx = `${file}/${id}`;
+    if (!REF_ID_RE.test(id)) throw new Error(`${ctx}: id must be kebab-case (a-z, 0-9, -)`);
+    if (!isPlainObject(data)) throw new Error(`${ctx}: entry must be a mapping`);
+
+    const unknown = Object.keys(data).filter((k) => !BIB_KEYS.has(k));
+    if (unknown.length) {
+      throw new Error(
+        `${ctx}: unknown key(s) ${unknown.map((k) => `"${k}"`).join(', ')}; allowed: ${[...BIB_KEYS].join(', ')}`,
+      );
+    }
+    if (!BIB_SECTIONS.has(data.section)) {
+      throw new Error(
+        `${ctx}: section must be one of ${[...BIB_SECTIONS].join(' | ')} (got ${JSON.stringify(data.section)})`,
+      );
+    }
+
+    const entry = { id, section: data.section };
+    for (const field of BIB_TEXT_FIELDS) {
+      const value = data[field];
+      if (value === undefined || value === null) continue;
+      // YAML reads an unquoted 2015 as a number; accept it as text.
+      if (typeof value !== 'string' && typeof value !== 'number') {
+        throw new Error(`${ctx}: "${field}" must be a string`);
+      }
+      const text = String(value).trim();
+      if (text) entry[field] = text;
+    }
+    if (!entry.title) throw new Error(`${ctx}: missing required field "title"`);
+    if (entry.url && !(/^https?:\/\/\S+$/.test(entry.url) && URL.canParse(entry.url))) {
+      throw new Error(`${ctx}: url must be an absolute http(s) URL`);
+    }
+
+    if (data.titleStyle !== undefined && !TITLE_STYLES.has(data.titleStyle)) {
+      throw new Error(
+        `${ctx}: titleStyle must be italic or quoted (got ${JSON.stringify(data.titleStyle)})`,
+      );
+    }
+    entry.titleStyle =
+      data.titleStyle ?? (ITALIC_SECTIONS.has(entry.section) ? 'italic' : 'quoted');
+
+    const lang = data.lang ?? 'en';
+    if (lang !== 'en' && lang !== 'es') {
+      throw new Error(`${ctx}: lang must be en or es (got ${JSON.stringify(lang)})`);
+    }
+    // §6 holds exactly the Spanish-language works.
+    if ((entry.section === 'es') !== (lang === 'es')) {
+      throw new Error(
+        `${ctx}: section: es and lang: es go together (got section: ${entry.section}, lang: ${lang})`,
+      );
+    }
+    entry.lang = lang;
+
+    if (data.es !== undefined && data.es !== null) {
+      if (typeof data.es !== 'string' || !data.es) throw new Error(`${ctx}: "es" must be an id`);
+      entry.es = data.es;
+    }
+    if (data.modules !== undefined && !Array.isArray(data.modules)) {
+      throw new Error(`${ctx}: "modules" must be a list`);
+    }
+    if (data.comment !== undefined && data.comment !== null && typeof data.comment !== 'string') {
+      throw new Error(`${ctx}: "comment" must be a string`);
+    }
+
+    bib.set(id, entry);
+  }
+
+  // Alternates are checked once every id is known.
+  for (const entry of bib.values()) {
+    if (!entry.es) continue;
+    const ctx = `${file}/${entry.id}`;
+    const alt = bib.get(entry.es);
+    if (!alt) throw new Error(`${ctx}: es: "${entry.es}" is not an id in the bibliography`);
+    if (alt.id === entry.id) throw new Error(`${ctx}: es: points at the entry itself`);
+    if (alt.lang !== 'es') {
+      throw new Error(`${ctx}: es: "${entry.es}" must be a Spanish-language entry (lang: es)`);
+    }
+  }
+
+  return bib;
+}
+
+/** A bibliography entry as shipped to the browser (no bookkeeping fields). */
+function publicEntry(entry) {
+  const { es, ...rest } = entry;
+  return rest;
+}
+
+/**
+ * Validates a lesson's `references:` and resolves each id against the
+ * bibliography. ES lessons also carry the `es:` alternate edition.
+ */
+function resolveReferences(value, bib, lang, ctx) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) throw new Error(`${ctx}: references: must be a list`);
+
+  const seen = new Set();
+  return value.map((item, index) => {
+    const where = `${ctx}: references[${index}]`;
+    let id;
+    let note;
+    if (typeof item === 'string') {
+      id = item;
+    } else if (isPlainObject(item)) {
+      const extra = Object.keys(item).filter((k) => k !== 'id' && k !== 'note');
+      if (extra.length) {
+        throw new Error(`${where}: unknown key(s) ${extra.join(', ')}; allowed: id, note`);
+      }
+      id = item.id;
+      if (item.note !== undefined && item.note !== null) {
+        if (typeof item.note !== 'string' || !item.note.trim()) {
+          throw new Error(`${where}: note must be non-empty text`);
+        }
+        note = item.note.trim();
+      }
+    } else {
+      throw new Error(`${where}: must be an id or { id, note }`);
+    }
+    if (typeof id !== 'string' || !id.trim()) throw new Error(`${where}: missing id`);
+    id = id.trim();
+
+    const entry = bib.get(id);
+    if (!entry) {
+      throw new Error(`${ctx}: unknown reference id "${id}" (not in content/bibliography.yaml)`);
+    }
+    if (seen.has(id)) throw new Error(`${ctx}: reference id "${id}" is listed twice`);
+    seen.add(id);
+
+    const ref = publicEntry(entry);
+    if (note) ref.note = note;
+    if (lang === 'es' && entry.es) ref.es = publicEntry(bib.get(entry.es));
+    return ref;
+  });
+}
+
 function requireField(data, field, ctx) {
   const value = data[field];
   if (value === undefined || value === null || value === '') {
@@ -126,13 +333,16 @@ function requireField(data, field, ctx) {
   return value;
 }
 
-async function readModule(lang, moduleId) {
+async function readModule(lang, moduleId, bib) {
   const dir = path.join(CONTENT_DIR, lang, moduleId);
   const modulePath = path.join(dir, '_module.md');
   if (!existsSync(modulePath)) throw new Error(`${lang}/${moduleId}: no _module.md`);
 
   const parsed = matter(await readFile(modulePath, 'utf8'));
   const ctx = `${lang}/${moduleId}/_module.md`;
+  if (parsed.data['references'] !== undefined) {
+    throw new Error(`${ctx}: references: belongs in lessons, not in _module.md`);
+  }
   const meta = {
     id: moduleId,
     number: moduleId.split('-')[0],
@@ -162,13 +372,14 @@ async function readModule(lang, moduleId) {
       minutes: Number.isFinite(minutes) && minutes > 0 ? minutes : 5,
       widgets: blocks.filter((b) => b.kind === 'widget').map((b) => b.type),
       blocks,
+      references: resolveReferences(lesson.data['references'], bib, lang, lessonCtx),
     });
   }
 
   return meta;
 }
 
-async function buildLang(lang) {
+async function buildLang(lang, bib) {
   const langDir = path.join(CONTENT_DIR, lang);
   const moduleIds = (await readdir(langDir, { withFileTypes: true }))
     .filter((e) => e.isDirectory())
@@ -176,12 +387,18 @@ async function buildLang(lang) {
     .sort();
 
   const modules = [];
-  for (const id of moduleIds) modules.push(await readModule(lang, id));
+  for (const id of moduleIds) modules.push(await readModule(lang, id, bib));
 
   // Emit one TS module per lesson; the index keeps metadata only.
   const loaders = [];
+  /** `{moduleId}/{lessonId}` -> cited ids, for the EN/ES cross-check. */
+  const citations = new Map();
   for (const mod of modules) {
     for (const lesson of mod.lessons) {
+      citations.set(
+        `${mod.id}/${lesson.id}`,
+        lesson.references.map((r) => r.id),
+      );
       const file = `${lang}.${mod.id}.${lesson.id}`;
       await writeFile(
         path.join(LESSON_DIR, `${file}.ts`),
@@ -200,6 +417,7 @@ async function buildLang(lang) {
               minutes: lesson.minutes,
               widgets: lesson.widgets,
               blocks: lesson.blocks,
+              references: lesson.references,
             },
             null,
             2,
@@ -213,6 +431,7 @@ async function buildLang(lang) {
 
   return {
     loaders,
+    citations,
     lang,
     modules: modules.map((mod) => ({
       id: mod.id,
@@ -221,7 +440,7 @@ async function buildLang(lang) {
       title: mod.title,
       summary: mod.summary,
       intro: mod.intro,
-      lessons: mod.lessons.map(({ blocks, ...rest }) => rest),
+      lessons: mod.lessons.map(({ blocks, references, ...rest }) => rest),
     })),
   };
 }
@@ -252,12 +471,16 @@ async function main() {
   await rm(GEN_DIR, { recursive: true, force: true });
   await mkdir(LESSON_DIR, { recursive: true });
 
+  const bib = await loadBibliography();
   const curricula = {};
+  const citations = {};
   const loaders = [];
   for (const lang of LANGS) {
-    const built = await buildLang(lang);
+    const built = await buildLang(lang, bib);
     loaders.push(...built.loaders);
+    citations[lang] = built.citations;
     delete built.loaders;
+    delete built.citations;
     curricula[lang] = built;
   }
 
@@ -276,6 +499,17 @@ async function main() {
     if (lessonsA !== lessonsB) {
       throw new Error(
         `lesson ids differ in module ${mod.id}:\n  ${a}: ${lessonsA}\n  ${b}: ${lessonsB}`,
+      );
+    }
+  }
+
+  // A translation cites the same sources as its original (order may differ).
+  for (const [key, citedA] of citations[a]) {
+    const setA = [...citedA].sort().join(', ');
+    const setB = [...(citations[b].get(key) ?? [])].sort().join(', ');
+    if (setA !== setB) {
+      throw new Error(
+        `${key}: references differ between "${a}" and "${b}":\n  ${a}: ${setA || '(none)'}\n  ${b}: ${setB || '(none)'}`,
       );
     }
   }

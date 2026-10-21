@@ -3,6 +3,21 @@ slug: voltage-divider
 title: The Voltage Divider, and What Loading Does to It
 summary: How two resistors make a smaller voltage, and why the output drops when you connect something to it.
 minutes: 12
+references:
+  - id: fluke-11x-manual
+    note: "A multimeter's 10 MΩ: the Fluke 110 series measures DC volts with more than 10 MΩ of input impedance (Table 7)."
+  - id: fender-tm-twin-reverb
+    note: "Guitar amplifiers have about 1 MΩ of input impedance: this amplifier's Input 1 is 1 MΩ."
+  - id: yuasa-powersports-manual
+    note: "12 V lead-acid battery voltages: 11.8 V or less at rest is flat, and a working charging system holds 13.0 to 14.5 V. Yuasa's charger peaks at 14.4 V."
+  - id: bu-403
+    note: "Charging limit for a six-cell lead-acid battery: 13.8 to 14.7 V."
+  - id: microchip-atmega328p
+    note: "The ADC asks for a source impedance of 10 kΩ or less."
+  - id: horowitz-hill-2015
+    note: "Chapter 1."
+  - id: kuphaldt-liec
+    note: "Volume I (DC). Free online."
 ---
 
 You want a microcontroller to measure a 12 V battery, but its input only reads

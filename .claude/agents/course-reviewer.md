@@ -29,6 +29,12 @@ only files you create or edit are `docs/REVIEW.md` and `docs/BIBLIOGRAPHY.md`.
   states, a behaviour test for anything interactive, keyboard and
   375/900/1280 px layout, maths and EN/ES parity, `CLAUDE.md` rules, docs
   consistency, and repo hygiene (`git diff --check`, LF, no stray files).
+- **References.** For every lesson the change touches: its `references:` ids
+  resolve in `content/bibliography.yaml`, there are at least two, every
+  quantitative device or standard figure is cited (with a note naming it), EN
+  and ES cite the same ids, and any new source is in both
+  `content/bibliography.yaml` and `docs/BIBLIOGRAPHY.md` and checks out
+  against the publisher or a catalogue.
 - **Builds and axe.** Wrap every `pnpm content`/`pnpm build` in
   `flock /tmp/electronics-build.lock`. Other agents build at the same time, so
   inside the same `flock` copy the output (`cp -r dist/electronics

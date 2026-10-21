@@ -41,6 +41,10 @@ export interface UiStrings {
     backToModule: string;
     onThisPage: string;
     interactive: string;
+    /** Heading of the per-lesson bibliography block. */
+    sources: string;
+    /** Prefix for an entry's Spanish-language edition (shown on ES pages). */
+    inSpanish: string;
   };
   callout: Record<'note' | 'warning' | 'key' | 'safety', string>;
   widget: {
@@ -152,6 +156,8 @@ const en: UiStrings = {
     backToModule: 'Back to module',
     onThisPage: 'On this page',
     interactive: 'Interactive',
+    sources: 'Sources and further reading',
+    inSpanish: 'In Spanish:',
   },
   callout: {
     note: 'Note',
@@ -277,6 +283,8 @@ const es: UiStrings = {
     backToModule: 'Volver al módulo',
     onThisPage: 'En esta página',
     interactive: 'Interactivo',
+    sources: 'Fuentes y lecturas recomendadas',
+    inSpanish: 'En español:',
   },
   callout: {
     note: 'Nota',

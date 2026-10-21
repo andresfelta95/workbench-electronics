@@ -1,0 +1,635 @@
+# Course bibliography: the single source of every reference a lesson can cite.
+#
+# Each top-level key is a reference id (kebab-case). Lessons cite these ids in
+# their `references:` front matter. Entries were transcribed from the tables in
+# docs/BIBLIOGRAPHY.md §1–§6; that document records how and when each entry was
+# verified, and lists unverified or excluded candidates (§8) that must not be
+# added here until checked.
+#
+# Fields (all values are double-quoted strings, or lists of strings):
+#   section     required  textbook (§1) | note (§2) | standard (§3) |
+#                         datasheet (§4) | web (§5) | es (§6)
+#   title       required  the document's own title only, without surrounding
+#                         italics or quotes
+#   titleStyle  optional  "italic" | "quoted": overrides the section default
+#                         (used for whole works listed under note/web)
+#   authors     optional  copied as written ("Surname, I.; Surname, I.")
+#   container   optional  journal, series, report/tutorial number, volume
+#   edition     optional
+#   publisher   optional
+#   year        optional  date text as written, qualifiers included
+#   identifier  optional  ISBN / DOI / document number (several in one string)
+#   url         optional
+#   lang        optional  "es" for Spanish-language entries; omitted = English
+#   es          optional  on an English entry: id of its Spanish alternate
+#   modules     optional  modules or lesson ids (with the figure supported)
+#   comment     optional  editorial / verification remark; never rendered
+
+# ---------------------------------------------------------------------------
+# §1 Textbooks
+# ---------------------------------------------------------------------------
+
+horowitz-hill-2015:
+  section: "textbook"
+  authors: "Horowitz, P.; Hill, W."
+  title: "The Art of Electronics"
+  edition: "3rd ed."
+  publisher: "Cambridge University Press"
+  year: "2015"
+  identifier: "ISBN 978-0-521-80926-9"
+  modules: ["00–11 (the general reference)"]
+
+scherz-monk-2016:
+  section: "textbook"
+  authors: "Scherz, P.; Monk, S."
+  title: "Practical Electronics for Inventors"
+  edition: "4th ed."
+  publisher: "McGraw-Hill Education (TAB)"
+  year: "2016"
+  identifier: "ISBN 978-1-259-58754-2"
+  modules: ["00", "01", "03", "06", "07", "09", "10"]
+
+floyd-buchla-2019:
+  section: "textbook"
+  authors: "Floyd, T. L.; Buchla, D. M."
+  title: "Principles of Electric Circuits: Conventional Current Version"
+  edition: "10th ed."
+  publisher: "Pearson"
+  year: "2019"
+  identifier: "ISBN 978-0-13-487948-2"
+  es: "floyd-2007-es"
+  modules: ["00", "01", "02"]
+
+agarwal-lang-2005:
+  section: "textbook"
+  authors: "Agarwal, A.; Lang, J. H."
+  title: "Foundations of Analog and Digital Electronic Circuits"
+  publisher: "Morgan Kaufmann (Elsevier)"
+  year: "2005"
+  identifier: "ISBN 978-1-55860-735-4"
+  modules: ["00", "02", "03", "06"]
+
+sedra-smith-2020:
+  section: "textbook"
+  authors: "Sedra, A. S.; Smith, K. C.; Chan Carusone, T.; Gaudet, V."
+  title: "Microelectronic Circuits"
+  edition: "8th ed."
+  publisher: "Oxford University Press"
+  year: "2020"
+  comment: "released Nov. 2019"
+  identifier: "ISBN 978-0-19-085346-4"
+  es: "sedra-smith-2006-es"
+  modules: ["03", "04"]
+
+franco-2015:
+  section: "textbook"
+  authors: "Franco, S."
+  title: "Design with Operational Amplifiers and Analog Integrated Circuits"
+  edition: "4th ed."
+  publisher: "McGraw-Hill Education"
+  year: "2015"
+  comment: "©; on sale Jan. 2014"
+  identifier: "ISBN 978-0-07-802816-8"
+  es: "franco-2005-es"
+  modules: ["04", "08", "10"]
+
+carter-mancini-2017:
+  section: "textbook"
+  authors: "Carter, B.; Mancini, R."
+  title: "Op Amps for Everyone"
+  edition: "5th ed."
+  publisher: "Newnes (Elsevier)"
+  year: "2017"
+  identifier: "ISBN 978-0-12-811648-7"
+  modules: ["04", "08", "10"]
+
+jung-2005:
+  section: "textbook"
+  authors: "Jung, W. (ed.), with the staff of Analog Devices"
+  title: "Op Amp Applications Handbook"
+  publisher: "Newnes (Elsevier)"
+  year: "2005"
+  identifier: "ISBN 978-0-7506-7844-5"
+  modules: ["04", "08", "10"]
+
+erickson-maksimovic-2020:
+  section: "textbook"
+  authors: "Erickson, R. W.; Maksimović, D."
+  title: "Fundamentals of Power Electronics"
+  edition: "3rd ed."
+  publisher: "Springer"
+  year: "2020"
+  identifier: "ISBN 978-3-030-43879-1. DOI 10.1007/978-3-030-43881-4"
+  modules: ["05", "08 (class D)", "09"]
+
+wurth-trilogy-2018:
+  section: "textbook"
+  authors: "Brander, T.; Gerfer, A.; Rall, B.; Zenkner, H."
+  title: "Trilogy of Magnetics: Design Guide for EMI Filter Design, SMPS & RF Circuits"
+  edition: "5th ed."
+  publisher: "Würth Elektronik eiSos"
+  year: "2018"
+  identifier: "ISBN 978-3-89929-157-5"
+  modules: ["01 (inductors)", "05", "11"]
+
+self-2020:
+  section: "textbook"
+  authors: "Self, D."
+  title: "Small Signal Audio Design"
+  edition: "3rd ed."
+  publisher: "Focal Press (Routledge)"
+  year: "2020"
+  identifier: "ISBN 978-0-367-46895-8 (pbk), 978-0-367-46896-5 (hbk)"
+  modules: ["08"]
+
+hughes-drury-2019:
+  section: "textbook"
+  authors: "Hughes, A.; Drury, B."
+  title: "Electric Motors and Drives: Fundamentals, Types and Applications"
+  edition: "5th ed."
+  publisher: "Newnes (Elsevier)"
+  year: "2019"
+  identifier: "ISBN 978-0-08-102615-1"
+  modules: ["09"]
+
+ott-2009:
+  section: "textbook"
+  authors: "Ott, H. W."
+  title: "Electromagnetic Compatibility Engineering"
+  publisher: "John Wiley & Sons"
+  year: "2009"
+  identifier: "ISBN 978-0-470-18930-6"
+  modules: ["08 (grounding, hum)", "11"]
+
+bogatin-2018:
+  section: "textbook"
+  authors: "Bogatin, E."
+  title: "Signal and Power Integrity — Simplified"
+  edition: "3rd ed."
+  publisher: "Pearson (Prentice Hall)"
+  year: "2018"
+  identifier: "ISBN 978-0-13-451341-6"
+  modules: ["11"]
+
+wadell-1991:
+  section: "textbook"
+  authors: "Wadell, B. C."
+  title: "Transmission Line Design Handbook"
+  publisher: "Artech House"
+  year: "1991"
+  identifier: "ISBN 978-0-89006-436-8"
+  modules: ["11 (controlled impedance)"]
+
+# ---------------------------------------------------------------------------
+# §2 Application notes, tutorials and papers
+# ---------------------------------------------------------------------------
+
+fortunato-5527:
+  section: "note"
+  authors: "Fortunato, M."
+  title: "Temperature and Voltage Variation of Ceramic Capacitors, or Why Your 4.7µF Capacitor Becomes a 0.33µF Capacitor"
+  container: "Maxim Integrated Tutorial 5527"
+  comment: "now hosted by Analog Devices"
+  year: "2012"
+  url: "https://www.analog.com/en/resources/technical-articles/temperature-and-voltage-variation-ceramic-capacitor.html"
+  modules: ["01 (MLCC DC bias)", "05", "11"]
+
+ti-slva477:
+  section: "note"
+  authors: "Texas Instruments"
+  title: "Basic Calculation of a Buck Converter's Power Stage"
+  container: "Application Report SLVA477"
+  url: "https://www.ti.com/lit/pdf/slva477"
+  modules: ["05"]
+
+ti-slva372:
+  section: "note"
+  authors: "Texas Instruments"
+  title: "Basic Calculation of a Boost Converter's Power Stage"
+  container: "Application Report SLVA372"
+  url: "https://www.ti.com/lit/pdf/slva372"
+  modules: ["05"]
+
+ti-spra953:
+  section: "note"
+  authors: "Texas Instruments"
+  title: "Semiconductor and IC Package Thermal Metrics"
+  container: "Application Note SPRA953"
+  url: "https://www.ti.com/lit/pdf/spra953"
+  modules: ["00 (thermal resistance)", "03", "05"]
+
+ti-slua618:
+  section: "note"
+  authors: "Balogh, L."
+  title: "Fundamentals of MOSFET and IGBT Gate Driver Circuits"
+  publisher: "Texas Instruments"
+  year: "2017, rev. 2018"
+  identifier: "SLUA618A"
+  url: "https://www.ti.com/lit/pdf/slua618"
+  modules: ["03 (switching losses)", "05", "09"]
+
+nexperia-an10441:
+  section: "note"
+  authors: "NXP / Nexperia"
+  title: "Level shifting techniques in I²C-bus design"
+  edition: "Rev. 2"
+  year: "10 Feb. 2020"
+  identifier: "AN10441"
+  url: "https://assets.nexperia.com/documents/application-note/AN10441.pdf"
+  modules: ["06 (level shifting)", "07"]
+
+ti-slva689:
+  section: "note"
+  authors: "Arora, R."
+  title: "I2C Bus Pullup Resistor Calculation"
+  publisher: "Texas Instruments"
+  year: "Feb. 2015"
+  identifier: "SLVA689"
+  url: "https://www.ti.com/lit/pdf/slva689"
+  modules: ["06 (pull-ups)", "07 (I²C)"]
+
+ganssle-debounce:
+  section: "note"
+  authors: "Ganssle, J. G."
+  title: "A Guide to Debouncing"
+  publisher: "The Ganssle Group"
+  year: "2004, rev. 2008"
+  url: "https://www.ganssle.com/debouncing.htm"
+  modules: ["06"]
+
+adi-mt002:
+  section: "note"
+  authors: "Kester, W."
+  title: "What the Nyquist Criterion Means to Your Sampled Data System Design"
+  container: "Analog Devices Tutorial MT-002"
+  url: "https://www.analog.com/media/en/training-seminars/tutorials/MT-002.pdf"
+  modules: ["06 (ADC, aliasing)", "10"]
+
+dhaker-2018:
+  section: "note"
+  authors: "Dhaker, P."
+  title: "Introduction to SPI Interface"
+  container: "Analog Dialogue 52-09"
+  publisher: "Analog Devices"
+  year: "Sept. 2018"
+  url: "https://www.analog.com/en/resources/analog-dialogue/articles/introduction-to-spi-interface.html"
+  modules: ["07"]
+
+tek-xyz:
+  section: "note"
+  authors: "Tektronix"
+  title: "XYZs of Oscilloscopes"
+  titleStyle: "italic"
+  container: "Primer"
+  url: "https://www.tek.com/en/documents/primer/xyzs-oscilloscopes-primer"
+  modules: ["02", "07 (oscilloscope)"]
+
+fluke-abc-safety:
+  section: "note"
+  authors: "Fluke Corporation"
+  title: "ABCs of multimeter safety"
+  container: "Application note"
+  comment: "IEC 61010 measurement categories"
+  url: "https://media.fluke.com/51012112-8f43-4aa7-a30a-b2e3016e8f2f_original%20file.pdf"
+  modules: ["00 (multimeter, 00-05)", "safety callouts"]
+
+ti-sloa119:
+  section: "note"
+  authors: "Texas Instruments"
+  title: "Class-D LC Filter Design"
+  container: "Application Report SLOA119"
+  year: "2006, rev. 2008"
+  url: "https://www.ti.com/lit/pdf/sloa119"
+  modules: ["08 (class D)"]
+
+whitlock-an004:
+  section: "note"
+  authors: "Whitlock, B."
+  title: "Hum & Buzz in Unbalanced Interconnect Systems"
+  container: "Jensen Transformers Application Note AN-004"
+  url: "https://www.jensen-transformers.com/wp-content/uploads/2014/08/an004.pdf"
+  modules: ["08 (hum, ground loops)"]
+
+kitchin-counts-2006:
+  section: "note"
+  authors: "Kitchin, C.; Counts, L."
+  title: "A Designer's Guide to Instrumentation Amplifiers"
+  titleStyle: "italic"
+  edition: "3rd ed."
+  publisher: "Analog Devices"
+  year: "2006"
+  url: "https://www.analog.com/media/en/training-seminars/design-handbooks/designers-guide-instrument-amps-TOC-bib.pdf"
+  modules: ["10 (in-amps, bridges)"]
+
+yuasa-powersports-manual:
+  section: "note"
+  authors: "Yuasa Battery, Inc."
+  title: "Technical Manual: Powersports Batteries"
+  titleStyle: "italic"
+  comment: "Undated (file published 2017)"
+  url: "https://www.yuasabatteries.com/wp-content/uploads/2017/07/TechManual.x78244.pdf"
+  modules:
+    - "00-03"
+    - "00-04 (12 V lead-acid: a fully charged conventional battery rests at 12.6 V, 11.8 V or less at rest is 0 %, \"fully discharged\" at 10.5 V in a capacity test; a working charging system holds 13.0–14.5 V, AGM batteries need 14.0–14.8 V, Yuasa's charger peaks at 14.4 V)"
+
+ti-slay054:
+  section: "note"
+  authors: "Texas Instruments"
+  title: "Temperature Sensing with Thermistors"
+  edition: "Rev. A"
+  identifier: "SLAY054"
+  url: "https://www.ti.com/lit/pdf/slay054"
+  modules: ["10 (thermistors)"]
+
+steinhart-hart-1968:
+  section: "note"
+  authors: "Steinhart, J. S.; Hart, S. R."
+  title: "Calibration curves for thermistors"
+  container: "Deep Sea Research and Oceanographic Abstracts 15 (4): 497–503"
+  year: "1968"
+  identifier: "DOI 10.1016/0011-7471(68)90057-0"
+  modules: ["10"]
+
+# ---------------------------------------------------------------------------
+# §3 Standards and specifications
+# ---------------------------------------------------------------------------
+
+iec-60063-2015:
+  section: "standard"
+  authors: "IEC"
+  title: "IEC 60063:2015, Preferred number series for resistors and capacitors"
+  edition: "Ed. 3.0"
+  year: "2015"
+  modules: ["01 (E-series)", "00 (E24 in `Control`)"]
+
+ipc-2152:
+  section: "standard"
+  authors: "IPC"
+  title: "IPC-2152, Standard for Determining Current Carrying Capacity in Printed Board Design"
+  year: "2009"
+  modules: ["11 (trace width)"]
+  comment: "See REVIEW m-06 on licensing."
+
+ipc-2221b:
+  section: "standard"
+  authors: "IPC"
+  title: "IPC-2221B, Generic Standard on Printed Board Design"
+  year: "2012"
+  comment: "Superseded by IPC-2221C (2023)"
+  modules: ["11"]
+
+nxp-um10204:
+  section: "standard"
+  authors: "NXP Semiconductors"
+  title: "UM10204, I²C-bus specification and user manual"
+  edition: "Rev. 7.0"
+  year: "1 Oct. 2021"
+  url: "https://www.nxp.com/docs/en/user-guide/UM10204.pdf"
+  modules: ["06", "07"]
+
+usb-if-usb2:
+  section: "standard"
+  authors: "USB Implementers Forum"
+  title: "Universal Serial Bus Specification"
+  edition: "Revision 2.0"
+  year: "27 Apr. 2000"
+  comment: "USB-IF document library package dated 3 June 2025"
+  url: "https://www.usb.org/document-library/usb-20-specification"
+  modules:
+    - "00-01 (a USB port gives 5 V)"
+    - "00-04 (bus-powered hub: the current in the upstream cable feeds the hub and its ports, §7.2.1)"
+
+ucamco-gerber:
+  section: "standard"
+  authors: "Ucamco"
+  title: "The Gerber Layer Format Specification"
+  edition: "Revision 2026.05"
+  year: "19 May 2026"
+  comment: "previous revision 2024.05"
+  url: "https://www.ucamco.com/en/gerber/downloads"
+  modules: ["11 (fab files)"]
+
+# ---------------------------------------------------------------------------
+# §4 Datasheets and product manuals
+# ---------------------------------------------------------------------------
+
+ti-ne555:
+  section: "datasheet"
+  authors: "Texas Instruments"
+  title: "xx555 Precision Timers"
+  container: "Datasheet SLFS022"
+  comment: "NA555, NE555, SA555, SE555"
+  url: "https://www.ti.com/lit/ds/symlink/ne555.pdf"
+  modules: ["04 (555)"]
+
+microchip-atmega328p:
+  section: "datasheet"
+  authors: "Microchip Technology"
+  title: "ATmega48A/PA/88A/PA/168A/PA/328/P Data Sheet"
+  year: "2018"
+  identifier: "DS40002061"
+  url: "https://www.microchip.com/en-us/product/atmega328p"
+  modules: ["00-03 (ADC source impedance, REVIEW m-08)", "06", "10"]
+
+yageo-cfr:
+  section: "datasheet"
+  authors: "YAGEO Corporation"
+  title: "Carbon Film Resistors, General Purpose, CFR Series"
+  comment: "through-hole"
+  edition: "Product specification V.3"
+  year: "3 Apr. 2024"
+  url: "https://www.yageogroup.com/content/Resource%20Library/Datasheet/YAGEO-CFR_DATASHEET.pdf"
+  modules: ["00-01 (1/4 W through-hole: CFR-25 power rating 1/4 W at 70 °C, Table 1)"]
+
+yageo-rc-l:
+  section: "datasheet"
+  authors: "YAGEO Corporation"
+  title: "General Purpose Chip Resistors, RC_L series"
+  comment: "surface-mount, sizes 0075 to 2512"
+  edition: "Product specification V.14"
+  year: "14 Nov. 2025"
+  url: "https://yageogroup.com/content/datasheet/asset/file/PYU-RC_GROUP_51_ROHS_L"
+  modules: ["00-01 (1/10 W surface-mount: RC0603 rated power 1/10 W at 70 °C; a high-power 0603 option is 1/5 W)"]
+
+kingbright-wp7113id:
+  section: "datasheet"
+  authors: "Kingbright"
+  title: "WP7113ID T-1 3/4 (5mm) Solid State Lamp"
+  comment: "high-efficiency red LED"
+  edition: "Rev. V.14A"
+  year: "2026"
+  identifier: "Spec No. DSAF0012"
+  url: "https://www.kingbrightusa.com/images/catalog/spec/wp7113id.pdf"
+  modules: ["00-01", "00-04 (a red LED takes about 2 V: V_F 1.9 V typ., 2.3 V max. at 10 mA)"]
+
+fluke-11x-manual:
+  section: "datasheet"
+  authors: "Fluke Corporation"
+  title: "110/113/114/115/117 True-rms Multimeter Users Manual"
+  year: "March 2020"
+  url: "https://media.fluke.com/5e1db354-3a6e-49cf-9edd-b10800c0e608_original%20file.pdf"
+  comment: "the copy Fluke hosts is labelled Simplified Chinese; the specification tables are in English"
+  modules: ["00-02", "00-03 (a typical multimeter has 10 MΩ: Volts DC input impedance > 10 MΩ, < 100 pF, Table 7)"]
+
+fender-tm-twin-reverb:
+  section: "datasheet"
+  authors: "Fender Musical Instruments Corporation"
+  title: "Tone Master Twin Reverb Owner's Manual"
+  identifier: "Type PR 5184"
+  url: "https://www.fmicassets.com/Damroot/Original/10001/OM_22742XX000_Tone_Master_Twin_Reverb-Amp_USplus5.pdf"
+  modules: ["00-03 (guitar amps have about 1 MΩ input impedance: Input 1 is 1 MΩ, Input 2 is 136 kΩ)"]
+
+energizer-alkaline-ais:
+  section: "datasheet"
+  authors: "Energizer Brands, LLC"
+  title: "Alkaline Manganese Dioxide-Zinc Batteries"
+  container: "Article Information Sheet"
+  year: "March 2018"
+  comment: "marked valid until March 2021; still the version Energizer serves on 2026-10-02"
+  identifier: "Document 0318-Alk"
+  url: "https://data.energizer.com/pdfs/alkaline_ais.pdf"
+  modules: ["00-04 safety callout (alkaline cells are \"not designed for recharging. Recharging can cause battery leakage or, in some cases, high pressure rupture\"; do not mix with other battery types; replace all batteries at the same time)"]
+
+# ---------------------------------------------------------------------------
+# §5 Online courses, references and tools
+# ---------------------------------------------------------------------------
+
+kuphaldt-liec:
+  section: "web"
+  authors: "Kuphaldt, T. R."
+  title: "Lessons in Electric Circuits"
+  titleStyle: "italic"
+  container: "Vols. I–VI"
+  publisher: "All About Circuits"
+  comment: "Design Science License; maintained by All About Circuits"
+  url: "https://www.allaboutcircuits.com/textbook/"
+  modules: ["00–07"]
+
+mit-6002-2007:
+  section: "web"
+  authors: "Agarwal, A.; Lang, J."
+  title: "6.002 Circuits and Electronics"
+  titleStyle: "italic"
+  publisher: "MIT OpenCourseWare"
+  year: "Spring 2007"
+  url: "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/"
+  modules: ["00", "02", "03", "06"]
+
+bu-403:
+  section: "web"
+  authors: "Battery University (Cadex Electronics)"
+  title: "BU-403: Charging Lead Acid"
+  year: "Updated 8 Dec. 2023"
+  url: "https://www.batteryuniversity.com/article/bu-403-charging-lead-acid/"
+  modules:
+    - "00-03"
+    - "00-04 (lead-acid charge limit 2.30–2.45 V per cell, 13.8–14.7 V for six cells; float 2.25–2.27 V per cell; 2.10 V per cell, 12.6 V, is about 90 % charged)"
+
+kicad-9-docs:
+  section: "web"
+  authors: "KiCad Project"
+  title: "KiCad 9.0 Documentation"
+  titleStyle: "italic"
+  container: "Schematic Editor, PCB Editor, Getting Started"
+  url: "https://docs.kicad.org/9.0/"
+  modules: ["11"]
+
+# ---------------------------------------------------------------------------
+# §6 Spanish-language resources
+# ---------------------------------------------------------------------------
+
+boylestad-2017-es:
+  section: "es"
+  authors: "Boylestad, R. L."
+  title: "Introducción al análisis de circuitos"
+  edition: "13.ª ed."
+  publisher: "Pearson Educación"
+  year: "2017"
+  identifier: "ISBN 978-607-32-4147-2"
+  lang: "es"
+  modules: ["00", "01", "02"]
+
+floyd-2007-es:
+  section: "es"
+  authors: "Floyd, T. L."
+  title: "Principios de circuitos eléctricos"
+  edition: "8.ª ed."
+  comment: "the ES counterpart of floyd-buchla-2019, two editions older"
+  publisher: "Pearson Educación"
+  year: "2007"
+  identifier: "ISBN 978-970-26-0967-4"
+  lang: "es"
+  modules: ["00", "01", "02"]
+
+boylestad-nashelsky-2009-es:
+  section: "es"
+  authors: "Boylestad, R. L.; Nashelsky, L."
+  title: "Electrónica: teoría de circuitos y dispositivos electrónicos"
+  edition: "10.ª ed."
+  publisher: "Pearson Educación"
+  year: "2009"
+  identifier: "ISBN 978-607-442-292-4"
+  lang: "es"
+  modules: ["03", "04", "05"]
+
+malvino-bates-2007-es:
+  section: "es"
+  authors: "Malvino, A. P.; Bates, D. J."
+  title: "Principios de electrónica"
+  edition: "7.ª ed."
+  publisher: "McGraw-Hill/Interamericana de España"
+  year: "2007"
+  identifier: "ISBN 978-84-481-5619-0"
+  lang: "es"
+  modules: ["03", "04", "05"]
+
+sedra-smith-2006-es:
+  section: "es"
+  authors: "Sedra, A. S.; Smith, K. C."
+  title: "Circuitos microelectrónicos"
+  edition: "5.ª ed."
+  comment: "an older edition than sedra-smith-2020"
+  publisher: "McGraw-Hill Interamericana"
+  year: "2006"
+  identifier: "ISBN 978-970-10-5472-7"
+  lang: "es"
+  modules: ["03", "04"]
+
+franco-2005-es:
+  section: "es"
+  authors: "Franco, S."
+  title: "Diseño con amplificadores operacionales y circuitos integrados analógicos"
+  edition: "3.ª ed."
+  comment: "translation of the 3rd English ed."
+  publisher: "McGraw-Hill"
+  year: "2005"
+  identifier: "ISBN 978-970-10-4595-4"
+  lang: "es"
+  modules: ["04", "08", "10"]
+
+openstax-fisica-u2-es:
+  section: "es"
+  authors: "OpenStax"
+  title: "Física universitaria, volumen 2"
+  url: "https://openstax.org/books/física-universitaria-volumen-2"
+  lang: "es"
+  modules: ["00", "01", "02"]
+  comment: "Ch. 9 (current and resistance), 10 (DC circuits, Kirchhoff's rules, RC circuits), 14 (inductance), 15 (AC circuits); free, openly licensed"
+
+hyperphysics-es:
+  section: "es"
+  authors: "Nave, C. R."
+  title: "HyperPhysics"
+  publisher: "Georgia State University"
+  url: "https://hyperphysics.gsu.edu/hbasees/electric/ohmlaw.html"
+  lang: "es"
+  modules: ["00", "02"]
+
+phet-cck-es:
+  section: "es"
+  authors: "PhET Interactive Simulations, University of Colorado Boulder"
+  title: "Kit de Construcción de Circuitos: CD"
+  comment: "BIBLIOGRAPHY.md lists two simulations: *Kit de Construcción de Circuitos: CD* and *CA* (Spanish)"
+  url: "https://phet.colorado.edu/es/simulations/circuit-construction-kit-dc"
+  lang: "es"
+  modules: ["00", "02"]
