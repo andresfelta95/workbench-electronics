@@ -5,10 +5,11 @@ import { I18n } from '../../core/i18n';
 import { Seo } from '../../core/seo';
 import type { Lang, Lesson } from '../../core/content.types';
 import { LessonBody } from '../../lesson/lesson-body';
+import { LessonSources } from '../../lesson/lesson-sources';
 
 @Component({
   selector: 'app-lesson',
-  imports: [RouterLink, LessonBody],
+  imports: [RouterLink, LessonBody, LessonSources],
   templateUrl: './lesson-page.html',
   styleUrl: './lesson-page.scss',
 })

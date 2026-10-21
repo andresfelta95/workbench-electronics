@@ -14,6 +14,10 @@
 
     <app-lesson-body [blocks]="lesson.blocks" />
 
+    @if (lesson.references.length > 0) {
+      <app-lesson-sources [references]="lesson.references" />
+    }
+
     <nav class="pager" [attr.aria-label]="t().lesson.next">
       @if (neighbours().previous; as previous) {
         <a class="pager__link pager__link--prev" [routerLink]="['/', lang(), previous.module.slug, previous.lesson.slug]">

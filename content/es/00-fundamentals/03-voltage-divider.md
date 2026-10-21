@@ -3,6 +3,21 @@ slug: divisor-de-tension
 title: El divisor de tensión, y qué le hace la carga
 summary: Cómo dos resistores dan una tensión más baja, y por qué la salida cae cuando le conectas algo.
 minutes: 12
+references:
+  - id: fluke-11x-manual
+    note: "Los 10 MΩ de un multímetro: la serie Fluke 110 mide tensión continua con más de 10 MΩ de impedancia de entrada (tabla 7)."
+  - id: fender-tm-twin-reverb
+    note: "Los amplificadores de guitarra tienen alrededor de 1 MΩ de impedancia de entrada: la entrada 1 de este amplificador es de 1 MΩ."
+  - id: yuasa-powersports-manual
+    note: "Tensiones de una batería de plomo-ácido de 12 V: con 11,8 V o menos en reposo está descargada, y un sistema de carga que funciona la mantiene entre 13,0 y 14,5 V. El cargador de Yuasa llega a 14,4 V."
+  - id: bu-403
+    note: "Límite de carga de una batería de plomo-ácido de seis celdas: de 13,8 a 14,7 V."
+  - id: microchip-atmega328p
+    note: "El ADC pide una impedancia de fuente de 10 kΩ o menos."
+  - id: horowitz-hill-2015
+    note: "Capítulo 1."
+  - id: kuphaldt-liec
+    note: "Volumen I (corriente continua). Gratis en línea, en inglés."
 ---
 
 Quieres que un microcontrolador mida una batería de 12 V, pero su entrada solo

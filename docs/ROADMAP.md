@@ -78,10 +78,9 @@ reference board (§2).
 - **00 finish runs in parallel with A1–A4.** Lessons 04–07 reuse existing
   symbols plus one meter symbol drawn in 00's step 3, and use no traces or audio.
 - **Exception: 00-04 shipped before A5 and A7** at the maintainer's request
-  (2026-10-02). The bridge is the interim rule in
-  `.claude/skills/course-writing/SKILL.md` §4: the figures in 00-01 to 00-04
-  are sourced in `docs/BIBLIOGRAPHY.md` by lesson id, and their `references:`
-  are owed when A5 lands.
+  (2026-10-02). The bridge was an interim rule that sourced the figures in
+  00-01 to 00-04 in `docs/BIBLIOGRAPHY.md` by lesson id. That debt is paid:
+  A5 landed on 2026-10-21 and the four lessons now carry `references:`.
 - **01–07 are sequential**: each module's prose leans on the vocabulary of the
   one before it (a filter needs reactance, a MOSFET switch needs Ohm's law and
   power, a bus needs logic levels and pull-ups).
@@ -101,7 +100,7 @@ reference board (§2).
 | A2 | **`app-trace` plot primitive** in `src/app/ui/`: time-domain (scope) and frequency-domain (Bode, log axes) traces as SVG polylines, cursors, labelled axes, two channels | Modules 02, 03, 04, 05, 06, 07, 08 are mostly "watch the waveform change" | Renders 2k-point traces without jank; keyboard-movable cursor; axis text through `formatSI`; **key values (cursor time/frequency, value per channel, and the widget's headline numbers) exposed through `app-readout` or a visually hidden summary that updates on cursor move (WCAG 1.1.1)** |
 | A3 | **`AudioOut` service** wrapping Web Audio: oscillator/noise source → `BiquadFilterNode` → gain, muted by default, explicit play button, ramped gain | Module 02 promises "a filter you can hear"; module 08 is about sound | Never autoplays; global mute; SSR-safe (no-op on the server); **hard output cap enforced in the service, not per widget (master gain ceiling about −12 dBFS, default lower); visible "playing" indicator while sound is on; stops on Escape and when the tab is hidden; every audible effect is also shown on screen (trace or readout)** |
 | A4 | **Logic-analyser primitive** (`app-logic-trace`): stacked digital lanes, decoded byte annotations | Module 06 (debounce, PWM) and all of 07 | UART/SPI/I²C frames render from a bit array; **decoded frames also available as text (a list or table), and the lane under the cursor announced through a visually hidden summary** |
-| A5 | **References in content**: a `references:` list in lesson front matter (ids into `content/bibliography.yaml`), rendered as a "Sources and further reading" block; the build fails on an unknown id | Every lesson needs citable sources; one shared bibliography avoids 69 copies of Horowitz & Hill | `pnpm content` validates ids; an entry may carry an `es:` alternate edition, rendered on ES pages (Boylestad, Floyd, Malvino, Sedra & Smith, Franco have one) |
+| A5 | **References in content**: a `references:` list in lesson front matter (ids into `content/bibliography.yaml`), rendered as a "Sources and further reading" block; the build fails on an unknown id | Every lesson needs citable sources; one shared bibliography avoids 69 copies of Horowitz & Hill | `pnpm content` validates ids; an entry may carry an `es:` alternate edition, rendered on ES pages (Floyd, Sedra & Smith and Franco have one; Boylestad and Malvino are Spanish-only entries in BIBLIOGRAPHY §6). **Status (2026-10-21): done.** `content/bibliography.yaml` holds the entries (keyed by id; unknown keys fail the build); lessons cite ids or `{ id, note }` in `references:`; `pnpm content` fails on an unknown or duplicate id, a malformed item or entry, a bad `es:` link, or EN and ES citing different ids; lesson pages render "Sources and further reading" / "Fuentes y lecturas recomendadas", with an "En español" line on ES pages. 00-01 to 00-04 carry `references:`. Still open: generating BIBLIOGRAPHY.md from the YAML (§6) |
 | A6 | **Pixel-art instrument skin** (see `docs/DESIGN-PIXEL-ART.md`) applied to `Panel`, `Control`, `Readout`, the schematic canvas and the three existing widgets | Every new instrument inherits it for free if it lands before the first new widget | Both themes, WCAG AA, keyboard and reduced-motion intact, `pnpm build` passes; drawing fills at least about 70 % of its screen (REVIEW M-10) |
 | A7 | **Quality gates**: `ng test` specs for `core/format.ts` and each widget's arithmetic; axe over every prerendered route in four theme states (light, system-dark, explicit dark, explicit light on a dark OS) as a **build gate**; a check in `build-content.mjs` that every `::widget` type is registered **and every prop is known to that widget**; a **glyph-coverage check** of instrument strings against the pixel font; a script that regenerates the contrast table from `_pixel.scss` | Sixty-nine lessons cannot be checked by eye | Scriptable, documented in README. The pre-existing prose failures (REVIEW M-12) are fixed, so nothing holds the axe gate back: `tools/axe-check.mjs` already covers every route in all four states and exits 1 on any violation. Still open: running it automatically on every build |
 | A8 | **Glyph decision** for τ, β, θ, →, ←, ₁, ₂, ∥ and the small `×` (VT323 lacks them; IBM Plex Mono lacks τ, β, θ, Ω, ∥) | `rc-transient` (τ, module 02), `bjt-switch` (β), `ldo-thermal`/`power-dissipation` (θ), `thermistor-divider` (β) | Before module 02 starts: one option chosen (ASCII names in instruments, a pixel Greek fallback face, or SVG glyphs like the tone glyphs), recorded in DESIGN-PIXEL-ART.md §Font, and enforced by the A7 glyph check. 00-06 avoids θ in instrument strings until then. **Status (2026-10-01):** the font side is recorded in DESIGN-PIXEL-ART.md §Glyph coverage: `--pix-font` falls back to JetBrains Mono for Greek and Iosevka Charon Mono for ∥, arrows and subscripts, and visible text prefers `·` to `×` and `R1` to `R₁`. Still open: the A7 glyph check |
@@ -161,7 +160,7 @@ passes.
 | 4. **Instrument build** | Standalone component in the pixel-art skin, registered in `widget-registry.ts`, arithmetic in a pure function with a spec | Keyboard-only operation, 375 px layout, both themes, axe clean, text equivalent for any trace or audio, A7 glyph check passes, prose worked example reproducible by typing values |
 | 5. **EN prose** | `content/en/<module>/<nn-id>.md` with worked example and callouts | Numbers in prose match the instrument to the displayed precision; required `:::safety` callouts present |
 | 6. **ES prose** | `content/es/...`, same ids, translated slug | `pnpm content` cross-check passes; locale decimals (`4,5 V`); same callouts as EN |
-| 7. **References** | `references:` ids per lesson; new entries in `bibliography.yaml` | Every quantitative claim (rule of thumb, standard, datasheet figure) traceable to a source |
+| 7. **References** | `references:` ids per lesson (same ids in EN and ES); new entries in `content/bibliography.yaml` and `docs/BIBLIOGRAPHY.md` | Every quantitative claim (rule of thumb, standard, datasheet figure) traceable to a source |
 | 8. **Review** | Technical (maths, §3.1 safety), pedagogical, and accessibility review | Module checklist (REVIEW §6 template) ticked in `docs/REVIEW.md` §7 |
 | 9. **Ship** | `pnpm build`, compose deploy, sitemap and hreflang verified | Lesson reachable in both languages; prev/next chain intact |
 
@@ -411,7 +410,7 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 |---|---|---|---|---|
 | Phase A | 0 | 4 primitives (A2–A4, symbols A1) + skin, refs, gates, glyphs | — | Unblocks everything; A1–A4 and A8 only before their first user |
 | Track H | 0 | 0 | — | Reference board, parallel from module 01 |
-| 00 finish | 3 | 3 | A5, A6, A7; meter symbol | Reuses existing symbols; the content fixes from REVIEW have landed (PR #1) |
+| 00 finish | 3 | 3 | A5 (done), A6, A7; meter symbol | Reuses existing symbols; the content fixes from REVIEW have landed (PR #1) |
 | 01 | 5 | 4 | A1 (inductor, potentiometer) | |
 | 02 | 7 | 7 | A2, A3, A8 | First user of `app-trace` and audio |
 | 03 | 6 | 6 | A1 semiconductors | Biggest symbol demand |

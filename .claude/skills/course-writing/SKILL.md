@@ -154,16 +154,23 @@ world, in the prose near where the concept is introduced.
   5 V; an AA alkaline cell is 1.5 V), or say "typical" ("a typical multimeter
   has 10 MΩ of input resistance"). Quantitative claims also need a source in
   `references:` (ROADMAP §3 step 7).
-- **Until `references:` exists, source figures in `docs/BIBLIOGRAPHY.md`.**
-  ROADMAP A5 (the `references:` front matter and `content/bibliography.yaml`)
-  is not built yet. Until it lands, every quantitative claim about a real
-  device (a datasheet limit, a battery voltage, a meter's input resistance)
-  needs an entry in `docs/BIBLIOGRAPHY.md` whose Modules column names the
-  lesson that uses it and the figure, for example `00-04 (12.6 V resting)`,
-  and the source goes in that module's row of the module map. List the new
-  entries in the PR body. When A5 lands, each entry moves into the
-  `references:` of the lessons it names. A figure with no entry is a review
-  finding.
+- **Cite every device figure in `references:`.** Every quantitative claim
+  about a real device (a datasheet limit, a battery voltage, a meter's input
+  resistance) needs a source in the lesson's `references:` front matter, with
+  a note naming the figure:
+
+  ```yaml
+  - id: fluke-11x-manual
+    note: "DC volts input impedance above 10 MΩ (Table 7)."
+  ```
+
+  The id must exist in `content/bibliography.yaml`. If the source is new, add
+  it there and to `docs/BIBLIOGRAPHY.md` (same id, Modules column naming the
+  lesson and the figure, for example `00-04 (12.6 V resting)`, plus the module
+  map row) after checking it against the publisher or a catalogue, and list
+  the new entries in the PR body. EN and ES cite the same ids; notes are
+  written in the lesson's language. `pnpm content` fails on an unknown id or
+  an EN/ES mismatch. A figure with no citation is a review finding.
 - **Stay inside the safety policy.** Examples come from the low-voltage world
   of ROADMAP §3.1. Do not use mains appliances (kettles, wall wiring, dimmers)
   as examples: mentioning mains at all makes a `:::safety` callout mandatory.
@@ -220,8 +227,8 @@ rules above apply in full: plain, short, every term defined on first use.
 ## 7. Course invariants (do not break)
 
 - **Front matter:** `slug`, `title`, `summary` required; `minutes` optional;
-  `references:` when the lesson has sources (once ROADMAP A5 lands; until
-  then, use the interim `docs/BIBLIOGRAPHY.md` rule in §4). `_module.md` has
+  `references:` (ids from `content/bibliography.yaml`, or `{ id, note }`; at
+  least two per lesson, same ids in EN and ES; see §4). `_module.md` has
   `slug`, `title`, `summary`.
 - **Published ids and slugs never change.** The file name is the id; only the
   slug is translated, and a published slug stays as it is.
@@ -252,8 +259,9 @@ Run every item for both languages.
       one em dash per paragraph. No bolded slogans.
 - [ ] **Numbers.** Arithmetic re-done by hand; prose matches the instrument to
       its displayed precision; ES uses decimal commas; every datasheet or
-      standard figure has a source (until A5, an entry in
-      `docs/BIBLIOGRAPHY.md` that names this lesson; see §4).
+      standard figure is cited in `references:` with a note, EN and ES cite
+      the same ids, and any new source is in both `content/bibliography.yaml`
+      and `docs/BIBLIOGRAPHY.md` (see §4); `pnpm content` passes.
 - [ ] **Invariants.** Front matter, widget lines, callout syntax and ids
       unchanged; safety policy respected; EN and ES have the same structure.
 

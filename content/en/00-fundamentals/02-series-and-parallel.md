@@ -3,6 +3,13 @@ slug: series-and-parallel
 title: Series and Parallel
 summary: Two rules that turn any group of resistors into one value, and why connecting something changes a circuit.
 minutes: 9
+references:
+  - id: fluke-11x-manual
+    note: "A typical multimeter has 10 MΩ: the Fluke 110 series measures DC volts with more than 10 MΩ of input impedance (Table 7)."
+  - id: horowitz-hill-2015
+    note: "Chapter 1."
+  - id: kuphaldt-liec
+    note: "Volume I (DC). Free online."
 ---
 
 You need a 15 kΩ resistor and your kit does not have one. The "k" stands for

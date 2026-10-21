@@ -3,6 +3,19 @@ slug: ley-de-ohm
 title: La ley de Ohm
 summary: Cómo se relacionan la tensión, la corriente y la resistencia, y cómo comprobar que un resistor aguanta el calor.
 minutes: 10
+references:
+  - id: usb-if-usb2
+    note: "Un puerto USB da 5 V."
+  - id: kingbright-wp7113id
+    note: "En un LED rojo caen unos 2 V: 1,9 V típicos y 2,3 V como máximo a 10 mA."
+  - id: yageo-cfr
+    note: "Los resistores con patas suelen ser de 1/4 W: el CFR-25 tiene una potencia nominal de 1/4 W a 70 °C (tabla 1)."
+  - id: yageo-rc-l
+    note: "Los resistores diminutos de montaje superficial suelen ser de 1/10 W: el RC0603 tiene una potencia nominal de 1/10 W a 70 °C."
+  - id: horowitz-hill-2015
+    note: "Capítulo 1."
+  - id: kuphaldt-liec
+    note: "Volumen I (corriente continua). Gratis en línea, en inglés."
 ---
 
 La etiqueta de un cargador de teléfono puede decir «5 V 2 A». El primer número

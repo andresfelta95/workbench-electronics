@@ -3,6 +3,13 @@ slug: serie-y-paralelo
 title: Serie y paralelo
 summary: Dos reglas que reducen cualquier grupo de resistores a un solo valor, y por qué conectar algo cambia un circuito.
 minutes: 9
+references:
+  - id: fluke-11x-manual
+    note: "Un multímetro típico tiene 10 MΩ: la serie Fluke 110 mide tensión continua con más de 10 MΩ de impedancia de entrada (tabla 7)."
+  - id: horowitz-hill-2015
+    note: "Capítulo 1."
+  - id: kuphaldt-liec
+    note: "Volumen I (corriente continua). Gratis en línea, en inglés."
 ---
 
 Necesitas un resistor de 15 kΩ y tu kit no lo tiene. La «k» significa kilo-,

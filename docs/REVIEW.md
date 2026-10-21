@@ -1,5 +1,149 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: A5 references in content (2026-10-21)
+
+This is an independent check of branch `infra/a5-references`: the
+uncommitted working tree against `main` (`0f1cd46`), untracked files
+included. I re-ran every check and did not take the implementers' reports on
+trust.
+
+**Ready to merge: yes** (second pass, below). m-1 to m-3 and S1–S7 are
+resolved and re-verified against the rendered HTML and the docs. No Blocker,
+Major or Minor finding is open in this change's scope.
+
+### Second pass: re-verification of the fixes (2026-10-21)
+
+Same method, run again on the whole working tree: a fresh build and axe run,
+the full mutation suite plus new cases in a new `/tmp` copy, the `es:`
+fixture, Playwright, and a read of every changed doc.
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/a5-verify-dist`) | Pass, 35 routes, no warnings. Lesson chunks 7.84–13.96 kB raw, 2.71–4.82 kB transfer. |
+| axe on the private copy | **0 violations**, 140 pages (light 0, system-dark 0, dark 0, light-forced 0). |
+| Mutation suite (38 cases, `/tmp/a5-mut2`) | All 32 first-pass cases still behave as before. New: `titleStyle: "bold"` fails; `titleStyle: "quoted"` on a textbook passes; `section: es` without `lang: es` fails, and so does `lang: es` on a `textbook`, so the check runs **both ways**; `http://[::1` (passes the regex, fails `URL.canParse`) fails; a URL with a stray `%zz` passes, and `shortUrl()` catches the `decodeURI` error. |
+| `es:` fixture | Unchanged: the alternate shows only on the ES page, inside `<span lang="es">`, after the note. |
+| Playwright, 8 pages × 375/900/1280 × light/dark | No horizontal scroll and nothing past the viewport. Focus and contrast are as in the first pass (outline 4.55:1 / 6.60:1, notes 5.20:1 / 7.38:1, links 5.79:1 / 8.20:1). My script flagged 00-01 and 00-02 only because they now have no quoted title to measure, which is expected: `bu-403`, the one article they could show, is not cited there. |
+| Leak check | None of "high-efficiency", "through-hole", "surface-mount, sizes", "Spanish edition", "00-03 cross-link" reaches `dist`. My grep matched "current and resistance" only in 00-01's own summary. |
+
+#### Resolution
+
+| # | Status | Evidence |
+|---|---|---|
+| m-1 | **Resolved** | Titles are now the documents' own: "*WP7113ID T-1 3/4 (5mm) Solid State Lamp*", "*Carbon Film Resistors, General Purpose, CFR Series*", "*General Purpose Chip Resistors, RC_L series*" (checked in the 00-01 and 00-04 HTML). `ti-ne555` is "*xx555 Precision Timers*"; `phet-cck-es` is "*Kit de Construcción de Circuitos: CD*" (the URL is the DC sim). The descriptors moved to `comment`. |
+| m-2 | **Resolved** | New optional `titleStyle: italic \| quoted`, validated and resolved at build into `BibEntry.titleStyle`; the component only reads it. Set to `italic` on `kuphaldt-liec`, `yuasa-powersports-manual`, `tek-xyz`, `kitchin-counts-2006`, `mit-6002-2007` and `kicad-9-docs`. Rendered: *Lessons in Electric Circuits* and *Technical Manual: Powersports Batteries* are italic on all their pages, and "BU-403: Charging Lead Acid." stays quoted. Documented in README, ARCHITECTURE §5.1, the YAML header and the compiler's JSDoc. |
+| m-3 | **Resolved** | `openstax-fisica-u2-es` now has only author, title, URL and `lang`, with the chapter map in `comment`. `hyperphysics-es` and `phet-cck-es` lost their "Spanish …" editions. No rendered §6 field holds English text. |
+| S1 | Resolved | "Type PR 5184.", "Document 0318-Alk.", "Vols. I–VI.", "Primer", "Application note" (rendered on 00-03 and 00-04). |
+| S2 | Resolved | See the mutation cases above. |
+| S3 | Resolved | `lesson.link` is gone from `ui.ts`. The build adds `URL.canParse`, and `shortUrl()` no longer has a fallback string. |
+| S4 | Resolved | ES 00-03: «con 11,8 V o menos en reposo está descargada» (rendered). |
+| S5 | Resolved | `ti-slay054` Modules is "10 (thermistors)" in both `BIBLIOGRAPHY.md` and the YAML. |
+| S6 | Resolved | The README example is quoted, and README says "Values are double-quoted strings". |
+| S7 | Resolved | The SKILL §4 example is now a fenced block, and ARCHITECTURE §6 is re-wrapped. Two SKILL lines over 80 columns remain (line 3, the front-matter description, and a URL at line 285); both predate this change. |
+
+#### Fixed during verification (second pass)
+
+- `README.md` and `ARCHITECTURE.md` §5.1 said only "`section: es` requires
+  `lang: es`" / "`section: es` entries have `lang: es`", but the build
+  enforces both directions. Both now say the two "go together (each requires
+  the other)", which matches the compiler's JSDoc and its error message.
+- `ARCHITECTURE.md` §3 line counts, again to the working tree:
+  `build-content.mjs` 311 → 545 (stale since this change began), `core/`
+  570 → 575, `i18n/ui.ts` 361 → 357, `lesson/` 351 → 347. §4.8 per-lesson
+  chunk 7.8–13.8 kB → 7.8–14.0 kB (13.96 kB); transfer 2.7–4.8 kB still
+  holds.
+
+`git diff --check` is clean, all files are LF, and the only untracked files
+are still `content/bibliography.yaml` and `src/app/lesson/lesson-sources.ts`.
+
+#### Ready to merge: yes (second pass)
+
+### First pass
+
+**Verdict then: no.** Three Minor findings were open (m-1 to m-3), all about
+how bibliography entries are transcribed and styled. The pipeline,
+validation, rendering, accessibility and lesson notes all passed.
+
+### What changed
+
+- **New** `content/bibliography.yaml`: 60 entries (15 + 18 + 6 + 8 + 4 + 9,
+  BIBLIOGRAPHY §1–§6), keyed by the BIBLIOGRAPHY ids. `es:` links:
+  `floyd-buchla-2019` → `floyd-2007-es`, `sedra-smith-2020` →
+  `sedra-smith-2006-es`, `franco-2015` → `franco-2005-es`.
+- **`tools/build-content.mjs`** loads and validates the bibliography,
+  validates and resolves each lesson's `references:` (id or `{ id, note }`),
+  rejects `references:` in `_module.md`, and checks EN/ES cite the same id
+  set. Resolved entries go into the per-lesson modules only, never into
+  `curriculum.ts`.
+- **New** `src/app/lesson/lesson-sources.ts` (`LessonSources` +
+  `Citation`), wired into `lesson-page.html` after the body and before the
+  pager. Types in `content.types.ts`; three new strings per language in
+  `ui.ts`.
+- **Lessons 00-01 to 00-04, EN and ES**: `references:` with 3–7 ids each
+  and notes in the lesson's language.
+- **Docs**: ROADMAP A5 marked done and the §1 exception closed; BIBLIOGRAPHY
+  intro rewritten; SKILL §4/§7/§8 replace the interim rule; README and
+  ARCHITECTURE document the format; `course-reviewer.md` gains a References
+  check.
+
+### Checks run
+
+| Check | Result |
+|---|---|
+| `pnpm build` (Node v22.23.2, inside `flock`, copied to `/tmp/a5-verify-dist` in the same lock) | Pass. 35 routes prerendered. `main` 314.49 kB / 88.22 kB. Lesson chunks 7.78–13.82 kB raw, 2.70–4.80 kB transfer (they now carry their resolved references). No warnings. |
+| `tools/axe-check.mjs` on the private copy | **0 violations**: 35 routes × 4 theme states = 140 pages (light 0, system-dark 0, dark 0, light-forced 0). Also 0 on the `es:` fixture build below. |
+| Validation, mutation tests (32 cases in a `/tmp` copy of the repo, never in the repo) | All behave as claimed. The build **fails** on: an unknown id (EN, and ES only); a duplicate id; a malformed item (number, nested list); `references:` not a list; an unknown key in an item; an empty note; an item with no id; an unknown bibliography key; a bad or missing `section`; a missing `title`; `es:` to a missing id, to an English entry, to itself, or not a string; a non-kebab id; a non-http(s) URL or one with a space; `lang: fr`; `modules` not a list; `comment` not a string; an entry that is not a mapping; invalid YAML; a duplicated YAML key; EN/ES id sets differing; `references:` in either `_module.md`. It **passes** a bare-id item, a numeric `year`, and EN/ES with the same ids in a different order (the docs say "same ids", never "same order"). Gap: S2. |
+| Generated data | `modules`, `comment` and `es` (the id) appear in no generated lesson module. `curriculum.ts` has no `references`. No bibliography text reaches `dist`: "Undated", "REVIEW m-", "released Nov", "Design Science" are absent. |
+| Fidelity, YAML against BIBLIOGRAPHY.md | I compared all 60 entries field by field, including the 12 entries the lessons cite, the 3 `es:`-linked pairs and all 9 §6 entries. Authors, titles, editions, publishers, years, ISBNs/DOIs/document numbers and URLs match. Verification remarks moved to `comment` (Yuasa "Undated (file published 2017)", Fluke's Simplified Chinese label, Energizer's validity date, Sedra's and Franco's release notes, IPC licensing). `kuphaldt-liec` promotes "maintained by All About Circuits" to `publisher`, which is fair. Problems: descriptors inside `title` (m-1), italic/quoted style (m-2), English editorial text in §6 rendered fields (m-3). |
+| Rendered HTML of the 8 lesson pages | Each page has one `<section aria-labelledby>` with an `h2` after the last body heading and before the pager; heading levels never skip (h1 → h2/h3 → h2). Entry order follows the front matter. Every citation is wrapped in `<span lang="en">` (correct on ES pages too); `rel="noopener"` on every link; link text is host + path with `%20` decoded. No double periods ("Inc.", "LLC.", "3rd ed.", "13.ª ed." are handled). No "En español:" line appears, which is right: none of the 12 cited entries has `es:`. |
+| `es:` rendering, fixture | In the `/tmp` copy I cited `floyd-buchla-2019` (bare id) and `franco-2015` (with a note) in 00-01 EN and ES and rebuilt. The EN page shows no alternate. The ES page shows `En español:` followed by the Floyd 8.ª ed. and Franco 3.ª ed. citations in `<span lang="es">`, after the note when there is one. |
+| Notes against BIBLIOGRAPHY.md and lesson bodies | Every figure agrees. 00-01: 5 V; LED 1.9 V typ., 2.3 V max at 10 mA (body "about 2 V"); CFR-25 1/4 W at 70 °C, Table 1; RC0603 1/10 W at 70 °C. 00-02/00-03: Fluke > 10 MΩ, Table 7 (body "10 MΩ"). 00-03: Fender Input 1 = 1 MΩ; Yuasa 11.8 V at rest flat, 13.0–14.5 V charging, charger 14.4 V (body "about 11 V … under load", "up to about 14.4 V"); BU-403 13.8–14.7 V; ATmega328P ≤ 10 kΩ. 00-04: USB §7.2.1 bus-powered hub; 12.6 V resting, 13.0–14.5 V (body "about 14 V", "about 12.6 V"); BU-403 12.6 V ≈ 90 %; Energizer: not rechargeable, leak or burst, do not mix types, replace all at once (matches the safety callout). ES uses decimal commas throughout (1,9; 2,3; 11,8; 13,0–14,5; 14,4; 13,8–14,7; 12,6). EN and ES notes say the same thing; ES adds "en inglés" to Kuphaldt, which is useful. Voice: short, plain, no em dashes, no tells. One ES wording nit: S4. |
+| Coverage of the interim figures | Every lesson-tagged figure in the BIBLIOGRAPHY Modules column is cited by the lesson it names: `usb-if-usb2` (00-01, 00-04), `kingbright-wp7113id` (00-01, 00-04), `yageo-cfr`, `yageo-rc-l` (00-01), `fluke-11x-manual` (00-02, 00-03), `fender-tm-twin-reverb`, `microchip-atmega328p` (00-03), `yuasa-powersports-manual`, `bu-403` (00-03, 00-04), `energizer-alkaline-ais` (00-04). Every lesson has at least two references (3–7). `ti-slay054` lists "00-03 cross-link" but carries no figure (S5). |
+| Layout, keyboard, contrast (Playwright, light and dark, 8 lesson pages × 375/900/1280 px) | 48/48 pass: no horizontal scroll and no element of the sources block past the viewport (long URLs wrap with `overflow-wrap: anywhere`). Titles render italic and quoted titles upright, as coded. Tabbing reaches the first source link with `:focus-visible` and a 2 px solid outline (outline contrast 4.55:1 light, 6.60:1 dark). Note text contrast 5.20:1 light and 7.38:1 dark; links 5.79:1 and 8.20:1. I checked a 375 px screenshot of the 04 sources block by eye. |
+| CLAUDE.md Angular rules | Pass. `input.required()`, `computed()`, `inject()`, `@for`/`@if`, `[class.quoted]`, inline templates and styles. No `standalone`, OnPush, `ngClass`/`ngStyle`, `@HostBinding`/`@HostListener`, `any` or `mutate`. `new URL()` runs at prerender and in the browser alike. |
+| Docs consistency | README, ARCHITECTURE §3/§4.3/§5.1/§6, SKILL §4/§7/§8, BIBLIOGRAPHY intro, ROADMAP §1/A5/§3 step 7/§5 and `course-reviewer.md` match the build: same field list, same error list, "same ids" (not same order), `modules`/`comment` never rendered, "En español" only on ES pages for entries with `es:`. No stale "interim", "until A5", "proposed keys" outside the historical REVIEW sections. Fixed during verification: stale ARCHITECTURE line counts and lesson-chunk sizes, the ROADMAP A5 list of `es:` alternates, a code comment (below). |
+| Repo hygiene | `git diff --check` clean; all changed and new files LF with a final newline. Untracked files are exactly `content/bibliography.yaml` and `src/app/lesson/lesson-sources.ts`. `content-generated/` stays git-ignored and untracked. `package.json` and the lockfile are unchanged (the YAML parser is gray-matter's own `js-yaml`). |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-1 | Minor | References | `content/bibliography.yaml`: `kingbright-wp7113id`, `yageo-cfr`, `yageo-rc-l` (rendered today on 00-01 and 00-04); `ti-ne555`, `phet-cck-es` (latent) | Editorial descriptors were folded into `title`, so they render in italics as part of the document's title: "*WP7113ID T-1 3/4 (5mm) Solid State Lamp (high-efficiency red LED)*", "*… CFR Series (through-hole)*", "*… RC_L series (surface-mount, sizes 0075 to 2512)*". BIBLIOGRAPHY.md keeps them outside the italics. `phet-cck-es` merges two titles ("*CD* and *CA*") into one with an English "and". Keep `title` to the document's own title. Either drop the descriptors (the lesson notes already say what each part is) or add a rendered, upright field for them (e.g. `description`), and document it in README and the YAML header. |
+| m-2 | Minor | References / Code | `src/app/lesson/lesson-sources.ts:6-11` (`ITALIC_TITLES` by section); entries `kuphaldt-liec` (all 8 pages), `yuasa-powersports-manual` (00-03, 00-04); latent `tek-xyz`, `kitchin-counts-2006`, `mit-6002-2007`, `kicad-9-docs` | Italic or quoted is chosen by `section`, but BIBLIOGRAPHY's own format italicises standalone works in §2 and §5 (a book, a manual, a primer, a handbook, a course) and quotes only articles and notes. So *Lessons in Electric Circuits* and *Technical Manual: Powersports Batteries* render as "quoted" article titles. Make the style per entry: for example an optional `title_style: italic | quoted` (default by section), set on these six entries, and documented in README and the YAML header. |
+| m-3 | Minor | References / Content parity | `content/bibliography.yaml` §6: `openstax-fisica-u2-es` (`container`, `edition`), `hyperphysics-es` (`edition`), `phet-cck-es` (`edition`) | Rendered fields hold English editorial text inside a `lang="es"` citation: "Ch. 9 (current and resistance), 10 (DC circuits, Kirchhoff's rules, RC circuits), 14 (inductance), 15 (AC circuits)", "Spanish edition", "Spanish version", "Spanish". Nothing cites these yet, but the first ES lesson that does will show them. Move the chapter map to `comment` (or translate it: «Cap. 9 (corriente y resistencia), 10 (circuitos de CC…)…»), and drop the "Spanish …" editions, which `lang: es` already says. |
+| S1 | Suggestion | References | `content/bibliography.yaml`: `fender-tm-twin-reverb` ("type PR 5184"), `energizer-alkaline-ais` ("document 0318-Alk"), `kuphaldt-liec` ("vols. I–VI"), `tek-xyz` ("primer"), `fluke-abc-safety` ("application note") | These render as sentences that start lower-case ("… Owner's Manual*. type PR 5184."). Capitalise them in the YAML ("Type PR 5184", "Document 0318-Alk", "Vols. I–VI", "Primer", "Application note"). |
+| S2 | Suggestion | Code | `tools/build-content.mjs` `loadBibliography()` | `section: es` without `lang: es` (or `lang: es` outside §6) passes, and the entry would render with `lang="en"`. Add a check that `section === 'es'` if and only if `lang === 'es'`. |
+| S3 | Suggestion | Code | `src/app/i18n/ui.ts` `lesson.link`; `lesson-sources.ts` `shortUrl()` fallback | The build only accepts `https?://\S+` URLs, which `new URL()` always parses, so the "link"/"enlace" fallback is unreachable. Keep it as a guard or drop it; either way, note it. |
+| S4 | Suggestion | Content parity | `content/es/00-fundamentals/03-voltage-divider.md:12` (yuasa note) | «11,8 V o menos en reposo es descargada» reads awkwardly. Write «con 11,8 V o menos en reposo está descargada». |
+| S5 | Suggestion | References | `docs/BIBLIOGRAPHY.md` §2 `ti-slay054` ("00-03 cross-link"), `content/bibliography.yaml` same entry | 00-03 introduces thermistors but does not cite this note. Cite it in 00-03 EN and ES as further reading, or drop "00-03 cross-link" from the Modules column. |
+| S6 | Suggestion | Docs | `README.md` bibliography example; `content/bibliography.yaml` header ("all values are double-quoted strings") | The README example uses unquoted values while the YAML file's header asks for double quotes. Both parse; quote the README example, or soften the header to "quote any value containing `:` or `#`". |
+| S7 | Suggestion | Code (hygiene) | `.claude/skills/course-writing/SKILL.md:160` (inline example), `ARCHITECTURE.md:483` (§6) | Lines overrun the 80-column wrap of the rest of the file. Re-wrap them. |
+
+### Fixed during verification
+
+- `ARCHITECTURE.md` §3: line counts updated to the working tree: `core/`
+  538 → 570, `i18n/ui.ts` 349 → 361, `lesson/` 216 → 351 (the new
+  `lesson-sources.ts`), `pages/` 1046 → 1051.
+- `ARCHITECTURE.md` §4.8: "Per-lesson chunk" 6.9–11.4 kB / 2.3–3.9 kB →
+  7.8–13.8 kB / 2.7–4.8 kB, from this build (all eight lesson chunks are in
+  the default output), and the date note says when that row changed. The
+  `main.js`, `styles.css` and instrument rows still hold.
+- `docs/ROADMAP.md` A5 row: "(Boylestad, Floyd, Malvino, Sedra & Smith,
+  Franco have one)" was wrong for the YAML: only Floyd, Sedra & Smith and
+  Franco have an `es:` alternate, while Boylestad and Malvino are
+  Spanish-only §6 entries. Reworded to say so.
+- `tools/build-content.mjs:164`: the JSDoc said the returned entries drop
+  only `modules`; they drop `comment` too. Comment fixed (no code change;
+  `node --check` passes).
+
+### Ready to merge: no
+
+m-1 to m-3 are open, and all three are data or formatting fixes in
+`content/bibliography.yaml` (m-1, m-3) plus a small, documented
+per-entry style switch in `lesson-sources.ts` (m-2). Route m-1 and m-3 to
+the content/references owner and m-2 to the code owner, then re-verify.
+S1–S7 do not block the merge.
+
 ## Verification: Kirchhoff lesson and plain-writing rewrite (2026-10-02)
 
 This is an independent check of branch `content/kirchhoff-plain-writing`. It
