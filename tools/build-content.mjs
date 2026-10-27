@@ -54,7 +54,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import { REGISTRY_FILE, loadFormat, readWidgetSchema } from './widget-props.mjs';
+import { REGISTRY_FILE, fenceStep, loadFormat, readWidgetSchema } from './widget-props.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -122,7 +122,7 @@ function toBlocks(markdown, ctx, lineOffset = 0) {
   const blocks = [];
   const lines = markdown.split(/\r?\n/);
   let buffer = [];
-  let inFence = false;
+  let fence = null;
 
   const flush = () => {
     const text = buffer.join('\n').trim();
@@ -133,13 +133,10 @@ function toBlocks(markdown, ctx, lineOffset = 0) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Never interpret directives inside a fenced code block.
-    if (/^\s*```/.test(line)) {
-      inFence = !inFence;
-      buffer.push(line);
-      continue;
-    }
-    if (inFence) {
+    // Never interpret directives inside a fenced code block (``` or ~~~).
+    const wasFenced = fence;
+    fence = fenceStep(line, fence);
+    if (wasFenced || fence) {
       buffer.push(line);
       continue;
     }
@@ -167,16 +164,17 @@ function toBlocks(markdown, ctx, lineOffset = 0) {
       const title = callout[2].trim();
       const inner = [];
       let closed = false;
-      let innerFence = false;
+      let innerFence = null;
       for (i = i + 1; i < lines.length; i++) {
-        if (/^\s*```/.test(lines[i])) innerFence = !innerFence;
+        const wasFenced = innerFence;
+        innerFence = fenceStep(lines[i], innerFence);
         if (CALLOUT_CLOSE_RE.test(lines[i])) {
           closed = true;
           break;
         }
         // A callout body goes straight to marked, so a directive here would
         // ship as literal text without any of the widget checks.
-        if (!innerFence && lines[i].trim().startsWith('::widget')) {
+        if (!wasFenced && !innerFence && lines[i].trim().startsWith('::widget')) {
           throw new Error(`${ctx}:${i + 1 + lineOffset}: ${WIDGET_IN_CALLOUT}`);
         }
         inner.push(lines[i]);

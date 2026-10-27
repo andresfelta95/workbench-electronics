@@ -22,8 +22,8 @@
  *      spoken-only when its name ends in `Spoken`/`Label` or its doc comment in
  *      `UiStrings` says "spoken".
  *   2. Every .ts file under src/app/widgets, src/app/ui and src/app/schematic:
- *      the component template's text, attribute values and string literals in
- *      bindings, and the string literals in the class and module code. Spoken
+ *      the component template's (inline or `templateUrl`) text, attribute
+ *      values and string literals in bindings and `@let`s, and the string literals in the class and module code. Spoken
  *      bindings are `aria-*` attributes and the inputs in SPOKEN_INPUTS; a
  *      class member read only from spoken bindings is spoken too.
  *   3. Everything src/app/core/format.ts can emit (digits, separators, SI
@@ -36,7 +36,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import * as ng from '@angular/compiler';
-import { loadFormat, readWidgetSchema } from './widget-props.mjs';
+import { fenceStep, loadFormat, readWidgetSchema } from './widget-props.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const COVERAGE_FILE = 'tools/glyph-coverage.json';
@@ -237,7 +237,11 @@ function decorators(sf) {
       node.expression.arguments[0] &&
       ts.isObjectLiteralExpression(node.expression.arguments[0])
     ) {
-      found.push({ decorator: node, meta: node.expression.arguments[0] });
+      found.push({
+        decorator: node,
+        meta: node.expression.arguments[0],
+        component: node.expression.expression.getText(sf) === 'Component',
+      });
     }
   });
   return found;
@@ -352,6 +356,10 @@ function scanTemplate(template, file, onText, spokenReads, visibleReads) {
     visitBoundEvent(e) {
       expr(e.handler, true, 'event');
     }
+    visitLetDeclaration(d) {
+      // `@let x = '…'`: whatever it holds may be drawn, so it is checked as visible.
+      expr(d.value, false, `@let ${d.name}`);
+    }
     visitIfBlockBranch(b) {
       expr(b.expression, false, '@if');
       super.visitIfBlockBranch(b);
@@ -379,10 +387,38 @@ function checkComponents() {
     const visibleReads = new Set();
     const skip = new Set(); // decorator metadata nodes handled (or ignored) here
 
-    for (const { meta } of decorators(sf)) {
+    for (const { meta, component, decorator } of decorators(sf)) {
       skip.add(meta);
       const tpl = metaProp(meta, 'template');
-      if (!tpl) continue;
+      const url = metaProp(meta, 'templateUrl');
+      if (!tpl && url) {
+        // External template: same visitor, positions in the .html file.
+        const htmlFile = ts.isStringLiteralLike(url) && path.resolve(path.dirname(file), url.text);
+        if (!htmlFile || !existsSync(htmlFile)) {
+          throw new Error(
+            `${name}:${lineOf(sf, url.getStart(sf))}: templateUrl must be a string literal naming an existing file`,
+          );
+        }
+        const html = readFileSync(htmlFile, 'utf8');
+        const htmlName = rel(htmlFile);
+        scanTemplate(
+          html,
+          htmlFile,
+          (text, offset, what) =>
+            check(text, htmlName, html.slice(0, offset).split('\n').length, what),
+          spokenReads,
+          visibleReads,
+        );
+        continue;
+      }
+      if (!tpl) {
+        if (component) {
+          throw new Error(
+            `${name}:${lineOf(sf, decorator.getStart(sf))}: @Component has neither an inline template nor a templateUrl`,
+          );
+        }
+        continue;
+      }
       if (!ts.isNoSubstitutionTemplateLiteral(tpl) && !ts.isStringLiteral(tpl)) {
         throw new Error(`${name}:${lineOf(sf, tpl.getStart(sf))}: template must be a literal`);
       }
@@ -478,13 +514,14 @@ function checkContent() {
   };
   if (existsSync(dir)) list(dir);
   for (const file of files) {
-    let fence = false;
+    let fence = null;
     let callout = false;
     readFileSync(file, 'utf8')
       .split(/\r?\n/)
       .forEach((line, i) => {
-        if (/^\s*```/.test(line)) fence = !fence;
-        if (fence) return;
+        const wasFenced = fence;
+        fence = fenceStep(line, fence);
+        if (wasFenced || fence) return;
         // Callout open/close as in build-content.mjs (CALLOUT_KINDS there).
         if (!callout && /^:::(note|warning|key|safety)\b/.test(line)) {
           callout = true;

@@ -102,7 +102,7 @@ electronics/
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
 │
 ├── tools/
-│   ├── build-content.mjs       ← the content compiler (623 lines)
+│   ├── build-content.mjs       ← the content compiler (621 lines)
 │   ├── widget-props.mjs        ← each widget's registered type and known props, read from src
 │   ├── check-glyphs.mjs        ← build gate: instrument text vs the pixel font stack
 │   ├── glyph-coverage.json     ← committed coverage table check-glyphs reads
@@ -355,7 +355,7 @@ production and does nothing but serve files.
 
 ### 5.1 The content compiler — `tools/build-content.mjs`
 
-A 623-line Node script, the only genuinely custom "backend" in the project. It
+A 621-line Node script, the only genuinely custom "backend" in the project. It
 runs before every build.
 
 **Input:** `content/{lang}/{moduleId}/{lessonId}.md`

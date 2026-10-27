@@ -8,8 +8,10 @@
  * Run it again when src/index.html changes the font request, or to pick up a
  * new upstream version of a family.
  *
- * Method (DESIGN-PIXEL-ART.md §Glyph coverage): request the same CSS2 URL as
- * src/index.html with a desktop Chrome user agent, so Google answers with the
+ * Method (DESIGN-PIXEL-ART.md §Glyph coverage): build a CSS2 URL for the
+ * three `--pix-font` families (the same families and default weight that
+ * src/index.html requests, without the prose faces) and fetch it with a
+ * desktop Chrome user agent, so Google answers with the
  * per-script woff2 slices and their `unicode-range`s, exactly what a browser
  * gets. Download every slice, read its `cmap`, and count a code point only if
  * it is in the slice's `unicode-range` **and** mapped to a glyph in that

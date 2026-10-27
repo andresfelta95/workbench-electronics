@@ -16,11 +16,14 @@
  *   attribute.
  * - A key read through `parseValue(this.props()[…], …)` is numeric: its value
  *   must be one parseValue (src/app/core/format.ts) accepts, such as "10k".
- *   Any other key is text.
+ *   Any other key is text. Parentheses, `!`, `as T` and `satisfies T` around
+ *   the access are looked through: `parseValue(this.props()['x']!, 9)` and
+ *   `parseValue(this.props()['x'] as string, 9)` are numeric too.
  *
  * Two consequences that can surprise:
- * - The number check needs the access to be parseValue's direct first
- *   argument. `parseValue(this.props()['x'] ?? '9', 9)` makes `x` a text prop,
+ * - The number check needs the access to be parseValue's first argument
+ *   (through those wrappers only). `parseValue(this.props()['x'] ?? '9', 9)`
+ *   makes `x` a text prop,
  *   so a non-numeric value is no longer rejected; put the fallback in
  *   parseValue's second argument instead.
  * - Only the component's TypeScript is read. A key read only in the template
@@ -97,6 +100,25 @@ export function readRegistry() {
   return registry;
 }
 
+/**
+ * Fenced-code tracking for the Markdown scanners (build-content.mjs and
+ * check-glyphs.mjs), after CommonMark: a fence opens with three or more
+ * backticks or tildes, and closes only with a bare line of the same character
+ * at least as long. `open` is null outside a fence; returns the new state.
+ * A line is fenced (never a directive) if `open` was or becomes non-null.
+ */
+export function fenceStep(line, open) {
+  const m = /^\s*(`{3,}|~{3,})(.*)$/.exec(line);
+  if (!m) return open;
+  const ch = m[1][0];
+  if (!open) {
+    // A backtick fence's info string cannot contain a backtick.
+    if (ch === '`' && m[2].includes('`')) return open;
+    return { ch, len: m[1].length };
+  }
+  return ch === open.ch && m[1].length >= open.len && !m[2].trim() ? null : open;
+}
+
 /** `this.props()` */
 function isPropsCall(node) {
   return (
@@ -110,6 +132,16 @@ function isPropsCall(node) {
 
 /** True when `node` is the first argument of a `parseValue(…)` call. */
 function isParsedNumber(node) {
+  // Look through wrappers that do not change the value: (x), x!, x as T, x satisfies T.
+  while (
+    ts.isParenthesizedExpression(node.parent) ||
+    ts.isNonNullExpression(node.parent) ||
+    ts.isAsExpression(node.parent) ||
+    ts.isSatisfiesExpression(node.parent) ||
+    ts.isTypeAssertionExpression(node.parent)
+  ) {
+    node = node.parent;
+  }
   const parent = node.parent;
   return (
     ts.isCallExpression(parent) &&
