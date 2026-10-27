@@ -329,7 +329,7 @@ yuasa-powersports-manual:
   comment: "Undated (file published 2017)"
   url: "https://www.yuasabatteries.com/wp-content/uploads/2017/07/TechManual.x78244.pdf"
   modules:
-    - "00-03"
+    - "00-03 (12 V lead-acid: 11.8 V or less at rest is 0 %, \"fully discharged\" at 10.5 V in a capacity test; a working charging system holds 13.0–14.5 V, Yuasa's charger peaks at 14.4 V)"
     - "00-04 (12 V lead-acid: a fully charged conventional battery rests at 12.6 V, 11.8 V or less at rest is 0 %, \"fully discharged\" at 10.5 V in a capacity test; a working charging system holds 13.0–14.5 V, AGM batteries need 14.0–14.8 V, Yuasa's charger peaks at 14.4 V)"
 
 ti-slay054:

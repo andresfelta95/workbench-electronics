@@ -66,6 +66,8 @@ once the project committed to static output, because nothing imported them.
 | `gray-matter` | 4.0.3 | YAML front matter parsing in the content pipeline. Node-only. |
 | `@types/node` | 20.x | Types for the pipeline script. |
 | `prettier` | 3.8.x | Formatting. |
+| `vitest` | 4.x | Unit-test runner behind `ng test` (`@angular/build:unit-test`). Specs only, never shipped. |
+| `jsdom` | 27.x | The DOM the unit tests run in, so `pnpm test:ci` needs no browser. |
 
 **Nothing else.** No component library, no CSS framework, no state management
 library, no chart library, no icon package, no analytics, no font package. The
@@ -100,7 +102,12 @@ electronics/
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
 │
 ├── tools/
-│   ├── build-content.mjs       ← the content compiler (545 lines)
+│   ├── build-content.mjs       ← the content compiler (623 lines)
+│   ├── widget-props.mjs        ← each widget's registered type and known props, read from src
+│   ├── check-glyphs.mjs        ← build gate: instrument text vs the pixel font stack
+│   ├── glyph-coverage.json     ← committed coverage table check-glyphs reads
+│   ├── glyph-coverage-gen.mjs  ← regenerates glyph-coverage.json
+│   ├── contrast-table.mjs      ← regenerates / checks the DESIGN-PIXEL-ART contrast table
 │   └── axe-check.mjs           ← axe over every prerendered route (needs AXE_TOOLS_DIR)
 │
 ├── docs/                       ← roadmap, review, bibliography, pixel-art design notes
@@ -119,15 +126,16 @@ electronics/
 │       ├── app.config.ts       ← providers
 │       ├── app.config.server.ts
 │       │
-│       ├── core/               ← services and pure logic (575 lines)
+│       ├── core/               ← services and pure logic (596 lines, plus a 269-line spec)
 │       ├── i18n/ui.ts          ← every UI string, both languages (357 lines)
 │       ├── lesson/             ← the Markdown → components renderer (347 lines)
 │       ├── pages/              ← the five routed views (1051 lines)
 │       ├── schematic/          ← SVG symbol library (374 lines)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
-│       ├── widgets/            ← the instruments (1215 lines, plus a 107-line spec)
+│       ├── widgets/            ← the instruments (1360 lines, plus 536 lines of maths specs)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
+├── .github/workflows/build.yml ← CI: build, unit tests + contrast, axe (§5.5)
 ├── Dockerfile                  ← two stages: node builder, nginx runtime
 ├── nginx.conf                  ← routing, caching, headers
 ├── LICENSE                     ← MIT, code only
@@ -347,7 +355,7 @@ production and does nothing but serve files.
 
 ### 5.1 The content compiler — `tools/build-content.mjs`
 
-A 311-line Node script, the only genuinely custom "backend" in the project. It
+A 623-line Node script, the only genuinely custom "backend" in the project. It
 runs before every build.
 
 **Input:** `content/{lang}/{moduleId}/{lessonId}.md`
@@ -360,17 +368,24 @@ runs before every build.
    track fence state and never interpret a directive inside a fenced code block.
 3. Splits the prose into ordered blocks, converting `::widget{...}` directives
    and `:::note … :::` callouts into typed structures and running everything
-   else through `marked`.
+   else through `marked`. Each widget is checked against
+   `tools/widget-props.mjs` (§5.5): an unregistered type, an unknown prop, a
+   non-numeric value for a numeric prop, or a duplicate or unparsable
+   attribute fails the build, as does a malformed `::widget` line outside a
+   fence (`<file>:<line>: malformed ::widget directive`) or inside a callout.
 4. **Cross-checks the languages.** If `en` and `es` disagree about which modules
    or lessons exist, the build fails. A half-translated lesson cannot ship, and
    the language switcher can never point at a page that does not exist.
 5. **Resolves references.** It loads `content/bibliography.yaml` (one entry per
    source, keyed by id; unknown keys or a missing `title` fail; `modules` and
    `comment` are bookkeeping and never rendered; an optional `titleStyle`,
-   `italic` or `quoted`, overrides the section's default title style), checks
+   `italic` or `quoted`, overrides the section's default title style; a
+   `null` `titleStyle` or `modules` counts as absent, and `modules` items must
+   be non-empty strings), checks
    that `section: es` and `lang: es` go together (each requires the other)
    and that every `es:` link points
-   at an entry with `lang: es`, and resolves each lesson's
+   at an entry with `lang: es` (an entry that is itself `lang: es` may not
+   carry `es:`), and resolves each lesson's
    `references:` (an id or `{ id, note }`) into the lesson data. It fails on an
    unknown or duplicate id, a malformed item, or EN and ES citing different
    ids. `docs/BIBLIOGRAPHY.md` is still hand-written and must be kept in step
@@ -474,6 +489,53 @@ Browser → Cloudflare edge (TLS, Always Use HTTPS)
 The home server never exposes an inbound port. There is no origin certificate to
 manage and no firewall rule to get wrong.
 
+### 5.5 Quality gates
+
+Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
+"Quality gates", has the commands).
+
+- **Widget props**, in `build-content.mjs`, before `ng build`.
+  `tools/widget-props.mjs` reads the registered types and their component
+  files from `WIDGETS` in `widget-registry.ts` with the TypeScript compiler
+  API. `WidgetHost` passes every directive attribute in one `props` map, so a
+  widget's known props are the keys it reads as `this.props()['key']`, and a
+  key read through `parseValue` is numeric. Any other way of reading
+  `props()` fails the build loudly rather than passing everything.
+- **Glyphs**, `tools/check-glyphs.mjs`, also before `ng build`. It scans the
+  `widget.*` strings in `ui.ts`, the widget, `ui` and schematic templates
+  (parsed with `@angular/compiler`), formatter output in both locales and the
+  text-valued widget attributes in content, against the committed
+  `tools/glyph-coverage.json` (regenerated by `tools/glyph-coverage-gen.mjs`,
+  which needs network). A character passes if VT323 draws it; a Greek
+  letter also passes if JetBrains Mono has it; ∥ and arrows also pass if
+  Iosevka Charon Mono has them. `×` and the subscripts U+2080–209C always
+  fail in visible text. Spoken-only text is exempt: `ui.ts` keys ending in
+  `Spoken` or `Label` (or documented as spoken in `UiStrings`), `aria-*`
+  bindings, and the inputs listed in `SPOKEN_INPUTS` in `check-glyphs.mjs`
+  (`app-panel` `headingLabel`, `sch-canvas` `label`). It also
+  fails if `--pix-font` no longer lists the families in the coverage file's
+  order. The Dockerfile runs `pnpm build`, so an image cannot be built past
+  either check.
+- **Unit tests**: `ng test` (Vitest in jsdom) runs `core/format.spec.ts` and
+  one `*-math.spec.ts` per widget (Ohm's law, series/parallel, divider,
+  Kirchhoff), 89 tests. `pnpm test:ci` runs them once and needs no
+  `pnpm content` first.
+- **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
+  `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x
+  ratios for a fixed pair list and regenerates the table in
+  `docs/DESIGN-PIXEL-ART.md`; `--check` fails if that table is stale or a pair
+  is under its minimum.
+- **axe**: `tools/axe-check.mjs` over every prerendered route in four theme
+  states (§4.6), exit 1 on any violation.
+
+**CI** (`.github/workflows/build.yml`, every pull request and every push to
+`main`, read-only token) runs three jobs: `build` (`pnpm build`, uploading
+`dist/electronics`), `checks` (`pnpm check:contrast`, `pnpm test:ci`) in
+parallel, and `axe`, which downloads the `build` output rather than building
+again. Playwright and `@axe-core/playwright` are installed with pinned
+versions into the runner's temp folder, never into the repo's dependencies,
+and the Chromium download is cached per Playwright version.
+
 ---
 
 ## 6. Adding to it
@@ -489,8 +551,10 @@ prerendering all follow from that. See `README.md`.
 **An instrument** is a standalone component taking `props`, registered in
 `lesson/widget-registry.ts` as a dynamic import. Reuse `Panel`, `Control` and
 `Readout`, draw with the `schematic/` symbols, and format numbers through
-`core/format.ts`. Before building one, follow the "Adopting the skin in a new
-widget" checklist in `docs/DESIGN-PIXEL-ART.md`.
+`core/format.ts`. Read each directive attribute as `this.props()['key']` and
+wrap numeric ones in `parseValue`: that is how the build learns which props a
+widget accepts (§5.5). Before building one, follow the "Adopting the skin in a
+new widget" checklist in `docs/DESIGN-PIXEL-ART.md`.
 
 Two rules that are not negotiable, because they are the point of the project:
 

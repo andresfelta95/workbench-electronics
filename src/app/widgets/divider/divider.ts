@@ -1,10 +1,11 @@
 import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { I18n } from '../../core/i18n';
-import { formatPercent, formatSI, parallel, parseValue } from '../../core/format';
+import { formatPercent, formatSI, parseValue } from '../../core/format';
 import { SCHEMATIC } from '../../schematic/schematic';
 import { Control } from '../../ui/control';
 import { Panel, type PanelHeadingPart } from '../../ui/panel';
 import { Readout } from '../../ui/readout';
+import { dividerFlow, errorTone, solveDivider } from './divider-math';
 
 const IDEAL_HEADING = 'Vout = Vin · R2 / (R1 + R2)';
 
@@ -158,56 +159,33 @@ export class DividerWidget {
   protected readonly rLoad = linkedSignal(() => parseValue(this.props()['rload'], 10000));
   protected readonly loaded = signal(false);
 
-  /** R2 as the circuit actually sees it once something is hung off the output. */
-  private readonly r2Effective = computed(() =>
-    this.loaded() ? parallel(this.r2(), this.rLoad()) : this.r2(),
+  private readonly solution = computed(() =>
+    solveDivider({
+      vin: this.vin(),
+      r1: this.r1(),
+      r2: this.r2(),
+      rLoad: this.rLoad(),
+      loaded: this.loaded(),
+    }),
   );
 
-  protected readonly vout = computed(() => {
-    const r2 = this.r2Effective();
-    return (this.vin() * r2) / (this.r1() + r2);
-  });
-
-  protected readonly videal = computed(() => (this.vin() * this.r2()) / (this.r1() + this.r2()));
-
-  protected readonly error = computed(() => {
-    const ideal = this.videal();
-    return ideal === 0 ? 0 : (this.vout() - ideal) / ideal;
-  });
-
-  protected readonly zout = computed(() => parallel(this.r1(), this.r2()));
-
-  protected readonly iLoad = computed(() => (this.loaded() ? this.vout() / this.rLoad() : 0));
-
+  protected readonly vout = computed(() => this.solution().vout);
+  protected readonly videal = computed(() => this.solution().videal);
+  protected readonly error = computed(() => this.solution().error);
+  protected readonly zout = computed(() => this.solution().zout);
+  protected readonly iLoad = computed(() => this.solution().iLoad);
   /** What the divider burns just by existing, with nothing connected. */
-  protected readonly pQuiescent = computed(() => {
-    const total = this.r1() + this.r2();
-    return total === 0 ? 0 : (this.vin() * this.vin()) / total;
-  });
+  protected readonly pQuiescent = computed(() => this.solution().pQuiescent);
+  private readonly iTotal = computed(() => this.solution().iTotal);
 
-  private readonly iTotal = computed(() => {
-    const total = this.r1() + this.r2Effective();
-    return total === 0 ? 0 : this.vin() / total;
-  });
-
-  protected readonly flow = computed(() => this.normalise(this.iTotal()));
-  protected readonly loadFlow = computed(() => this.normalise(this.iLoad()));
+  protected readonly flow = computed(() => dividerFlow(this.iTotal()));
+  protected readonly loadFlow = computed(() => dividerFlow(this.iLoad()));
 
   protected readonly errorText = computed(() => formatPercent(this.error(), this.i18n.lang(), 1));
 
-  protected readonly errorTone = computed(() => {
-    const magnitude = Math.abs(this.error());
-    if (magnitude < 0.01) return 'signal' as const;
-    if (magnitude < 0.1) return 'warn' as const;
-    return 'danger' as const;
-  });
+  protected readonly errorTone = computed(() => errorTone(this.error()));
 
   protected text(value: number, unit: string): string {
     return formatSI(value, unit, this.i18n.lang());
-  }
-
-  private normalise(amps: number): number {
-    if (!Number.isFinite(amps) || amps <= 0) return 0;
-    return Math.min(1, Math.max(0.08, (Math.log10(amps) + 6) / 6));
   }
 }

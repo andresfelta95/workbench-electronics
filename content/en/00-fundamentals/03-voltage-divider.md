@@ -9,7 +9,7 @@ references:
   - id: fender-tm-twin-reverb
     note: "Guitar amplifiers have about 1 MΩ of input impedance: this amplifier's Input 1 is 1 MΩ."
   - id: yuasa-powersports-manual
-    note: "12 V lead-acid battery voltages: 11.8 V or less at rest is flat, and a working charging system holds 13.0 to 14.5 V. Yuasa's charger peaks at 14.4 V."
+    note: "12 V lead-acid battery voltages: 11.8 V or less at rest is flat, and a capacity test counts it as fully discharged at 10.5 V. A working charging system holds 13.0 to 14.5 V. Yuasa's charger peaks at 14.4 V."
   - id: bu-403
     note: "Charging limit for a six-cell lead-acid battery: 13.8 to 14.7 V."
   - id: microchip-atmega328p

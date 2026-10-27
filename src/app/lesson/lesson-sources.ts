@@ -33,7 +33,7 @@ function shortUrl(url: string): string {
  */
 @Component({
   selector: 'app-citation',
-  template: `<span [attr.lang]="entry().lang">{{ parts().lead }}<cite [class.quoted]="parts().quoted">{{ parts().title }}</cite>{{ parts().tail }}@if (entry().url; as url) {<a [href]="url" rel="noopener">{{ parts().linkText }}</a>}</span>`,
+  template: `<span [attr.lang]="entry().lang">{{ parts().lead }}<cite [class.quoted]="parts().quoted">{{ parts().title }}</cite>{{ parts().tail }}@if (entry().url; as url) {<a [href]="url">{{ parts().linkText }}</a>}</span>`,
   styles: `
     :host {
       display: inline;

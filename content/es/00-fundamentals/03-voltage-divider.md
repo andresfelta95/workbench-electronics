@@ -9,7 +9,7 @@ references:
   - id: fender-tm-twin-reverb
     note: "Los amplificadores de guitarra tienen alrededor de 1 MΩ de impedancia de entrada: la entrada 1 de este amplificador es de 1 MΩ."
   - id: yuasa-powersports-manual
-    note: "Tensiones de una batería de plomo-ácido de 12 V: con 11,8 V o menos en reposo está descargada, y un sistema de carga que funciona la mantiene entre 13,0 y 14,5 V. El cargador de Yuasa llega a 14,4 V."
+    note: "Tensiones de una batería de plomo-ácido de 12 V: con 11,8 V o menos en reposo está descargada, y una prueba de capacidad la da por totalmente descargada a 10,5 V. Un sistema de carga que funciona la mantiene entre 13,0 y 14,5 V. El cargador de Yuasa llega a 14,4 V."
   - id: bu-403
     note: "Límite de carga de una batería de plomo-ácido de seis celdas: de 13,8 a 14,7 V."
   - id: microchip-atmega328p

@@ -1,5 +1,170 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: A7 quality gates (2026-10-27)
+
+This is an independent check of branch `infra/a7-quality-gates`: the
+uncommitted working tree against `main` (`b29ece8`), untracked files
+included. I re-ran every check and did not take the implementers' reports on
+trust. Mutations ran in `/tmp` copies of the working tree, never in the repo.
+
+**Ready to merge: yes** (third pass, below). m-1, m-2 and S1–S4 are all
+resolved and re-verified. No Blocker, Major or Minor finding is open in this
+change's scope.
+
+### Third pass: m-2 and full regression (2026-10-27)
+
+The only changes since the second pass: a callout check in
+`build-content.mjs` and `check-glyphs.mjs`, one line each in README
+"Quality gates" item 1 and ARCHITECTURE §5.1, and the line count (623,
+which matches `wc -l`). Mutations ran in a fresh `/tmp/verify3-wt` copy.
+
+| Check | Result |
+|---|---|
+| m-2 cases (each script run on its own) | Both scripts exit 1 with `file:line: ::widget directives are not allowed inside a :::callout; close the callout first` on: a valid `::widget{type="divider" vin="9"}` inside `:::note` (line `:197`); an indented one inside `:::warning` (`:198`); a malformed one inside `:::key` (`:197`); a valid one inside an ES `:::note` (`es/…:208`). I checked every line number against the file. Both pass, as they should, on: a `::widget` inside a ```` ``` ```` fence within a callout; a mid-line mention inside a callout; a widget directly after a closed callout. `:::notes` is not a callout kind, so it is prose in both scripts and the widget after it is checked as normal. Both scripts accept the same kinds (`note`, `warning`, `key`, `safety`), matching `CALLOUT_KINDS`. |
+| Regressions | The missing-`}`, unknown-type and non-numeric mutations still fail with the same messages. Baseline content and glyph runs pass. |
+| `pnpm build` (inside `flock`, copied to `/tmp/a7-verify3-dist`) | Pass: content OK, glyphs "649 … all covered", 35 routes, `main` 314.44 kB / 88.14 kB, no warnings. |
+| axe on the private copy | **0 violations**, 140 pages (light 0, system-dark 0, dark 0, light-forced 0). |
+| `pnpm test:ci`, `pnpm check:contrast` | 5 files and 89 tests pass. Contrast: 28 pairs × 2 themes (+ more) pass, and the table is current. |
+| Lockfile | `pnpm@9.15.0 install --frozen-lockfile` passes in the fresh copy. |
+| Hygiene | `git diff --check` is clean. No working-tree text file contains `\r`, and no `git ls-files --eol` entry is CRLF. Every changed or new file ends with a newline. The new doc lines stay within 80 columns. The status has the same 36 entries as the second pass (24 modified, 12 new). |
+
+#### Ready to merge: yes (third pass)
+
+### Second pass: re-verification of the fixes (2026-10-27)
+
+Same method, run on the whole working tree: a fresh build and axe run,
+tests, contrast, the 642-state `main`-vs-branch comparison, new mutation
+cases for the new error paths in a fresh `/tmp/verify2-wt` copy, and a CRLF
+scan.
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/a7-verify2-dist`) | Pass: content OK, glyphs "649 … all covered", 35 routes, `main` 314.44 kB / 88.14 kB. |
+| axe on the private copy | **0 violations**, 140 pages (light 0, system-dark 0, dark 0, light-forced 0). |
+| `pnpm test:ci`, `pnpm check:contrast` | 5 files and 89 tests pass. Contrast: 28 pairs × 2 themes (+ more) pass, and the table is current. |
+| Lockfile | `pnpm@9.15.0 install --frozen-lockfile` passes in the fresh copy, and `test:ci` there runs 89 tests. |
+| Displayed output, `main` vs branch | 642 snapshots per build, **20 differ**. They are the same 20 as in the first pass, all intended ("1000 mV"/"1,000 mV" → "1 V", 90 times; "-0%"/"-0 %" → "0%"/"0 %"). Nothing else changed. |
+| Prerendered HTML | The citations differ from `main` only by the dropped `rel="noopener"` and the 00-03 Yuasa note (EN and ES). The footer now has `rel="license"` on the CC link and no `noopener` anywhere (0 on every lesson page). |
+| New error paths (`build-content.mjs` **and** `check-glyphs.mjs`, each run on its own) | Both exit 1 with `file:line: malformed ::widget directive; …` on: a missing `}`; a space before `{`; an indented line (spaces or a tab); trailing text after `}`; a `::widgets{` typo; and the same in ES (`es/…/03-voltage-divider.md:68`, which I checked against the file). They pass, as they should, on: malformed and indented `::widget` lines inside a ```` ``` ```` fence; a `::widget{…}` mention in the middle of a prose line; a baseline build. `::Widget{` and `:widget{` also pass, because they do not start with `::widget`, and marked renders them as text. That is an acceptable limit. **A `::widget` line inside a `:::note … :::` callout is not covered (m-2):** a valid-looking `::widget{type="dividr" vin="9"}` there passes both scripts, and the generated lesson holds `<p>::widget{type=&quot;dividr&quot; vin=&quot;9&quot;}</p>`. A *malformed* one inside a callout passes `build-content.mjs` but fails `check-glyphs.mjs` (`:197`), so `pnpm build` still stops on that case. Regressions: unknown type, non-numeric prop and `×` in visible text still fail. |
+| S1 | A bad `--pix-font` order now prints `glyph check failed: --pix-font is VT323, Iosevka Charon Mono, JetBrains Mono but …` with no stack trace, exit 1. A corrupt `glyph-coverage.json` prints `glyph check failed: Expected property name …`, exit 1. |
+| CRLF | No working-tree text file (tracked or untracked, binaries excluded) contains `\r`. No `git ls-files --eol` entry is CRLF. `git diff --check` is clean, and every changed or new file ends with a newline. |
+| Docs | The README "Adding an instrument" step 3 and "Quality gates" item 1, and ARCHITECTURE §5.1, describe the malformed-line rule and its message exactly as the code throws it. The `widget-props.mjs` header describes the two fail-safe surprises correctly, and I checked both against the code. No prose line added by the change goes past 80 columns. |
+
+#### Resolution
+
+| # | Status | Evidence |
+|---|---|---|
+| m-1 | **Resolved** | See "New error paths": every malformed shape I raised now fails in both scripts with `file:line`, and fences and mid-line mentions are left alone. |
+| S1 | Resolved | `loadCoverage()` now runs inside `main()`, so errors print as a clean message (above). |
+| S2 | Resolved | The 00-03 parenthetical now lists 11.8 V at rest = 0 %, 10.5 V in a capacity test, 13.0–14.5 V while charging and the 14.4 V charger peak. Those are exactly the four figures in the 00-03 notes (EN and ES). The YAML and BIBLIOGRAPHY.md agree word for word. |
+| S3 | Resolved | `app.html` drops `noopener` from both footer links and keeps `rel="license"`. No `noopener` remains in `src/`. |
+| S4 | Resolved | The `widget-props.mjs` header now explains the `?? '…'` and template-only cases. |
+
+#### New finding
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-2 | Minor | Build gate | `tools/build-content.mjs` `toBlocks()`, the callout loop (lines inside `:::kind … :::` go straight to `marked`) | A `::widget` line inside a callout skips the type and prop checks and ships as literal text. That is the same failure as m-1, by a different route, and a lesson author could easily write one ("Try it: ::widget{…}" inside a `:::note`). `check-glyphs.mjs` already catches the malformed form, so the two scripts disagree. In the callout loop, fail on any inner line whose trimmed start is `::widget`, with `file:line` (e.g. "widgets cannot go inside a :::callout; put the ::widget line before or after it"). Add a line to README "Quality gates" and ARCHITECTURE §5.1. |
+
+#### Fixed during verification (second pass)
+
+- In the first pass I rewrapped `course-reviewer.md:29` and ARCHITECTURE
+  §5.5 badly: each edit left a line of more than 100 columns. Both are now
+  rewrapped properly. ARCHITECTURE's spoken-text sentence is re-flowed with
+  the wording unchanged.
+- `ARCHITECTURE.md` §3 and §5.1: `build-content.mjs` went from 607 to 614
+  lines with the m-1 fix. Both counts are updated.
+
+After these edits, `git diff --check` is clean and the files are LF.
+
+#### Ready to merge: no (second pass)
+
+m-2 is open. It is a small check in the callout loop of `build-content.mjs`,
+plus one line each in README and ARCHITECTURE §5.1. Route it to the
+implementer, then re-verify the in-callout cases (valid and malformed) and
+re-run the malformed-line cases. Nothing else is open.
+
+### First pass
+
+**Verdict then: no.** One Minor finding was open (m-1). Every other claim
+held.
+
+### What changed
+
+- **Unit tests.** `ng test` now runs through `@angular/build:unit-test`
+  (Vitest, jsdom). The new devDeps are `vitest` ^4.0.8 (resolves to 4.1.12)
+  and `jsdom` ^27.1.0 (27.4.0). There are new `test:ci`, `check:glyphs` and
+  `check:contrast` scripts. The ohm-law, resistor-network and divider maths
+  moved into pure `*-math.ts` files with specs, and `format.spec.ts` is new.
+  The Kirchhoff spec gained readout and range-corner cases.
+- **`core/format.ts`.** The SI prefix is now picked after rounding, and no
+  formatter can print "-0".
+- **Build gates.** `tools/widget-props.mjs` is wired into `build-content.mjs`,
+  which also tightens three bibliography rules. `tools/check-glyphs.mjs` and
+  `tools/glyph-coverage{.json,-gen.mjs}` are new, and `pnpm build` now runs
+  the glyph check between content and `ng build`. `tools/contrast-table.mjs`
+  is new, and the DESIGN-PIXEL-ART table now sits between generated-block
+  markers.
+- **CI.** `build.yml` gains `checks` and `axe` jobs, a dist artifact, a
+  concurrency group and a Playwright cache.
+- **Content.** The 00-03 Yuasa note (EN and ES) now gives 10.5 V, and the
+  BIBLIOGRAPHY.md row and the YAML `modules` changed to match. The citations
+  in `lesson-sources.ts` no longer carry `rel="noopener"`.
+- **Docs.** README "Quality gates", ARCHITECTURE §3, §5.1, §5.5 and §6,
+  ROADMAP A7, A8 and §5, DESIGN-PIXEL-ART, CLAUDE.md and
+  `course-reviewer.md`.
+
+### Checks run
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/a7-verify-dist` in the same lock) | Pass. Content OK, glyph check "649 instrument strings … all covered", 35 routes prerendered, `main` 314.46 kB / 88.11 kB, no warnings. A fresh copy of the working tree with no `content-generated/` also builds with pnpm 9.15.0 (the `packageManager` version CI and the Dockerfile use). |
+| axe on the private copy | **0 violations**: 35 routes × 4 theme states = 140 pages (light 0, system-dark 0, dark 0, light-forced 0). |
+| Claim 1: unit tests | `pnpm test:ci`: 5 files, **89 tests**, all pass (format 33, ohm-law 12, resistor-network 14, divider 16, kirchhoff 14). They also pass in a `/tmp` copy that has no `content-generated/`, so `pnpm content` is not needed first. I broke the code five ways, and each time `test:ci` exited 1: ohm flow offset (1 test failed), the format prefix fix reverted (1 failed, "1,000 Ω" vs "1 kΩ"), `unsignedZero` removed (4 failed), divider `iLoad` using R2 (1 failed), parallel branch current (3 failed). |
+| Claim 2: maths extraction | `solveOhm`, `powerLevel`/`ohmFlow`, `solveNetwork`/`networkFlow`, `solveDivider`/`errorTone`/`dividerFlow` match the removed component code expression for expression (guards, thresholds, log offsets). The component templates are unchanged. I compared the specs with the lesson prose myself. **00-01**: 19.1 mA (and 19,1 mA in ES), 13.6 mA / 40.9 mW, 100 mA / 2.2 W / 8.8 × 1/4 W, 10 W. **00-02**: 5.7 kΩ / 1.58 mA, 825 Ω, 1 V + 9 V, 100 Ω and 10 Ω from ten and a hundred 1 kΩ, 15 kΩ from three 10 kΩ, half the heat each, 0.01 % and 9 %. **00-03**: 4.5 → 3 V, 4.48 V, 4.05 mW / 405 mW, 5 kΩ, 4.5 · 10/15, a 5 kΩ load halves it, a 500 kΩ load costs ≈ 1 %, the 10× and 100× rules, 3.06 / 2.34 V, 15.5 V, 2.13 kΩ, 5.1 V at 24 V, 2.88 / 3.2 kΩ / 2.18 V / 24.2 %. **00-04**: 5 V, 4/1/5 mA, "in 5 mA = out 5 mA", KVL 0 V, the reversal (4 V, −1 mA, −3 mW), and the turning point at 4.5 V. ES states the same figures with decimal commas. The only ES-only numbers are in reference notes (1,9 / 2,3 V, 90 %), and EN has them too. |
+| Claim 3: displayed output, `main` vs branch | I wrote a Playwright script and ran it on a `main` build (`/tmp/a7v-main`) and on this branch. On all 8 lesson pages (EN and ES) it clicks every radio and checkbox, presses the add and remove buttons, and puts 18 values (including 999.95, 9.995, 0, −1, 0.0001, 1M and 48) into every field of all four widgets. That is 642 snapshots per build, each holding the widget text, every `aria-label`/`aria-valuetext`, inline styles (`--travel`, flow `animation-duration`) and input values. **20 snapshots differ.** In every one the difference is an intended fix: "1000 mV" / "1,000 mV" becomes "1 V" (Kirchhoff VA and KVL readouts at 1 V, 45 + 45 occurrences), and the divider's "-0%" / "-0 %" becomes "0%" / "0 %" (EN and ES). Nothing else changed. |
+| Claim 4: widget props and bibliography | Every error names the file and line, and I checked each line number against the file (EN 00-03 `:66`, ES `:68`). The build **fails** on: an unknown type; an unknown prop (`foo`, and `R1` because case matters); a non-numeric value (`10q`, `""`, `1e3`); a duplicate attribute; an unparsable attribute (`r1=10k`, `r1='10k'`); a missing `type`. In widget code it fails on `this.props()` stored in a field, on `Object.keys(this.props())`, and on a computed key `this.props()[this.k]`, each with `file:line`. In the bibliography it fails on `modules: [""]`, `["   "]`, `[3]`, `titleStyle: bold`, and `es:` on the `lang: es` entry `floyd-2007-es`. It **passes** `titleStyle:` (null), and the generated content is byte-identical to leaving the key out. It also passes `modules:` (null) and `es:` (null) on a `lang: es` entry. Gap: m-1. The derived schema is ohm-law v/r/i, resistor-network supply, divider vin/r1/r2/rload, kirchhoff v1/v2/r1/r2/r3, all numeric. |
+| Claim 5: glyphs | The rule in `check-glyphs.mjs` matches DESIGN-PIXEL-ART §Glyph coverage: VT323, then Greek (U+0370–03FF) through JetBrains Mono, then ∥ and arrows (U+2190–21FF) through Iosevka. `×` and U+2080–209C always fail, and spoken text is exempt. I re-ran `glyph-coverage-gen.mjs` in a `/tmp` copy (network). The regenerated JSON is **identical** to the committed file (VT323 527 code points, JetBrains Mono 663, Iosevka 6275). The JSON agrees with all 13 rows of the doc's coverage table and with "· ± ° ² … — are VT323, ≈ only in Iosevka". I also checked independently with fontTools on the VT323 `latin` woff2 downloaded from gstatic: Ω absent; µ, ×, · present. **Mutations that fail:** `×` in `IDEAL_HEADING`, `R₁` in `en.widget.reset`, `≈` in `es.widget.reset`, `×` in a visible `[heading]` binding, and a formatter that emits `₥`. Swapping or dropping a family in `--pix-font` also fails (the order guard). **Mutations that pass, as they should:** τ → ∥ in visible text, `× ₁ ≈` in a `…Spoken` key, and `×` in the `headingLabel` (spoken) binding. |
+| Claim 6: contrast | `pnpm check:contrast` passes: 28 pairs × 2 themes, plus the `prefers-contrast: more` overrides. Regenerating the table rewrites nothing, and the table is **identical** to `git show main:docs/DESIGN-PIXEL-ART.md` (31 lines). I worked out four ratios by hand in Python: `#4d4b40`/`#e3dfcf` 6.56, `#9db0a5`/`#1a1f1c` 7.31, `#8a3f12`/`#d6dec0` 5.38, `#ffb05c`/`#0f1313` 10.35. All four match the table. Exit 1 on a lighter light-theme accent (`#c08040`: "Tone accent (light): 2.04 < 4.5", and the table is stale). Exit 1 on a hand-edited ratio. Exit 1 on a `prefers-contrast` override that fails (`--pix-lcd-muted: var(--pix-lcd)`, 1.00 in both themes). Exit 2 with a clear message on `rgb(…)`. |
+| Claim 7: CI workflow | Read through: `permissions: contents: read` and nothing broader; every job sets up its own Node (`.nvmrc`). pnpm comes from `packageManager` in `build` and `checks`; `axe` needs no pnpm. The artifact path is right: `upload-artifact@v4` with `path: dist/electronics` stores the folder's contents, and downloading to `dist/electronics` puts `browser/` and `prerendered-routes.json` back side by side, so `axe-check.mjs dist/electronics/browser` finds `../prerendered-routes.json`. `dist` has no dotfiles, so v4's default of skipping hidden files loses nothing. The cache key is per OS and Playwright version, and on a cache hit `install-deps` still installs the system libraries. **Simulation:** I made a working-tree copy with the build output laid out as the download would be (`dist/electronics/{browser,prerendered-routes.json,3rdpartylicenses.txt}`). Then I ran the job's own `npm install --prefix $RUNNER_TEMP/a11y … playwright@1.63.0 @axe-core/playwright@4.13.0` into an empty `/tmp` prefix (installed: playwright 1.63.0, @axe-core/playwright 4.13.0, axe-core 4.13.0), ran `playwright install chromium`, and ran the job's exact `axe-check` command: **0 violations, 140 pages**. |
+| Claim 8: content | The EN and ES 00-03 notes add the 10.5 V capacity-test figure (the source text quoted in the 2026-10-02 review: "fully discharged when the voltage reaches 10.5 volts"). It backs the body's "about 11 V when it is nearly flat and powering a load". The YAML `modules` item and the BIBLIOGRAPHY.md row agree word for word. On the ES page: «una prueba de capacidad la da por totalmente descargada a 10,5 V». |
+| Claim 9: citations | I compared the `Sources` sections of all 8 prerendered lesson pages, `main` vs branch. They are identical apart from the removed `rel="noopener"` and the 00-03 note above (EN and ES). Citation `<a>` elements have no `target`, so `noopener` had no effect. See S3. |
+| Claim 10: docs | README "Quality gates" (commands, job table, pinned versions, regenerating the generated files), ARCHITECTURE §5.1/§5.5/§6, ROADMAP A7 (status with the open items: axe runs in CI only, required checks not yet set), A8 (done) and §5, DESIGN-PIXEL-ART (§Contrast generated note, §Glyph coverage "Enforced", checklist items 6 and 8), CLAUDE.md steps 3 and 4, and `course-reviewer.md`: all match the behaviour above. `pnpm test` watches only in a TTY (the builder's `watch` default), as README says. ARCHITECTURE §3 counts are right: `build-content.mjs` 607, `core/` 596 + 269-line spec, `widgets/` 1360 + 536 lines of specs (160 + 113 + 118 + 145). `lesson/` 347 and `ui.ts` 357 are unchanged. The Dockerfile runs `pnpm build` after a full (dev-inclusive) install, so the glyph check also gates the image. |
+| CLAUDE.md Angular rules | Pass. The touched components still use `computed()`, `linkedSignal()`, `input()` and `inject()`. The new code is plain functions and `as const` lookup tables. No `standalone`, OnPush, `any`, `ngClass`/`ngStyle`, `@HostBinding`/`@HostListener` or `mutate`. Templates are unchanged, so keyboard behaviour and layout at 375/900/1280 px are unchanged, and the 642-state comparison shows the same behaviour. |
+| Lockfile and devDeps | A `/tmp` copy of the working tree installs with `pnpm install --frozen-lockfile`, with both the local pnpm and `pnpm@9.15.0`, and no warnings. ARCHITECTURE §2 lists and justifies `vitest` 4.x and `jsdom` 27.x. Playwright and axe stay out of the repo. |
+| Repo hygiene | `git diff --check` is clean. All changed and new text files are LF with a final newline. The untracked files are exactly the 7 new `src/` files (math, specs) and the 5 new `tools/` files. Ignored files are only the usual build output. Prettier: `build-content.mjs` is now clean. `divider.ts`, `ohm-law.ts` and `lesson-sources.ts` were already flagged on `main` (templates) and are no worse. |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-1 | Minor | Build gate | `tools/build-content.mjs` `toBlocks()` (`WIDGET_RE`); the same regex in `tools/check-glyphs.mjs` `checkContent()` | Some directive lines are not recognised as directives at all: one missing its `}` (`::widget{type="divider" vin="9" r1="10k" r2="10k"`), one with a space before `{` (`::widget {type="dividr" …}`), and an indented one. Each goes to `marked` as a paragraph. The build passes, the page shows the literal `::widget{…}` text with no instrument, and the new type and prop checks never run (I tried all three in `/tmp`; each exited 0). Outside a fenced block, make any line whose trimmed start is `::widget` and that does not match `WIDGET_RE` fail with `file:line` ("malformed ::widget directive; write ::widget{type="…" …} on its own line"). Add it to the failure lists in README "Quality gates" and ARCHITECTURE §5.1, and add a mutation case. |
+| S1 | Suggestion | Code | `tools/check-glyphs.mjs:90` (`const COVER = loadCoverage()` at module top level) | When the `--pix-font` guard fails, the error is thrown at import time, outside `main().catch`. Node prints a raw stack trace instead of the script's "glyph check failed: …" line. The exit code is still 1, so the gate holds. Call `loadCoverage()` inside `main()`. |
+| S2 | Suggestion | References | `content/bibliography.yaml` and `docs/BIBLIOGRAPHY.md`, `yuasa-powersports-manual`, Modules "00-03 (…)" | The 00-03 parenthetical names only the 10.5 V figure, but the 00-03 note also uses 11.8 V, 13.0–14.5 V and 14.4 V from this source. The 00-04 parenthetical lists every figure. Either list all the figures for 00-03 too, or drop the parenthetical, as before. |
+| S3 | Suggestion | Code (consistency) | `src/app/lesson/lesson-sources.ts:36` vs `src/app/app.html:53,57` | Citation links dropped `rel="noopener"`, which does nothing without `target="_blank"`. The two footer links still carry it, also without a target. Either convention is fine; pick one. |
+| S4 | Suggestion | Code (docs) | `tools/widget-props.mjs` | A key read as `parseValue(this.props()['k'] ?? '…', …)` counts as text, so its numeric check is skipped. A key read only in a template is unknown, so lessons that use it fail. Both fail safe: neither lets a bad value through silently. One line in the header saying so would save the next widget author a surprise. |
+
+### Fixed during verification
+
+- `.claude/agents/course-reviewer.md:29`: rewrapped a 106-column line the
+  change introduced to the file's 80-column wrap.
+- `ARCHITECTURE.md` §5.5 and §6, `README.md` (bibliography step): rewrapped
+  three prose lines the change pushed past 80 columns. The wording is
+  unchanged.
+- `tools/axe-check.mjs` header: the install line now pins
+  `playwright@1.63.0 @axe-core/playwright@4.13.0` and says these are the CI
+  versions, which matches README "Quality gates". This is a comment only;
+  `node --check` passes, and axe on `/es/fundamentos/divisor-de-tension`
+  still reports 0 violations.
+
+After these edits, `git diff --check` is clean and the files are still LF.
+
+### Ready to merge: no
+
+m-1 is open. It is a small change to `build-content.mjs`, plus one line each
+in README and ARCHITECTURE §5.1. Route it to the implementer, then re-verify
+the malformed-directive cases. S1–S4 do not block the merge.
+
 ## Verification: A5 references in content (2026-10-21)
 
 This is an independent check of branch `infra/a5-references`: the

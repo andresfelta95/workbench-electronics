@@ -5,12 +5,14 @@ import { SCHEMATIC } from '../../schematic/schematic';
 import { Control } from '../../ui/control';
 import { Panel } from '../../ui/panel';
 import { Readout, type ReadoutTone } from '../../ui/readout';
-
-type Unknown = 'i' | 'v' | 'r';
+import { ohmFlow, type OhmUnknown as Unknown, powerLevel, solveOhm } from './ohm-law-math';
 
 // Same scheme as Control's ids: a module counter gives every instance its own
 // radio group name, so two of these widgets on one page never merge groups.
 let nextId = 0;
+
+const POWER_NOTE = { ok: '', 'over-tenth': '> 1/10 W', 'over-quarter': '> 1/4 W' } as const;
+const POWER_TONE = { ok: 'signal', 'over-tenth': 'warn', 'over-quarter': 'danger' } as const;
 
 /**
  * V = I × R with one of the three held as the result. Fixing which quantity is
@@ -145,17 +147,15 @@ export class OhmLawWidget {
   protected readonly r = linkedSignal(() => parseValue(this.props()['r'], 470));
   protected readonly i = linkedSignal(() => parseValue(this.props()['i'], 0.02));
 
-  protected readonly voltage = computed(() =>
-    this.unknown() === 'v' ? this.i() * this.r() : this.v(),
-  );
-  protected readonly resistance = computed(() =>
-    this.unknown() === 'r' ? this.v() / this.i() : this.r(),
-  );
-  protected readonly current = computed(() =>
-    this.unknown() === 'i' ? this.v() / this.r() : this.i(),
+  private readonly solution = computed(() =>
+    solveOhm({ unknown: this.unknown(), v: this.v(), i: this.i(), r: this.r() }),
   );
 
-  protected readonly power = computed(() => this.voltage() * this.current());
+  protected readonly voltage = computed(() => this.solution().voltage);
+  protected readonly resistance = computed(() => this.solution().resistance);
+  protected readonly current = computed(() => this.solution().current);
+
+  protected readonly power = computed(() => this.solution().power);
 
   /** Nameplate uses the middle dot (VT323's multiply sign is a small raised
    *  x); the drawing's accessible name keeps it, so it is read as "times". */
@@ -182,27 +182,13 @@ export class OhmLawWidget {
   protected readonly powerText = computed(() => this.fmt(this.power(), 'W'));
 
   /** Flags the moment the numbers stop being survivable by a common part. */
-  protected readonly powerNote = computed(() => {
-    const watts = this.power();
-    if (watts > 0.25) return '> 1/4 W';
-    if (watts > 0.1) return '> 1/10 W';
-    return '';
-  });
+  protected readonly powerNote = computed(() => POWER_NOTE[powerLevel(this.power())]);
 
   /** Same thresholds as the note: past 1/10 W is a warning, past 1/4 W is trouble. */
-  protected readonly powerTone = computed<ReadoutTone>(() => {
-    const watts = this.power();
-    if (watts > 0.25) return 'danger';
-    if (watts > 0.1) return 'warn';
-    return 'signal';
-  });
+  protected readonly powerTone = computed<ReadoutTone>(() => POWER_TONE[powerLevel(this.power())]);
 
   /** Log-scaled so the animation reads across five decades of current. */
-  protected readonly flow = computed(() => {
-    const amps = this.current();
-    if (!Number.isFinite(amps) || amps <= 0) return 0;
-    return Math.min(1, Math.max(0.08, (Math.log10(amps) + 5) / 5));
-  });
+  protected readonly flow = computed(() => ohmFlow(this.current()));
 
   private fmt(value: number, unit: string): string {
     return formatSI(value, unit, this.i18n.lang());

@@ -1,3 +1,4 @@
+import { formatSI } from '../../core/format';
 import { clean, solveKirchhoff, type KirchhoffInput } from './kirchhoff-math';
 
 const k = 1000;
@@ -88,6 +89,58 @@ describe('solveKirchhoff', () => {
     const r = solveKirchhoff({ ...DEFAULT, v2: 0 });
     expect(r.i3).toBeLessThan(0);
     expect(r.s2).toBe('none');
+  });
+
+  it('shows the worked example as the readouts print it (lesson 00-04)', () => {
+    const r = solveKirchhoff(DEFAULT);
+    expect(formatSI(r.va, 'V', 'en')).toBe('5 V');
+    expect([r.i1, r.i3, r.i2].map((i) => formatSI(i, 'A', 'en'))).toEqual(['4 mA', '1 mA', '5 mA']);
+    // "in 5 mA = out 5 mA"
+    expect(formatSI(r.currentIn, 'A', 'en')).toBe('5 mA');
+    expect(formatSI(r.currentOut, 'A', 'en')).toBe('5 mA');
+    expect(formatSI(r.kcl, 'A', 'en')).toBe('0 A');
+    expect(formatSI(r.kvlLeft.sum, 'V', 'en')).toBe('0 V');
+    expect(formatSI(r.kvlRight.sum, 'V', 'en')).toBe('0 V');
+  });
+
+  it('shows the reversal as the readouts print it: V2 = 3 V (lesson 00-04)', () => {
+    const r = solveKirchhoff(REVERSE);
+    expect(formatSI(r.va, 'V', 'en')).toBe('4 V');
+    expect(formatSI(r.i3, 'A', 'en')).toBe('-1 mA');
+    expect(formatSI(r.p2, 'W', 'en')).toBe('-3 mW');
+    expect(formatSI(r.p2, 'W', 'es')).toBe('-3 mW');
+  });
+
+  it('puts the turning point at V2 = 4.5 V, the V1/R1/R2 divider (lesson 00-04)', () => {
+    const r = solveKirchhoff({ ...DEFAULT, v2: 4.5 });
+    expect(r.va).toBeCloseTo(4.5, 12);
+    expect(formatSI(r.va, 'V', 'es')).toBe('4,5 V');
+    expect(formatSI(r.i3, 'A', 'en')).toBe('0 A');
+    // Just either side of it, V2 delivers or absorbs.
+    expect(solveKirchhoff({ ...DEFAULT, v2: 4.6 }).s2).toBe('delivering');
+    expect(solveKirchhoff({ ...DEFAULT, v2: 4.4 }).s2).toBe('absorbing');
+  });
+
+  it('stays balanced at the ends of the control ranges (0–24 V, 10 Ω–100 kΩ)', () => {
+    const corners: KirchhoffInput[] = [];
+    for (const v1 of [0, 24]) {
+      for (const v2 of [0, 24]) {
+        for (const r1 of [10, 100 * k]) {
+          for (const r3 of [10, 100 * k]) {
+            for (const r2 of [10, 100 * k]) corners.push({ v1, v2, r1, r2, r3 });
+          }
+        }
+      }
+    }
+    for (const input of corners) {
+      const r = solveKirchhoff(input);
+      expect(r.kcl).toBe(0);
+      expect(r.kvlLeft.sum).toBe(0);
+      expect(r.kvlRight.sum).toBe(0);
+      // The node can never sit outside the range of the two sources.
+      expect(r.va).toBeGreaterThanOrEqual(0);
+      expect(r.va).toBeLessThanOrEqual(Math.max(input.v1, input.v2) + 1e-12);
+    }
   });
 
   it('rejects resistances that are not positive and finite', () => {
