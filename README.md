@@ -44,7 +44,7 @@ in detail, and what stands in for a backend — see [ARCHITECTURE.md](ARCHITECTU
 nvm use          # Node 22
 pnpm install
 pnpm start       # rebuilds content, then ng serve
-pnpm build       # content + prerender into dist/electronics/browser
+pnpm build       # content + checks + prerender into dist/electronics/browser
 pnpm content     # regenerate content only, after editing content/
 ```
 
@@ -106,8 +106,10 @@ git-ignored. `pnpm content` recreates them.
    or `"quoted"`, overriding the section default: italic for textbook,
    standard, datasheet and es; quoted for note and web). Two fields are never
    rendered: `modules` (which lessons use the source) and `comment` (editorial
-   or verification remarks). Unknown keys fail the build. A new source also
-   goes in `docs/BIBLIOGRAPHY.md`, under the same id, in the same change.
+   or verification remarks). A `null` `titleStyle` or `modules` counts as
+   absent, and `modules` items must be non-empty strings. An entry with
+   `lang: "es"` may not carry `es:`. Unknown keys fail the build. A new source
+   also goes in `docs/BIBLIOGRAPHY.md`, under the same id, in the same change.
 
 3. Write the prose. Two directives are available:
 
@@ -133,9 +135,14 @@ written" rather than disappearing — the full path is public from day one.
 
 1. Build a standalone component that takes a single input:
    `readonly props = input<Record<string, string>>({})`. Seed state from it with
-   `linkedSignal(() => parseValue(this.props()['r1'], 10000))`.
+   `linkedSignal(() => parseValue(this.props()['r1'], 10000))`. `WidgetHost`
+   passes every directive attribute in that one `props` map. Read each one as
+   `this.props()['key']` and wrap numbers in `parseValue`: the build derives
+   the props a widget accepts (and which are numeric) from exactly those
+   reads, and fails on anything else.
 2. Register it in `src/app/lesson/widget-registry.ts` as a dynamic import.
-3. Reference it from any lesson with `::widget{type="your-type"}`.
+3. Reference it from any lesson with `::widget{type="your-type"}`, unindented
+   on a line of its own; a malformed `::widget` line fails the build.
 
 Reuse `app-panel`, `app-control` and `app-readout` from `src/app/ui/`, and the
 symbols in `src/app/schematic/`. Every instrument must be operable from the
@@ -143,22 +150,70 @@ keyboard: `app-control` pairs its slider with a real text box for that reason.
 Before you start, work through the "Adopting the skin in a new widget" checklist
 in [docs/DESIGN-PIXEL-ART.md](docs/DESIGN-PIXEL-ART.md).
 
-## Checks
+## Quality gates
 
-`tools/axe-check.mjs` runs axe over every prerendered route in all four theme
-states and exits 1 on any violation. The repo does not depend on Playwright, so
-install it once in a folder outside the repo and point `AXE_TOOLS_DIR` at it:
+`pnpm build` is itself a gate. It stops at the first failure:
+
+1. `tools/build-content.mjs` compiles the lessons and fails on EN/ES
+   mismatches, bad references, and any `::widget` with an unregistered `type`,
+   an unknown prop, a non-numeric value for a numeric prop, or a duplicate or
+   unparsable attribute (see "Adding an instrument"). A malformed `::widget`
+   line outside a code fence fails too (`<file>:<line>: malformed ::widget
+   directive`): write it unindented on a line of its own, exactly as
+   `::widget{type="…" name="value" …}`. So does any `::widget` inside a callout.
+2. `tools/check-glyphs.mjs` fails on any character in visible instrument text
+   outside the pixel font rule: VT323, plus JetBrains Mono for Greek and
+   Iosevka Charon Mono for ∥ and arrows. `×` and subscripts always fail in
+   visible text; spoken-only text is exempt. It reads the committed
+   `tools/glyph-coverage.json` (see
+   [Glyph coverage](docs/DESIGN-PIXEL-ART.md#glyph-coverage)).
+3. `ng build` compiles and prerenders every route.
+
+CI (`.github/workflows/build.yml`, on every pull request and on pushes to
+`main`) runs three jobs:
+
+| Job | Runs | Fails on |
+|---|---|---|
+| `build` | `pnpm build`, then keeps `dist/electronics` for the `axe` job | any of the three steps above |
+| `checks` | `pnpm check:contrast`, `pnpm test:ci` | a stale or failing contrast table; a failing unit test |
+| `axe` | `tools/axe-check.mjs` on the `build` job's output, every route in four theme states | any axe violation |
+
+The same checks locally:
+
+```bash
+pnpm build             # content + widget props + glyphs + prerender
+pnpm test:ci           # unit tests (Vitest, jsdom), once; pnpm test watches
+pnpm check:glyphs      # the glyph check on its own
+pnpm check:contrast    # contrast table is current and every pair passes
+```
+
+**axe.** The repo does not depend on Playwright, so install it once in a
+folder outside the repo (CI pins the same versions) and point `AXE_TOOLS_DIR`
+at it:
 
 ```bash
 export AXE_TOOLS_DIR=/path/to/a11y-tools    # any folder outside the repo
 (mkdir -p "$AXE_TOOLS_DIR" && cd "$AXE_TOOLS_DIR" && npm init -y &&
-  npm i playwright @axe-core/playwright && npx playwright install chromium)
+  npm i playwright@1.63.0 @axe-core/playwright@4.13.0 &&
+  npx playwright install chromium)
 
 pnpm build
 node tools/axe-check.mjs [distDir] [--route=/en/...] [--verbose]
 ```
 
 The script's header has the details, including the four theme states.
+
+**Regenerating the generated files.**
+
+- *Contrast table.* The table in
+  [docs/DESIGN-PIXEL-ART.md §Contrast](docs/DESIGN-PIXEL-ART.md#contrast) is
+  computed from the palette in `src/styles/_pixel.scss`. After changing a
+  `--pix-*` colour, run `node tools/contrast-table.mjs` and commit the doc. A
+  new colour also needs its pairs added to the `PAIRS` list at the top of that
+  script.
+- *Glyph coverage.* After changing `--pix-font` or the Google Fonts request in
+  `src/index.html`, run `node tools/glyph-coverage-gen.mjs` (no arguments;
+  needs network) and commit the updated `tools/glyph-coverage.json`.
 
 ## Deploy
 

@@ -15,6 +15,11 @@
  *
  *   ::widget{type="divider" vin="9" r1="10k" r2="10k"}
  *
+ * The build fails if `type` is not a key of WIDGETS in
+ * src/app/lesson/widget-registry.ts, if an attribute is not one the widget
+ * reads, or if a numeric attribute is not a value `parseValue` accepts. What
+ * each widget reads is derived from its source (see tools/widget-props.mjs).
+ *
  * Callouts use a fenced directive:
  *
  *   :::note Optional title
@@ -35,7 +40,9 @@
  * The build fails on an unknown or duplicated id, a malformed item, a
  * malformed bibliography entry (missing title, unknown key or section, a bad
  * `titleStyle:` or url, `section: es` without `lang: es` or the reverse, an
- * `es:` alternate that is missing or not `lang: es`), or when the EN and ES
+ * `es:` alternate that is missing or not `lang: es`, an `es:` on an entry that
+ * is itself `lang: es`, `modules:` that is not a list of strings; a `null`
+ * optional field counts as absent), or when the EN and ES
  * versions of a lesson cite different id sets. Only the cited entries are
  * resolved into each lesson module (ES lessons also get the `es:` alternate),
  * so no YAML is parsed at runtime. The bibliography's `modules` and `comment`
@@ -47,6 +54,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import { REGISTRY_FILE, fenceStep, loadFormat, readWidgetSchema } from './widget-props.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -60,23 +68,61 @@ const CALLOUT_KINDS = new Set(['note', 'warning', 'key', 'safety']);
 marked.setOptions({ gfm: true, breaks: false });
 
 const WIDGET_RE = /^::widget\{(.*)\}\s*$/;
+const WIDGET_IN_CALLOUT =
+  '::widget directives are not allowed inside a :::callout; close the callout first';
+const MALFORMED_WIDGET =
+  'malformed ::widget directive; write it unindented on a line of its own, exactly as ::widget{type="…" name="value" …}';
 const CALLOUT_OPEN_RE = /^:::(\w+)\s*(.*)$/;
 const CALLOUT_CLOSE_RE = /^:::\s*$/;
 
-function parseAttrs(raw) {
+function parseAttrs(raw, where) {
   const attrs = {};
   const re = /([A-Za-z_][\w-]*)="([^"]*)"/g;
   let m;
-  while ((m = re.exec(raw)) !== null) attrs[m[1]] = m[2];
+  while ((m = re.exec(raw)) !== null) {
+    if (m[1] in attrs) throw new Error(`${where}: attribute "${m[1]}" is given twice`);
+    attrs[m[1]] = m[2];
+  }
+  const rest = raw.replace(re, '').trim();
+  if (rest) throw new Error(`${where}: cannot parse "${rest}"; write attributes as name="value"`);
   return attrs;
 }
 
-/** Split raw markdown into ordered blocks the Angular renderer can walk. */
-function toBlocks(markdown, ctx) {
+/** Filled in by main(): what each registered widget accepts, and parseValue. */
+let widgetSchema;
+let parseValue;
+
+/** Fails on an unregistered widget type, an unknown attribute or a bad number. */
+function checkWidget(type, props, where) {
+  const widget = widgetSchema[type];
+  if (!widget) {
+    throw new Error(
+      `${where}: unknown widget type "${type}"; registered in ${REGISTRY_FILE}: ${Object.keys(widgetSchema).join(', ')}`,
+    );
+  }
+  for (const [name, value] of Object.entries(props)) {
+    const kind = widget.props?.get(name);
+    if (!kind) {
+      const known = widget.props ? [...widget.props.keys()].join(', ') : '(none)';
+      throw new Error(
+        `${where}: widget "${type}" has no prop "${name}" (${widget.file} reads: ${known})`,
+      );
+    }
+    if (kind === 'number' && !Number.isFinite(parseValue(value, NaN))) {
+      throw new Error(
+        `${where}: widget "${type}" prop ${name}="${value}" is not a number parseValue accepts (e.g. 9, 4.7k, 100n)`,
+      );
+    }
+  }
+}
+
+/** Split raw markdown into ordered blocks the Angular renderer can walk.
+ *  `lineOffset` is the number of front-matter lines, for error positions. */
+function toBlocks(markdown, ctx, lineOffset = 0) {
   const blocks = [];
   const lines = markdown.split(/\r?\n/);
   let buffer = [];
-  let inFence = false;
+  let fence = null;
 
   const flush = () => {
     const text = buffer.join('\n').trim();
@@ -87,23 +133,27 @@ function toBlocks(markdown, ctx) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Never interpret directives inside a fenced code block.
-    if (/^\s*```/.test(line)) {
-      inFence = !inFence;
-      buffer.push(line);
-      continue;
-    }
-    if (inFence) {
+    // Never interpret directives inside a fenced code block (``` or ~~~).
+    const wasFenced = fence;
+    fence = fenceStep(line, fence);
+    if (wasFenced || fence) {
       buffer.push(line);
       continue;
     }
 
     const widget = WIDGET_RE.exec(line);
+    // Anything else that looks like a directive would render as plain text
+    // and skip every check below, so it is an error rather than prose.
+    if (!widget && line.trim().startsWith('::widget')) {
+      throw new Error(`${ctx}:${i + 1 + lineOffset}: ${MALFORMED_WIDGET}`);
+    }
     if (widget) {
-      const attrs = parseAttrs(widget[1]);
-      if (!attrs['type']) throw new Error(`${ctx}: ::widget without a type= attribute`);
+      const where = `${ctx}:${i + 1 + lineOffset}`;
+      const attrs = parseAttrs(widget[1], where);
+      if (!attrs['type']) throw new Error(`${where}: ::widget without a type= attribute`);
       flush();
       const { type, ...props } = attrs;
+      checkWidget(type, props, where);
       blocks.push({ kind: 'widget', type, props });
       continue;
     }
@@ -114,10 +164,18 @@ function toBlocks(markdown, ctx) {
       const title = callout[2].trim();
       const inner = [];
       let closed = false;
+      let innerFence = null;
       for (i = i + 1; i < lines.length; i++) {
+        const wasFenced = innerFence;
+        innerFence = fenceStep(lines[i], innerFence);
         if (CALLOUT_CLOSE_RE.test(lines[i])) {
           closed = true;
           break;
+        }
+        // A callout body goes straight to marked, so a directive here would
+        // ship as literal text without any of the widget checks.
+        if (!wasFenced && !innerFence && lines[i].trim().startsWith('::widget')) {
+          throw new Error(`${ctx}:${i + 1 + lineOffset}: ${WIDGET_IN_CALLOUT}`);
         }
         inner.push(lines[i]);
       }
@@ -223,7 +281,12 @@ async function loadBibliography() {
       throw new Error(`${ctx}: url must be an absolute http(s) URL`);
     }
 
-    if (data.titleStyle !== undefined && !TITLE_STYLES.has(data.titleStyle)) {
+    // An explicit `null` (`titleStyle:` with no value) means "use the default".
+    if (
+      data.titleStyle !== undefined &&
+      data.titleStyle !== null &&
+      !TITLE_STYLES.has(data.titleStyle)
+    ) {
       throw new Error(
         `${ctx}: titleStyle must be italic or quoted (got ${JSON.stringify(data.titleStyle)})`,
       );
@@ -245,10 +308,22 @@ async function loadBibliography() {
 
     if (data.es !== undefined && data.es !== null) {
       if (typeof data.es !== 'string' || !data.es) throw new Error(`${ctx}: "es" must be an id`);
+      if (lang === 'es') {
+        throw new Error(
+          `${ctx}: es: is for the Spanish edition of an English work; this entry is already lang: es`,
+        );
+      }
       entry.es = data.es;
     }
-    if (data.modules !== undefined && !Array.isArray(data.modules)) {
-      throw new Error(`${ctx}: "modules" must be a list`);
+    if (data.modules !== undefined && data.modules !== null) {
+      if (!Array.isArray(data.modules)) throw new Error(`${ctx}: "modules" must be a list`);
+      data.modules.forEach((m, index) => {
+        if (typeof m !== 'string' || !m.trim()) {
+          throw new Error(
+            `${ctx}: modules[${index}] must be a module id string (got ${JSON.stringify(m)})`,
+          );
+        }
+      });
     }
     if (data.comment !== undefined && data.comment !== null && typeof data.comment !== 'string') {
       throw new Error(`${ctx}: "comment" must be a string`);
@@ -353,15 +428,15 @@ async function readModule(lang, moduleId, bib) {
     lessons: [],
   };
 
-  const files = (await readdir(dir))
-    .filter((f) => f.endsWith('.md') && f !== '_module.md')
-    .sort();
+  const files = (await readdir(dir)).filter((f) => f.endsWith('.md') && f !== '_module.md').sort();
 
   for (const file of files) {
     const lessonId = file.replace(/\.md$/, '');
     const lessonCtx = `${lang}/${moduleId}/${file}`;
-    const lesson = matter(await readFile(path.join(dir, file), 'utf8'));
-    const blocks = toBlocks(lesson.content, lessonCtx);
+    const source = await readFile(path.join(dir, file), 'utf8');
+    const lesson = matter(source);
+    const frontMatterLines = source.split(/\r?\n/).length - lesson.content.split(/\r?\n/).length;
+    const blocks = toBlocks(lesson.content, `content/${lessonCtx}`, frontMatterLines);
     const minutes = Number(lesson.data['minutes'] ?? 0);
 
     meta.lessons.push({
@@ -423,9 +498,7 @@ async function buildLang(lang, bib) {
             2,
           )};\n\nexport default lesson;\n`,
       );
-      loaders.push(
-        `  '${lang}/${mod.slug}/${lesson.slug}': () => import('./lessons/${file}'),`,
-      );
+      loaders.push(`  '${lang}/${mod.slug}/${lesson.slug}': () => import('./lessons/${file}'),`);
     }
   }
 
@@ -468,6 +541,9 @@ async function writeSitemap(curricula) {
 }
 
 async function main() {
+  widgetSchema = readWidgetSchema();
+  ({ parseValue } = await loadFormat());
+
   await rm(GEN_DIR, { recursive: true, force: true });
   await mkdir(LESSON_DIR, { recursive: true });
 

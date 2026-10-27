@@ -6,7 +6,9 @@
  * anywhere outside the repo, and point AXE_TOOLS_DIR at that folder:
  *
  *   mkdir -p ~/.a11y-tools && cd ~/.a11y-tools && npm init -y
- *   npm i playwright @axe-core/playwright && npx playwright install chromium
+ *   npm i playwright@1.63.0 @axe-core/playwright@4.13.0 && npx playwright install chromium
+ *
+ * (the versions CI pins in .github/workflows/build.yml)
  *
  *   pnpm build
  *   AXE_TOOLS_DIR=~/.a11y-tools node tools/axe-check.mjs [distDir] [--route=/en/...] [--verbose]

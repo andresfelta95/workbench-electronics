@@ -22,35 +22,56 @@ export function formatSI(value: number, unit: string, lang: Lang, sig = 3): stri
   if (!Number.isFinite(value)) return `— ${unit}`;
   if (value === 0) return `0 ${unit}`;
 
-  const magnitude = Math.abs(value);
+  // Pick the prefix from the value as it will be shown, so 999.95 Ω rounds up
+  // into the next prefix ("1 kΩ") instead of reading "1,000 Ω".
+  const magnitude = Math.abs(Number(value.toPrecision(sig)));
   const chosen =
     PREFIXES.find((p) => magnitude >= Math.pow(10, p.exp)) ?? PREFIXES[PREFIXES.length - 1];
   const scaled = value / Math.pow(10, chosen.exp);
 
   // Keep `sig` significant figures, but never render trailing noise.
   const digits = Math.max(0, sig - 1 - Math.floor(Math.log10(Math.abs(scaled))));
-  const text = new Intl.NumberFormat(LOCALE[lang], {
-    maximumFractionDigits: Math.min(digits, 4),
-    minimumFractionDigits: 0,
-  }).format(scaled);
+  const text = unsignedZero(
+    new Intl.NumberFormat(LOCALE[lang], {
+      maximumFractionDigits: Math.min(digits, 4),
+      minimumFractionDigits: 0,
+    }),
+    scaled,
+  );
 
   return `${text} ${chosen.symbol}${unit}`;
 }
 
+/**
+ * Intl keeps the sign of a negative value that rounds to zero ("-0 %"). A
+ * reading that shows only zeros is zero, so it is formatted as 0. (Intl's
+ * `signDisplay: 'negative'` does this too, but is ES2023 and the lib is ES2022.)
+ */
+function unsignedZero(format: Intl.NumberFormat, value: number): string {
+  const text = format.format(value);
+  return /[1-9]/.test(text) ? text : format.format(0);
+}
+
 export function formatNumber(value: number, lang: Lang, digits = 1): string {
   if (!Number.isFinite(value)) return '—';
-  return new Intl.NumberFormat(LOCALE[lang], {
-    maximumFractionDigits: digits,
-    minimumFractionDigits: 0,
-  }).format(value);
+  return unsignedZero(
+    new Intl.NumberFormat(LOCALE[lang], {
+      maximumFractionDigits: digits,
+      minimumFractionDigits: 0,
+    }),
+    value,
+  );
 }
 
 export function formatPercent(fraction: number, lang: Lang, digits = 1): string {
   if (!Number.isFinite(fraction)) return '—';
-  return new Intl.NumberFormat(LOCALE[lang], {
-    style: 'percent',
-    maximumFractionDigits: digits,
-  }).format(fraction);
+  return unsignedZero(
+    new Intl.NumberFormat(LOCALE[lang], {
+      style: 'percent',
+      maximumFractionDigits: digits,
+    }),
+    fraction,
+  );
 }
 
 const SUFFIX_SCALE: Record<string, number> = {

@@ -8,7 +8,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # Content compiler (fails on unknown widget types and props), glyph check,
+  # then the prerender. The output is handed to the axe job.
   build:
     runs-on: ubuntu-latest
     steps:
@@ -25,3 +31,75 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/electronics
+          retention-days: 1
+          if-no-files-found: error
+
+  # Unit tests and the contrast table. Independent of the build output.
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Contrast table is current and every pair passes
+        run: pnpm check:contrast
+
+      - name: Unit tests
+        run: pnpm test:ci
+
+  # axe over every prerendered route in four theme states, on the build job's
+  # output. Playwright stays out of the repo's dependencies (see README).
+  axe:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_VERSION: 1.63.0
+      AXE_PLAYWRIGHT_VERSION: 4.13.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/electronics
+
+      - name: Install Playwright and axe outside the repo
+        run: |
+          echo "A11Y_DIR=$RUNNER_TEMP/a11y" >> "$GITHUB_ENV"
+          npm install --prefix "$RUNNER_TEMP/a11y" --no-audit --no-fund \
+            "playwright@$PLAYWRIGHT_VERSION" "@axe-core/playwright@$AXE_PLAYWRIGHT_VERSION"
+
+      - name: Cache the Playwright browser
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}-chromium
+
+      - name: Install Chromium and its system libraries
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: '"$A11Y_DIR/node_modules/.bin/playwright" install --with-deps chromium'
+
+      - name: Install Chromium's system libraries (browser cached)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: '"$A11Y_DIR/node_modules/.bin/playwright" install-deps chromium'
+
+      - name: axe, every route, four theme states
+        run: AXE_TOOLS_DIR="$A11Y_DIR" node tools/axe-check.mjs dist/electronics/browser

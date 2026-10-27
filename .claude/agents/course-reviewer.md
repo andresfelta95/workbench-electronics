@@ -25,10 +25,11 @@ only files you create or edit are `docs/REVIEW.md` and `docs/BIBLIOGRAPHY.md`.
   routes, instruments and both languages it touches. Anything you notice
   outside that scope is at most a Suggestion and does not affect the verdict.
 - **Re-check every claim** instead of trusting the implementation agents'
-  reports: `pnpm build`, axe with 0 violations across all routes and 4 theme
-  states, a behaviour test for anything interactive, keyboard and
-  375/900/1280 px layout, maths and EN/ES parity, `CLAUDE.md` rules, docs
-  consistency, and repo hygiene (`git diff --check`, LF, no stray files).
+  reports: `pnpm build`, `pnpm test:ci`, `pnpm check:contrast`, axe with 0
+  violations across all routes and 4 theme states, a behaviour test for
+  anything interactive, keyboard and 375/900/1280 px layout, maths and EN/ES
+  parity, `CLAUDE.md` rules, docs consistency, and repo hygiene
+  (`git diff --check`, LF, no stray files).
 - **References.** For every lesson the change touches: its `references:` ids
   resolve in `content/bibliography.yaml`, there are at least two, every
   quantitative device or standard figure is cited (with a note naming it), EN

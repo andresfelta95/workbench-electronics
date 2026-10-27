@@ -14,8 +14,7 @@ import { SCHEMATIC } from '../../schematic/schematic';
 import { Control } from '../../ui/control';
 import { Panel } from '../../ui/panel';
 import { Readout } from '../../ui/readout';
-
-type Mode = 'series' | 'parallel';
+import { networkFlow, type NetworkMode as Mode, solveNetwork } from './resistor-network-math';
 
 interface Placement {
   index: number;
@@ -174,34 +173,25 @@ export class ResistorNetworkWidget {
     this.mode() === 'series' ? 'R = R1 + R2 + …' : '1/R = 1/R1 + 1/R2 + …',
   );
 
-  protected readonly total = computed(() => {
-    const values = this.values();
-    if (this.mode() === 'series') return values.reduce((sum, value) => sum + value, 0);
-    const conductance = values.reduce((sum, value) => sum + 1 / value, 0);
-    return conductance === 0 ? Infinity : 1 / conductance;
-  });
+  private readonly solution = computed(() =>
+    solveNetwork(this.values(), this.mode(), this.supply()),
+  );
 
-  protected readonly supplyCurrent = computed(() => this.supply() / this.total());
-  protected readonly totalPower = computed(() => this.supply() * this.supplyCurrent());
+  protected readonly total = computed(() => this.solution().total);
+  protected readonly supplyCurrent = computed(() => this.solution().supplyCurrent);
+  protected readonly totalPower = computed(() => this.solution().totalPower);
 
   protected readonly placements = computed<Placement[]>(() => {
-    const values = this.values();
     const series = this.mode() === 'series';
-    const supply = this.supply();
-    const current = this.supplyCurrent();
-
-    return values.map((value, index) => {
-      const branchCurrent = series ? current : supply / value;
-      return {
-        index,
-        x: series ? 9 + index * 7 : 10 + index * 6,
-        y: 3,
-        vertical: !series,
-        value,
-        current: branchCurrent,
-        power: branchCurrent * branchCurrent * value,
-      };
-    });
+    return this.solution().branches.map((branch, index) => ({
+      index,
+      x: series ? 9 + index * 7 : 10 + index * 6,
+      y: 3,
+      vertical: !series,
+      value: branch.value,
+      current: branch.current,
+      power: branch.power,
+    }));
   });
 
   protected readonly canvasWidth = computed(() => {
@@ -233,11 +223,7 @@ export class ResistorNetworkWidget {
     return wires;
   });
 
-  protected readonly flow = computed(() => {
-    const amps = this.supplyCurrent();
-    if (!Number.isFinite(amps) || amps <= 0) return 0;
-    return Math.min(1, Math.max(0.08, (Math.log10(amps) + 5) / 5));
-  });
+  protected readonly flow = computed(() => networkFlow(this.supplyCurrent()));
 
   protected setResistor(index: number, value: number): void {
     this.values.update((values) => values.map((current, i) => (i === index ? value : current)));

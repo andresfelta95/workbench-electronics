@@ -85,16 +85,18 @@ session plans, delegates, commits and merges; the subagents do the work.
    names the files it may touch and forbids the rest.
 3. **Implement and self-check.** Each implementation agent follows this file,
    README and ARCHITECTURE, wraps every `pnpm content`/`pnpm build` in
-   `flock /tmp/electronics-build.lock`, and verifies its own work (build, axe,
-   a behaviour test for anything interactive) before reporting. Builds run
-   concurrently, so inside the same `flock` copy the output
+   `flock /tmp/electronics-build.lock`, and verifies its own work (build,
+   `pnpm test:ci`, `pnpm check:contrast`, axe, a behaviour test for anything
+   interactive) before reporting. Builds run concurrently, so inside the same
+   `flock` copy the output
    (`cp -r dist/electronics /tmp/<name>-dist`) and run axe on the copy
    (`AXE_TOOLS_DIR=… node tools/axe-check.mjs /tmp/<name>-dist/browser`).
    Behaviour tests are throwaway Playwright scripts kept outside the repo that
    load Playwright from `AXE_TOOLS_DIR`. EN and ES always change together.
 4. **Verify and document.** An independent verification agent (method:
    `.claude/agents/course-reviewer.md`) re-checks every claim rather than
-   trusting reports: `pnpm build`, `tools/axe-check.mjs` on a private copy
+   trusting reports: `pnpm build`, `pnpm test:ci`, `pnpm check:contrast`,
+   `tools/axe-check.mjs` on a private copy
    (as in step 3) with 0 violations across all routes and 4 theme states, a
    behaviour test for anything interactive, keyboard and 375/900/1280 px layout,
    maths and EN/ES parity, CLAUDE.md rules, docs consistency, repo hygiene. It

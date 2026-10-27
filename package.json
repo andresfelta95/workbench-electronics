@@ -12,9 +12,12 @@
     "ng": "ng",
     "content": "node tools/build-content.mjs",
     "start": "node tools/build-content.mjs && ng serve",
-    "build": "node tools/build-content.mjs && ng build",
+    "build": "node tools/build-content.mjs && node tools/check-glyphs.mjs && ng build",
     "watch": "node tools/build-content.mjs && ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false",
+    "check:glyphs": "node tools/check-glyphs.mjs",
+    "check:contrast": "node tools/contrast-table.mjs --check"
   },
   "dependencies": {
     "@angular/common": "^22.1.0",
@@ -33,8 +36,10 @@
     "@angular/compiler-cli": "^22.1.0",
     "@types/node": "^20.17.19",
     "gray-matter": "^4",
+    "jsdom": "^27.1.0",
     "marked": "^16",
     "prettier": "^3.8.1",
-    "typescript": "~6.0.2"
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.8"
   }
 }
