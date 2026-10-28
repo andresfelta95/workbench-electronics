@@ -97,7 +97,8 @@ electronics/
 │   │   ├── 02-series-and-parallel.md
 │   │   ├── 03-voltage-divider.md
 │   │   ├── 04-kirchhoff.md
-│   │   └── 05-multimeter.md
+│   │   ├── 05-multimeter.md
+│   │   └── 06-power-and-heat.md
 │   ├── es/00-fundamentals/     ← same ids, translated slugs and prose
 │   ├── bibliography.yaml       ← every source, keyed by id; lessons cite ids
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
@@ -129,12 +130,12 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (596 lines, plus a 269-line spec)
-│       ├── i18n/ui.ts          ← every UI string, both languages (405 lines)
-│       ├── lesson/             ← the Markdown → components renderer (349 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (463 lines)
+│       ├── lesson/             ← the Markdown → components renderer (351 lines)
 │       ├── pages/              ← the five routed views (1051 lines)
 │       ├── schematic/          ← SVG symbol library (444 lines, plus a 218-line spec)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
-│       ├── widgets/            ← the instruments (1921 lines, plus 804 lines of maths specs)
+│       ├── widgets/            ← the instruments (2372 lines, plus 1081 lines of maths specs)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── .github/workflows/build.yml ← CI: build, unit tests + contrast, axe (§5.5)
@@ -144,7 +145,7 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 6,500 lines of source, plus ~15,700 words of lesson prose so far.
+Roughly 7,000 lines of source, plus ~21,000 words of lesson prose so far.
 
 ---
 
@@ -343,13 +344,15 @@ not injected after hydration.
 |---|---|---|
 | `main.js` | 314 kB | **88 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
-| Per-lesson chunk | 7.8–17.5 kB | 2.7–5.7 kB |
+| Per-lesson chunk | 7.8–22.4 kB | 2.7–6.8 kB |
 | Per-instrument chunk | 5.6–10.3 kB | 2.0–3.2 kB |
 
 Gzipped figures are the build's "estimated transfer size" (2026-10-02, from
 `pnpm build --verbose`, which lists every lazy chunk; per-lesson row updated
 2026-10-21, when the lessons gained `references:`; per-lesson and
-per-instrument rows updated 2026-10-28, with 00-05 and `meter-loading`).
+per-instrument rows updated 2026-10-28, with 00-05 and `meter-loading`, and
+the per-lesson row again on 2026-10-28, with 00-06; `power-dissipation` is
+6.3 kB / 2.6 kB, inside the per-instrument range).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -434,7 +437,7 @@ the parameterised ones from the generated curriculum:
 
 Adding a lesson to `content/` is therefore all it takes to get a new static
 page — the route list is derived, never hand-maintained. The current build
-produces **37 prerendered routes**.
+produces **39 prerendered routes**.
 
 `lessonResolver` matters here. Loading the lesson in a resolver rather than
 inside the component makes the router *wait* for the content chunk, which is what
@@ -526,8 +529,9 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   either check.
 - **Unit tests**: `ng test` (Vitest in jsdom) runs `core/format.spec.ts`,
   one `*-math.spec.ts` per widget (Ohm's law, series/parallel, divider,
-  Kirchhoff, meter loading) and `schematic/schematic.spec.ts` (the meter
-  symbol), 124 tests. `pnpm test:ci` runs them once and needs no
+  Kirchhoff, meter loading, power dissipation) and
+  `schematic/schematic.spec.ts` (the meter symbol), 143 tests. `pnpm test:ci`
+  runs them once and needs no
   `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
   `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x

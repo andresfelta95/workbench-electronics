@@ -109,6 +109,27 @@ export interface UiStrings {
      *  with formatted values by the widget. */
     meterVoltageCircuitSpoken: string;
     meterCurrentCircuitSpoken: string;
+    /** Power-dissipation instrument. */
+    resistor: string;
+    ambientTemperature: string;
+    temperatureRise: string;
+    surfaceTemperature: string;
+    ratingUsed: string;
+    /** `{rating}` is the derated rating, `{ambient}` the air temperature. */
+    ratingOf: string;
+    /** `{current}` is the formatted current. */
+    currentThrough: string;
+    canBurn: string;
+    midBody: string;
+    aboveMax: string;
+    noMakerData: string;
+    heatSpoken: string;
+    heatCircuitSpoken: string;
+    heatOverSpoken: string;
+    /** Added to heatCircuitSpoken when the power is past the derated rating. */
+    heatDeratedSpoken: string;
+    /** Added to heatCircuitSpoken when the surface is above 155 °C. */
+    heatAboveMaxSpoken: string;
   };
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
@@ -242,6 +263,24 @@ const en: UiStrings = {
       'A {vin} supply feeds R1, {r1}, and R2, {r2}, in series. A voltmeter with {rin} input resistance is connected across R2 and reads {reading}. Without the meter, R2 has {trueValue}.',
     meterCurrentCircuitSpoken:
       'A {vin} supply drives a current through the ammeter, on its {range} range ({rm}), and a {rload} load in one loop. It reads {reading}; without the meter, {trueValue} flows.',
+    resistor: 'Resistor',
+    ambientTemperature: 'Ambient temperature',
+    temperatureRise: 'Temperature rise',
+    surfaceTemperature: 'Surface temperature',
+    ratingUsed: 'Rating used',
+    ratingOf: 'of {rating} at {ambient}',
+    currentThrough: '{current} through R',
+    canBurn: 'can burn skin',
+    midBody: 'middle of the body',
+    aboveMax: 'above the part’s 155 °C limit',
+    noMakerData: 'past its rating: no maker data',
+    heatSpoken: 'Surface temperature = ambient temperature + power × thermal resistance',
+    heatCircuitSpoken:
+      'A {vin} supply drives {current} through R, {r}, a {rating} resistor in {ambient} air. It turns {power} into heat, {used} of its rating at this temperature, and its surface sits about {rise} above the air, at about {surface}.',
+    heatOverSpoken:
+      'A {vin} supply drives {current} through R, {r}, a {rating} resistor in {ambient} air. It turns {power} into heat, {used} of its rating at this temperature. That is past its rating, where the maker gives no temperature figure.',
+    heatDeratedSpoken: 'That is past its derated rating of {ratedNow} at {ambient}.',
+    heatAboveMaxSpoken: 'Its surface is above the part’s 155 °C limit.',
   },
   theme: { toggle: 'Switch theme', light: 'Light', dark: 'Dark' },
   langSwitch: { label: 'Language', other: 'Español' },
@@ -386,6 +425,25 @@ const es: UiStrings = {
       'Una fuente de {vin} alimenta R1, {r1}, y R2, {r2}, en serie. Un voltímetro con {rin} de resistencia de entrada está conectado sobre R2 y marca {reading}. Sin el medidor, R2 tiene {trueValue}.',
     meterCurrentCircuitSpoken:
       'Una fuente de {vin} hace circular una corriente por el amperímetro, en su rango {range} ({rm}), y por una carga de {rload}, en un solo lazo. Marca {reading}; sin el medidor, circulan {trueValue}.',
+    resistor: 'Resistor',
+    ambientTemperature: 'Temperatura ambiente',
+    temperatureRise: 'Aumento de temperatura',
+    surfaceTemperature: 'Temperatura superficial',
+    ratingUsed: 'Potencia nominal usada',
+    ratingOf: 'de {rating} a {ambient}',
+    currentThrough: '{current} en R',
+    canBurn: 'puede quemar la piel',
+    midBody: 'centro del cuerpo',
+    aboveMax: 'sobre el límite de 155 °C de la pieza',
+    noMakerData: 'sobre su potencia nominal: sin datos del fabricante',
+    heatSpoken: 'Temperatura superficial = temperatura ambiente + potencia × resistencia térmica',
+    heatCircuitSpoken:
+      'Una fuente de {vin} hace circular {current} por R, {r}, un resistor de {rating} en aire a {ambient}. Convierte {power} en calor, el {used} de su potencia nominal a esta temperatura, y su superficie queda unos {rise} por encima del aire, a unos {surface}.',
+    heatOverSpoken:
+      'Una fuente de {vin} hace circular {current} por R, {r}, un resistor de {rating} en aire a {ambient}. Convierte {power} en calor, el {used} de su potencia nominal a esta temperatura. Eso está por encima de su potencia nominal, donde el fabricante no da ninguna temperatura.',
+    heatDeratedSpoken:
+      'Eso está por encima de su potencia nominal reducida, {ratedNow} a {ambient}.',
+    heatAboveMaxSpoken: 'Su superficie está por encima del límite de 155 °C de la pieza.',
   },
   theme: { toggle: 'Cambiar tema', light: 'Claro', dark: 'Oscuro' },
   langSwitch: { label: 'Idioma', other: 'English' },
