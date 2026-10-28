@@ -96,7 +96,8 @@ electronics/
 │   │   ├── 01-ohms-law.md
 │   │   ├── 02-series-and-parallel.md
 │   │   ├── 03-voltage-divider.md
-│   │   └── 04-kirchhoff.md
+│   │   ├── 04-kirchhoff.md
+│   │   └── 05-multimeter.md
 │   ├── es/00-fundamentals/     ← same ids, translated slugs and prose
 │   ├── bibliography.yaml       ← every source, keyed by id; lessons cite ids
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
@@ -111,6 +112,7 @@ electronics/
 │   └── axe-check.mjs           ← axe over every prerendered route (needs AXE_TOOLS_DIR)
 │
 ├── docs/                       ← roadmap, review, bibliography, pixel-art design notes
+│   └── briefs/                 ← one instrument brief per widget type (ROADMAP §3 step 2)
 │
 ├── src/
 │   ├── index.html              ← shell: fonts, theme pre-paint script
@@ -127,12 +129,12 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (596 lines, plus a 269-line spec)
-│       ├── i18n/ui.ts          ← every UI string, both languages (357 lines)
-│       ├── lesson/             ← the Markdown → components renderer (347 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (405 lines)
+│       ├── lesson/             ← the Markdown → components renderer (349 lines)
 │       ├── pages/              ← the five routed views (1051 lines)
-│       ├── schematic/          ← SVG symbol library (374 lines)
+│       ├── schematic/          ← SVG symbol library (444 lines, plus a 218-line spec)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
-│       ├── widgets/            ← the instruments (1360 lines, plus 536 lines of maths specs)
+│       ├── widgets/            ← the instruments (1921 lines, plus 804 lines of maths specs)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── .github/workflows/build.yml ← CI: build, unit tests + contrast, axe (§5.5)
@@ -142,7 +144,7 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 5,000 lines of source, plus ~11,200 words of lesson prose so far.
+Roughly 6,500 lines of source, plus ~15,700 words of lesson prose so far.
 
 ---
 
@@ -250,7 +252,7 @@ makes the prerenderer wait.
 
 The widget registry is a plain map of `type → () => import(...)`, so a lesson
 downloads only the instruments it references. Each instrument is its own lazy
-chunk of 5.3–8.5 kB.
+chunk of 5.6–10.3 kB.
 
 ### 4.4 The instruments
 
@@ -294,7 +296,12 @@ Circuits are components, not images. Symbols are **attribute selectors on
 ```
 
 Everything sits on a 10-unit grid. Symbols share an abstract base class giving
-them `x`, `y`, `dim` and `highlight`.
+them `x`, `y`, `dim` and `highlight`. The library (`SCHEMATIC`) holds the
+canvas and the resistor, capacitor, source, meter, ground, terminal, junction,
+current arrow, wire and label symbols. The meter, `svg:g[schMeter]`, is a round
+body with `V`, `A` or `Ω` inside (`kind`), drawn vertical or horizontal, and is
+how the multimeter lesson puts a voltmeter or ammeter into a circuit.
+`schematic.spec.ts` renders it with `dim` and `highlight`.
 
 > **Trap worth knowing.** That abstract base class **must** carry an
 > `@Directive()` decorator. Without it Angular silently ignores every inherited
@@ -336,12 +343,13 @@ not injected after hydration.
 |---|---|---|
 | `main.js` | 314 kB | **88 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
-| Per-lesson chunk | 7.8–14.0 kB | 2.7–4.8 kB |
-| Per-instrument chunk | 5.3–8.5 kB | 1.8–2.9 kB |
+| Per-lesson chunk | 7.8–17.5 kB | 2.7–5.7 kB |
+| Per-instrument chunk | 5.6–10.3 kB | 2.0–3.2 kB |
 
 Gzipped figures are the build's "estimated transfer size" (2026-10-02, from
 `pnpm build --verbose`, which lists every lazy chunk; per-lesson row updated
-2026-10-21, when the lessons gained `references:`).
+2026-10-21, when the lessons gained `references:`; per-lesson and
+per-instrument rows updated 2026-10-28, with 00-05 and `meter-loading`).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -426,7 +434,7 @@ the parameterised ones from the generated curriculum:
 
 Adding a lesson to `content/` is therefore all it takes to get a new static
 page — the route list is derived, never hand-maintained. The current build
-produces **35 prerendered routes**.
+produces **37 prerendered routes**.
 
 `lessonResolver` matters here. Loading the lesson in a resolver rather than
 inside the component makes the router *wait* for the content chunk, which is what
@@ -516,9 +524,10 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   fails if `--pix-font` no longer lists the families in the coverage file's
   order. The Dockerfile runs `pnpm build`, so an image cannot be built past
   either check.
-- **Unit tests**: `ng test` (Vitest in jsdom) runs `core/format.spec.ts` and
+- **Unit tests**: `ng test` (Vitest in jsdom) runs `core/format.spec.ts`,
   one `*-math.spec.ts` per widget (Ohm's law, series/parallel, divider,
-  Kirchhoff), 89 tests. `pnpm test:ci` runs them once and needs no
+  Kirchhoff, meter loading) and `schematic/schematic.spec.ts` (the meter
+  symbol), 124 tests. `pnpm test:ci` runs them once and needs no
   `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
   `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x
@@ -553,8 +562,9 @@ prerendering all follow from that. See `README.md`.
 `Readout`, draw with the `schematic/` symbols, and format numbers through
 `core/format.ts`. Read each directive attribute as `this.props()['key']` and
 wrap numeric ones in `parseValue`: that is how the build learns which props a
-widget accepts (§5.5). Before building one, follow the "Adopting the skin in a
-new widget" checklist in `docs/DESIGN-PIXEL-ART.md`.
+widget accepts (§5.5). It is built from a written brief,
+`docs/briefs/<widget-type>.md` (ROADMAP §3 step 2). Before building one, follow
+the "Adopting the skin in a new widget" checklist in `docs/DESIGN-PIXEL-ART.md`.
 
 Two rules that are not negotiable, because they are the point of the project:
 

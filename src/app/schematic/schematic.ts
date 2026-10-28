@@ -62,7 +62,9 @@ abstract class SchSymbol {
 
   readonly transform = computed(() => `translate(${this.x() * GRID} ${this.y() * GRID})`);
   readonly klass = computed(() =>
-    ['sch', this.dim() ? 'sch--dim' : '', this.highlight() ? 'sch--hot' : ''].join(' ').trim(),
+    ['sch', this.dim() ? 'sch--dim' : '', this.highlight() ? 'sch--hot' : '']
+      .filter(Boolean)
+      .join(' '),
   );
 }
 
@@ -190,6 +192,73 @@ export class SchCapacitor extends SchSymbol {
 })
 export class SchSource extends SchSymbol {
   readonly value = input('');
+}
+
+export type SchMeterKind = 'V' | 'A' | 'Ω';
+
+/**
+ * Meter: a round body with V, A or Ω inside. Vertical (the default): 4 grid
+ * units long like the vertical resistor, pins at (0, 0) and (0, 40), body
+ * centred on (0, 20). Horizontal: 5 units long, pins at (0, 0) and (50, 0),
+ * body from x = 13 to 37. `plus` marks the first pin (top or left) as the
+ * meter's + terminal.
+ *
+ * The body is a 24 × 24 staircase of whole-unit steps rather than a `<circle>`,
+ * so it stays crisp and still reads as round at label size.
+ *
+ * The letter is drawn text in the pixel font (Ω falls back to JetBrains Mono),
+ * so it takes the hot colour and the dimmed muted ink like any other label.
+ * Its baseline sits 4 units below the body's centre, which centres VT323's
+ * 8-unit capitals at 14 units of text (1 unit high at the phone size, 16).
+ * The fallback Ω is taller (11–12 units), so it sits 2 units lower.
+ */
+@Component({
+  selector: 'svg:g[schMeter]',
+  template: `
+    <svg:g [attr.transform]="transform()" [attr.class]="klass()">
+      <svg:path class="stroke" [attr.d]="path()" />
+      @if (vertical()) {
+        <svg:text class="label" x="0" [attr.y]="20 + baseline()" text-anchor="middle">
+          {{ kind() }}
+        </svg:text>
+        @if (plus()) {
+          <svg:text class="label" x="-8" y="6" text-anchor="end">+</svg:text>
+        }
+        <svg:text class="label" x="16" y="17">{{ name() }}</svg:text>
+        <svg:text class="value" x="16" y="29">{{ value() }}</svg:text>
+      } @else {
+        <svg:text class="label" x="25" [attr.y]="baseline()" text-anchor="middle">
+          {{ kind() }}
+        </svg:text>
+        @if (plus()) {
+          <svg:text class="label" x="6" y="-6" text-anchor="middle">+</svg:text>
+        }
+        <svg:text class="label" x="25" y="-16" text-anchor="middle">{{ name() }}</svg:text>
+        <svg:text class="value" x="25" y="28" text-anchor="middle">{{ value() }}</svg:text>
+      }
+    </svg:g>
+  `,
+  styles: SYMBOL_STYLES,
+})
+export class SchMeter extends SchSymbol {
+  readonly kind = input<SchMeterKind>('V');
+  readonly vertical = input(true);
+  readonly name = input('');
+  readonly value = input('');
+  readonly plus = input(false);
+
+  /** The letter's baseline below the body's centre. */
+  protected readonly baseline = computed(() => (this.kind() === 'Ω' ? 6 : 4));
+
+  protected readonly path = computed(() =>
+    this.vertical()
+      ? 'M0 0 v8 M0 32 v8 ' +
+        'M-4 8 H4 V10 H8 V12 H10 V16 H12 V24 H10 V28 H8 V30 H4 V32 ' +
+        'H-4 V30 H-8 V28 H-10 V24 H-12 V16 H-10 V12 H-8 V10 H-4 Z'
+      : 'M0 0 H13 M37 0 H50 ' +
+        'M21 -12 H29 V-10 H33 V-8 H35 V-4 H37 V4 H35 V8 H33 V10 H29 V12 ' +
+        'H21 V10 H17 V8 H15 V4 H13 V-4 H15 V-8 H17 V-10 H21 Z',
+  );
 }
 
 @Component({
@@ -365,6 +434,7 @@ export const SCHEMATIC = [
   SchResistor,
   SchCapacitor,
   SchSource,
+  SchMeter,
   SchGround,
   SchTerminal,
   SchJunction,
