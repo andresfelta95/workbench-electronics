@@ -1,5 +1,115 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: 00-05 Using a multimeter (2026-10-28)
+
+This is an independent check of branch `content/00-05-multimeter`: the
+uncommitted working tree against `main`, untracked files included. I re-ran
+every check and re-did every number myself rather than trusting the
+implementers' reports.
+
+**Ready to merge: yes.** No Blocker, Major or Minor finding is open in the
+change's scope. Four Suggestions are listed below.
+
+### What changed
+
+- New lesson `00-fundamentals/05-multimeter` (EN `multimeter`, ES
+  `multimetro`), with two `meter-loading` instances (voltage and current
+  mode) and three `:::safety` callouts.
+- New instrument `src/app/widgets/meter-loading/` (component, pure maths,
+  23-test spec), registered in `widget-registry.ts`; 13 new `ui.ts` keys in
+  EN and ES.
+- New symbol `svg:g[schMeter]` in `schematic.ts`, with
+  `schematic.spec.ts` (12 tests). `SchSymbol.klass` now filters empty
+  classes (it used to emit `sch  sch--hot` with a double space when only
+  `highlight` was set); the output is otherwise unchanged.
+- New sources `fluke-80v-manual` and `fluke-17x-cal` (YAML and
+  BIBLIOGRAPHY.md), richer `fluke-abc-safety` and `fluke-11x-manual` module
+  notes, three new BIBLIOGRAPHY §8 rows.
+- `docs/briefs/README.md` and `docs/briefs/meter-loading.md` (the binding
+  brief, decisions D-1 to D-8); glossary, ROADMAP and ARCHITECTURE updates.
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/ver-dist`) | Pass: content OK, glyphs OK, **37 prerendered routes**, `main` 316.73 kB / 88.84 kB. `meter-loading` chunk 10.32 kB / 3.18 kB; 00-05 lesson chunks 15.15 kB (EN) and 17.51 kB (ES). |
+| `pnpm test:ci` | **7 files, 124 tests pass** (format 33, ohm-law 12, resistor-network 14, divider 16, kirchhoff 14, meter-loading 23, schematic 12). |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ `prefers-contrast: more`) pass; the table is current. |
+| `pnpm check:glyphs` | 857 instrument strings, all covered. |
+| axe on the private copy | **0 violations**, 37 routes × 4 theme states = 148 pages (light 0, system-dark 0, dark 0, light-forced 0). Re-run on both 00-05 routes after the formatting fix below: 0. |
+| Behaviour test (Playwright, outside the repo), EN and ES, keyboard only | **102 checks pass.** Both instances render; the two mode groups and the range group have distinct radio names. V-1 (4.5 V / 4.5 V / -0.05% / 5 kΩ, signal), V-2 (type `10M` in R1 and R2: 3 V / 4.5 V / -33.33% / 5 MΩ, danger), V-2b (`1M`: 4.29 V / -4.76% / 500 kΩ, warn), back to 10k restores V-1. A-1 (8.98 mA / 9 mA / -0.18% / 16.2 mV, signal); A-2 (Supply `1.5`, ES `1,5`; Load `22`: 63 mA / 68.2 mA / -7.56% / 113 mV, warn); Range → A with the arrow key: 68.1 mA / -0.14% / 2.04 mV, signal, drawing shows `30 mΩ`. 24 V into 10 Ω on mA: Reading `OL` (danger) with the note "over 400 mA: use the A range" / «más de 400 mA: usa el rango A», Error and Burden `—`, drawing shows `OL`, spoken label says "It reads OL (…)"; the same on the A range reads 2.39 A, -0.3%. Supply clamps (30 → 24 V, 0.2 → 1 V). Per-mode state: R1 `1M` and Load `470` survive a mode round trip, the supply is shared (12 V → 12 mA in current mode), and switching instance 1's mode leaves instance 2 alone. Tab from the mode group lands on the Supply box. ES numbers carry the decimal comma and NBSP before `%`. No `∞`, `×`, `≈`, `NaN`, `Infinity` or `undefined` in visible widget text (spoken strings excluded). No console or page errors. |
+| Layout, 375 / 900 / 1280 px, light and dark, EN and ES | No horizontal page or widget overflow anywhere. The nameplate height, the mode segment's position and the canvas height are identical in both modes at every width. No text overlaps in either drawing beyond the name/value line boxes that `schResistor` already shares. ES at 375 px: the shipped label «Caída del amperímetro» takes two lines, breaking between words (that readout row 112 px, the first row 94 px); 900 and 1280 px fit on one line. |
+| Screenshots of both drawings | Voltage mode is the divider with the meter in RL's place, `4.5 V` label above the branch; current mode is one loop with `+` on the meter's left pin, `Rm` above, `1.8 Ω` below, the reading to the right. Pixel scan of the letter ink (device scale 4) against the body centre: **horizontal** offset V +0.48 unit, A +0.09 unit (under 1 CSS px at 1280 px); vertical offset V +1.5 units, A +1.0 unit (low; see S-1). |
+| Maths | Re-done by hand for every number in both lessons and the spec (brief §5 formulas): 4.4978 V, 2000 ×, 3 V, -33.33 %, 4.29 V, 909 kΩ, -9.09 %, `500 kΩ / 10.5 MΩ` = 4.76 %, 100 kΩ → 0.99 %, 1001.8 Ω → 8.98 mA, -0.18 %, 16.2 mV, 23.8 Ω → 63.0 mA, 68.2 mA, -7.56 %, 113 mV, 22.03 Ω → 68.1 mA, -0.14 %, 2.04 mV, 720 mV, 22 / 1.8 ≈ 12, 5 A and 300 A, 5 A / 440 mA = 11.4. All match. The identity `Vread = Vtrue · Rin / (Zout + Rin)` holds on a 48-point grid in the spec. Guards: no NaN for `vin` 0, `r1 + r2` 0, `r2` 0, `rin` 0 or ∞, `rLoad` 0, `rLoad + rMeter` 0; non-finite values format as `—`. |
+| Sources (PDFs downloaded from the bibliography URLs and read) | `fluke-80v-manual` (Rev. 2, 11/08): Table 14 p. 48 burden 1.8 mV/mA (60/400 mA), 0.03 V/A (6/10 A), 100 µV/µA (600/6000 µA); p. 43 fuses 44/100 A and 11 A, 1000 V FAST (also Table 8 p. 39); Table 18 p. 51 input 10 MΩ < 100 pF; p. 13 "the Meter acts like a short circuit"; p. 24 "Never place the probes across (in parallel with) …". `fluke-17x-cal` (PN 1600476, Rev. 4): p. 5 note 5 2 mV/mA, 37 mV/A (p. 6 note 6 misprints 2 mV/A, as recorded); p. 4 fuses 440 mA and 11 A, 1000 V FAST; p. 6 > 10 MΩ. `fluke-11x-manual`: Table 7 p. 17 Volts DC > 10 MΩ, ohms < 2.7 V dc open circuit and < 350 µA; Table 6 p. 16 continuity beeper on < 20 Ω, off > 250 Ω. `fluke-abc-safety` (1263690J_EN, printed 10/2012): Table 1 p. 2 CAT IV/III/II and "CAT 0 Electronic: protected electronic equipment"; p. 5 leads in the amps jacks across a source are a short circuit, so the amps inputs must be fused with the manufacturer's fuses; p. 7 Table 2. Every figure in the lesson traces to one of these at the cited place. Nothing from BIBLIOGRAPHY §8 is used: the lesson attributes "CAT 0" to Fluke's guide, not to IEC. References: 6 ids, the same in EN and ES, all resolve. |
+| Safety (brief §8, ROADMAP §3.1) | The three callouts are present in brief order and placement, identical in EN and ES: "Measurement categories" ends "The meter and its jacks", before the first probing step; "Never put the meter in current mode across a source" and "Fused current jacks" come before "move the red lead to the mA jack". Prose says the course stays at ≤ 24 V DC on battery- and USB-powered electronics, never on mains, and that a CAT rating is not permission; current jacks are fused and should be checked before buying or using; replace only with the named type, never bridge. Nothing suggests measuring mains, opening a meter or shorting a source. The instrument has no misuse state (D-1); `vin` clamps to 1–24 V; no CAT or mains presets. |
+| EN/ES parity, SKILL.md | Same four sections plus the closing note, the same callouts in the same order, the same two widget lines, the same references and numbers. ES uses the decimal comma, NBSP before `%`, «…», tú, "lazo" (as 00-04). Every new term is defined at first use and listed in the glossary (00-05 section, EN and ES); the ES instrument label «Caída del amperímetro» matches the glossary row and `ui.ts` (D-5). Prose that names controls uses the labels the widget shows. |
+| Code | Same idiom as `ohm-law` and `divider`: module-counter radio names, `linkedSignal` seeded from `props()` through `parseValue` and clamped, `computed` readouts, `@if` per mode, `headingAlt` for a stable plate. Widgets do not import each other (D-6). `schMeter` matches brief §4 (pins, 24 × 24 staircase body, letter, name/value positions, `plus`), uses `SYMBOL_STYLES`, no `<circle>`; the spec checks closure, whole units, symmetry, `dim`/`highlight` classes. |
+| Docs | ROADMAP status, A1 row, module 00 table, counts (5 done, 64/61 to write) and phase table match what was built; ARCHITECTURE tree, §3 text, 37 routes, §5.5 and §6 brief pointer match. Stale figures fixed below. |
+| Hygiene | `git diff --check` clean; all new files LF, ending in a newline. Changes are only the in-scope files; untracked files are the two lessons, `docs/briefs/`, `schematic.spec.ts` and `widgets/meter-loading/`. No scratch files, screenshots or temp files in the repo; `dist/`, `.angular/`, `content-generated/` and `public/sitemap.xml` stay ignored. Prettier: every new file now passes; `schematic.ts` has prettier deviations only in lines that are the same on `main`. |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| S-1 | Suggestion | Design | `src/app/schematic/schematic.ts`, `SchMeter` letter (`y="25"` vertical, `y="5"` horizontal) | The letter's ink sits about 1.5 units (V) and 1 unit (A) below the body centre; horizontal centring is within half a unit. Brief §4 asked to tune `y` so the cap height centres. Try `y="24"` / `y="4"` and re-check the ink against the body centre at 1280 px. |
+| S-2 | Suggestion | Content parity | `.claude/skills/course-writing/glossary.md`, "short circuit" | The term now has two rows: the 00-03 row (status changed to "defined in 00-05") and a new row in the 00-05 section. Keep one row so the glossary has one entry per term. |
+| S-3 | Suggestion | Technical accuracy | `content/en/00-fundamentals/05-multimeter.md:137` and ES `:149` (callout 2, first sentence) | "On its mA and A jacks, the meter is a few ohms or less" is true for the mA and A ranges, but the µA ranges use the same jack at about 100 Ω (said one paragraph earlier). Say "On its mA and A ranges" / «En sus rangos de mA y A». |
+| S-4 | Suggestion | Code | `src/app/schematic/schematic.ts` (pre-existing lines 186, 271, 354) | Out of scope: prettier would reflow three blocks that are unchanged from `main`. Format the file in a separate tidy-up if the repo wants prettier-clean sources. |
+
+### Fixed during verification
+
+- `src/app/widgets/meter-loading/meter-loading.ts`: ran `prettier --write`
+  (whitespace and line breaks only; the repo's `.prettierrc` applies and
+  the sibling `kirchhoff` files pass). Rebuilt, re-ran `test:ci` (124 pass),
+  axe on both 00-05 routes (0) and the behaviour test (102 pass).
+- `ARCHITECTURE.md` §5.5: restored the test count, now 124 tests.
+- `ARCHITECTURE.md` §3: `i18n/ui.ts` 357 → 405 lines, `lesson/` 347 → 349,
+  `schematic/` 374 → 434 lines plus a 214-line spec, `widgets/` 1360 → 1885
+  lines plus 804 (was 536) lines of specs (`core/` re-measured, unchanged at
+  596 + 269); "Roughly 5,000 lines of source" → 6,500 (`.ts`/`.html`/`.scss`
+  under `src/`, specs and generated code excluded: 6,456); "~11,200 words of
+  lesson prose" → ~15,700 (lesson bodies without front matter, EN 7,425 +
+  ES 8,246; the same method gives 11,274 on `main`).
+- `ARCHITECTURE.md` §4.3 and §4.8: per-instrument chunk 5.3–8.5 kB /
+  1.8–2.9 kB → 5.6–10.3 kB / 2.0–3.2 kB; per-lesson chunk 7.8–14.0 kB /
+  2.7–4.8 kB → 7.8–17.5 kB / 2.7–5.7 kB (from `pnpm build --verbose`,
+  2026-10-28), with the update date noted.
+- `docs/ROADMAP.md` §1 diagram: "00 finish (04–07)" → "00 finish (06–07)".
+- `docs/ROADMAP.md` A7 row: "89 specs" → "124 specs", naming the
+  meter-loading arithmetic and the `schMeter` symbol.
+
+#### Ready to merge: yes
+
+### Re-verification after the S-1 to S-3 fixes (2026-10-28)
+
+The only changes since the pass above: `SchMeter` now places its letter
+through a `baseline` computed (4 units below the body centre for `V` and
+`A`, 6 for the taller fallback `Ω`), with the spec updated; the duplicate
+"short circuit" glossary row is gone; callout 2 says "mA and A ranges" /
+«rangos de mA y A».
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/ver-dist`) | Pass, 37 routes. |
+| `pnpm test:ci` | 7 files, **124 tests** pass (schematic spec 12). |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ more) pass; table current. |
+| `pnpm check:glyphs` | **856** strings, all covered. The drop from 857 is explained: the tool checks every string literal and static attribute value in `src/app/schematic`, and the fix replaced the static `y="25"` and `y="5"` attributes with `[attr.y]` bindings (−2) and added the `'Ω'` literal in `baseline` (+1). I confirmed this by logging every checked string on a copy of the tree, with and without the two static attributes: the only difference is `"25"` and `"5"`, and the `'Ω'` entry comes from line 251. |
+| axe on the private copy | **0 violations**, 148 pages (37 routes × 4 theme states). |
+| Behaviour test (same script) | All 102 checks pass, EN and ES, at 375 / 900 / 1280 px, light and dark. |
+| Letter centring (pixel scan, device scale 4) | V: horizontal +0.48 unit, vertical +0.58 unit (was +1.5); A: +0.09 and 0.00 (was +1.0). Both under 1 CSS px at 1280 px, and the screenshots look centred. `Ω` is not drawn on any page; its spec case renders. |
+| S-2, S-3 | One "short circuit" row remains (00-03 section, "defined in 00-05"). EN line 137 and ES line 149 read "On its mA and A ranges" / «En sus rangos de mA y A». |
+| Hygiene | `git diff --check` clean; prettier passes on the new files; `git status` shows only the in-scope files and no stray files. |
+
+| # | Status |
+|---|---|
+| S-1 | Resolved |
+| S-2 | Resolved |
+| S-3 | Resolved |
+| S-4 | Deferred: out of scope (pre-existing prettier deviations in `schematic.ts`) |
+
+#### Ready to merge: yes (re-verification)
+
 ## Verification: A7 quality gates (2026-10-27)
 
 This is an independent check of branch `infra/a7-quality-gates`: the

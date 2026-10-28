@@ -11,4 +11,6 @@ export const WIDGETS: Record<string, () => Promise<Type<unknown>>> = {
     import('../widgets/resistor-network/resistor-network').then((m) => m.ResistorNetworkWidget),
   divider: () => import('../widgets/divider/divider').then((m) => m.DividerWidget),
   kirchhoff: () => import('../widgets/kirchhoff/kirchhoff').then((m) => m.KirchhoffWidget),
+  'meter-loading': () =>
+    import('../widgets/meter-loading/meter-loading').then((m) => m.MeterLoadingWidget),
 };

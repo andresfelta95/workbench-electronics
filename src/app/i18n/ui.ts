@@ -93,6 +93,22 @@ export interface UiStrings {
     currentIn: string;
     currentOut: string;
     signConvention: string;
+    /** Meter-loading instrument. */
+    measure: string;
+    inputResistance: string;
+    range: string;
+    reading: string;
+    trueValue: string;
+    withoutMeter: string;
+    burdenVoltage: string;
+    acrossMeter: string;
+    overRange: string;
+    meterVoltageSpoken: string;
+    meterCurrentSpoken: string;
+    /** The drawings' spoken descriptions. `{name}` placeholders are filled
+     *  with formatted values by the widget. */
+    meterVoltageCircuitSpoken: string;
+    meterCurrentCircuitSpoken: string;
   };
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
@@ -211,6 +227,21 @@ const en: UiStrings = {
     currentOut: 'out',
     signConvention:
       'Signs: I1 and I3 count positive flowing into A, I2 flowing from A to ground. Power counts positive when current leaves a source by its + terminal (delivering) and negative when current is forced in there (absorbing). The arrows show the real direction.',
+    measure: 'Measure',
+    inputResistance: 'Input resistance',
+    range: 'Range',
+    reading: 'Reading',
+    trueValue: 'True value',
+    withoutMeter: 'without the meter',
+    burdenVoltage: 'Burden voltage',
+    acrossMeter: 'across the meter',
+    overRange: 'over 400 mA: use the A range',
+    meterVoltageSpoken: 'Reading = true voltage × Rin / (Zout + Rin)',
+    meterCurrentSpoken: 'Reading = true current × RL / (RL + Rm)',
+    meterVoltageCircuitSpoken:
+      'A {vin} supply feeds R1, {r1}, and R2, {r2}, in series. A voltmeter with {rin} input resistance is connected across R2 and reads {reading}. Without the meter, R2 has {trueValue}.',
+    meterCurrentCircuitSpoken:
+      'A {vin} supply drives a current through the ammeter, on its {range} range ({rm}), and a {rload} load in one loop. It reads {reading}; without the meter, {trueValue} flows.',
   },
   theme: { toggle: 'Switch theme', light: 'Light', dark: 'Dark' },
   langSwitch: { label: 'Language', other: 'Español' },
@@ -338,6 +369,23 @@ const es: UiStrings = {
     currentOut: 'sale',
     signConvention:
       'Signos: I1 e I3 son positivas cuando entran en A, e I2 cuando va de A a tierra. La potencia de una fuente es positiva cuando la corriente sale por su terminal + (entrega) y negativa cuando la corriente se ve obligada a entrar por él (absorbe). Las flechas muestran el sentido real.',
+    measure: 'Medir',
+    inputResistance: 'Resistencia de entrada',
+    range: 'Rango',
+    reading: 'Lectura',
+    trueValue: 'Valor real',
+    withoutMeter: 'sin el medidor',
+    // The glossary's long form, «Caída de tensión del amperímetro», wraps to
+    // two lines in the readout and makes its row taller (brief D-5).
+    burdenVoltage: 'Caída del amperímetro',
+    acrossMeter: 'en el medidor',
+    overRange: 'más de 400 mA: usa el rango A',
+    meterVoltageSpoken: 'Lectura = tensión real × Rin / (Zout + Rin)',
+    meterCurrentSpoken: 'Lectura = corriente real × RL / (RL + Rm)',
+    meterVoltageCircuitSpoken:
+      'Una fuente de {vin} alimenta R1, {r1}, y R2, {r2}, en serie. Un voltímetro con {rin} de resistencia de entrada está conectado sobre R2 y marca {reading}. Sin el medidor, R2 tiene {trueValue}.',
+    meterCurrentCircuitSpoken:
+      'Una fuente de {vin} hace circular una corriente por el amperímetro, en su rango {range} ({rm}), y por una carga de {rload}, en un solo lazo. Marca {reading}; sin el medidor, circulan {trueValue}.',
   },
   theme: { toggle: 'Cambiar tema', light: 'Claro', dark: 'Oscuro' },
   langSwitch: { label: 'Idioma', other: 'English' },

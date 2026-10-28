@@ -289,9 +289,13 @@ fluke-abc-safety:
   authors: "Fluke Corporation"
   title: "ABCs of multimeter safety"
   container: "Application note"
-  comment: "IEC 61010 measurement categories"
+  comment: "IEC 61010 measurement categories. Re-checked 2026-10-27: the copy served is document 1263690J_EN, ©2006-2014, printed 10/2012; its text layer names the lowest category \"CAT 0\" (digit zero) where older printings said CAT I."
+  identifier: "1263690J_EN"
   url: "https://media.fluke.com/51012112-8f43-4aa7-a30a-b2e3016e8f2f_original%20file.pdf"
-  modules: ["00 (multimeter, 00-05)", "safety callouts"]
+  modules:
+    - "00 (multimeter)"
+    - "00-05 (measurement categories CAT IV/III/II/0 with examples, Table 1 p. 2; within a category a higher voltage rating means a higher transient rating, CAT III-600 V tested with 6000 V transients from a 2 Ω source vs CAT II-1000 V with 6000 V from 12 Ω, Table 2 p. 7; leads left in the amps jacks and put across a voltage source become a short circuit, so the amps inputs must be fused with the manufacturer's high-energy fuses, p. 5; 10 A terminal 0.01 Ω vs 10 MΩ on the volts terminals, p. 5)"
+    - "safety callouts"
 
 ti-sloa119:
   section: "note"
@@ -469,7 +473,33 @@ fluke-11x-manual:
   year: "March 2020"
   url: "https://media.fluke.com/5e1db354-3a6e-49cf-9edd-b10800c0e608_original%20file.pdf"
   comment: "the copy Fluke hosts is labelled Simplified Chinese; the specification tables are in English"
-  modules: ["00-02", "00-03 (a typical multimeter has 10 MΩ: Volts DC input impedance > 10 MΩ, < 100 pF, Table 7)"]
+  modules:
+    - "00-02"
+    - "00-03 (a typical multimeter has 10 MΩ: Volts DC input impedance > 10 MΩ, < 100 pF, Table 7)"
+    - "00-05 (Volts DC > 10 MΩ < 100 pF, Volts AC > 5 MΩ, Table 7 p. 17; A input fuse 11 A, 1000 V, IR 17 kA, p. 15; ohms open-circuit test voltage < 2.7 V dc, short-circuit current < 350 μA, Table 7; continuity beeper on < 20 Ω, off > 250 Ω, Table 6 p. 16; CAT III 600 V, p. 15; no burden-voltage figure)"
+
+fluke-80v-manual:
+  section: "datasheet"
+  authors: "Fluke Corporation"
+  title: "80 Series V Multimeters Users Manual"
+  edition: "Rev. 2, 11/08"
+  year: "May 2004"
+  comment: "covers the Fluke 83V and 87V; checked 2026-10-27 against the PDF Fluke serves at assets.fluke.com"
+  url: "https://assets.fluke.com/manuals/80v_____umeng0200.pdf"
+  modules:
+    - "00-05 (ammeter burden voltage, typical: 1.8 mV/mA on the 60 mA and 400 mA ranges, 0.03 V/A on the 6 A and 10 A ranges, 100 μV/μA on the 600 μA and 6000 μA ranges, Table 14 p. 48; fuses 44/100 A (440 mA), 1000 V FAST for mA/μA and 11 A, 1000 V FAST for A, p. 43; volts input 10 MΩ < 100 pF, ohms open-circuit test voltage < 7.9 V dc, typical short-circuit current 1 mA on 600 Ω, Table 18 p. 51; \"never place the probes across (in parallel with) any circuit or component when the leads are plugged into the current terminals\", p. 24, and \"the Meter acts like a short circuit\", p. 13)"
+
+fluke-17x-cal:
+  section: "datasheet"
+  authors: "Fluke Corporation"
+  title: "175, 177, & 179 True RMS Multimeters Calibration Information"
+  edition: "Rev. 4, 8/06"
+  year: "March 2001"
+  identifier: "PN 1600476"
+  comment: "checked 2026-10-27 against the PDF Fluke serves at assets.fluke.com. The DC Amps footnote (p. 6, note 6) prints the 400 mA burden as \"2 mV/A\"; the AC Amps footnote (p. 5, note 5) gives 2 mV/mA, which is the consistent value."
+  url: "https://assets.fluke.com/manuals/17x_____cieng0400.pdf"
+  modules:
+    - "00-05 (amps input burden voltage, typical: 400 mA input 2 mV/mA, 10 A input 37 mV/A, p. 5 note 5; fuses 440 mA, 1000 V FAST (10 kA) and 11 A, 1000 V FAST (17 kA), p. 4; volts input > 10 MΩ < 100 pF, ohms open-circuit test voltage < 8.0 V dc, short-circuit current < 1.1 mA, p. 6; continuity beeps at < 25 Ω, off at > 250 Ω, p. 5)"
 
 fender-tm-twin-reverb:
   section: "datasheet"
