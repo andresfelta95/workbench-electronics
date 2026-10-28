@@ -216,7 +216,12 @@ ti-spra953:
   title: "Semiconductor and IC Package Thermal Metrics"
   container: "Application Note SPRA953"
   url: "https://www.ti.com/lit/pdf/spra953"
-  modules: ["00 (thermal resistance)", "03", "05"]
+  comment: "Checked 2026-10-28: the copy served is SPRA953D (Edwards, D.; Nguyen, H.), Dec. 2003, revised Mar. 2024."
+  modules:
+    - "00 (thermal resistance)"
+    - "00-06 (thermal resistance defined as the temperature difference divided by the dissipated power, in °C/W, and valid only for the stated mounting and test board, §1 p. 2 and Table 1-1)"
+    - "03"
+    - "05"
 
 ti-slua618:
   section: "note"
@@ -402,6 +407,7 @@ usb-if-usb2:
   modules:
     - "00-01 (a USB port gives 5 V)"
     - "00-04 (bus-powered hub: the current in the upstream cable feeds the hub and its ports, §7.2.1)"
+    - "00-06 (a USB port gives 5 V)"
 
 ucamco-gerber:
   section: "standard"
@@ -412,6 +418,17 @@ ucamco-gerber:
   comment: "previous revision 2024.05"
   url: "https://www.ucamco.com/en/gerber/downloads"
   modules: ["11 (fab files)"]
+
+cenelec-guide-29:
+  section: "standard"
+  authors: "CENELEC"
+  title: "CENELEC Guide 29, Temperatures of hot surfaces likely to be touched: Guidance document for Technical Committees and manufacturers"
+  edition: "Edition 1"
+  year: "April 2007"
+  url: "https://boss.cenelec.eu/media/Guides/CLC/29_cenelecguide29.pdf"
+  comment: "Free PDF served by CENELEC, checked 2026-10-28. Its Annex A burn-threshold data are stated to be based on the measurement methods of EN ISO 13732-1:2006 (§4.4 note, p. 10); ISO 13732-1 itself was not seen. Values for 1 s and 10 s are read from curves (about ±1 °C); the 1 min, 10 min and 8 h values are stated in Table A.1."
+  modules:
+    - "00-06 safety callout (burn threshold for skin touching a hot smooth surface: bare metal about 65–70 °C for 1 s and about 55–59 °C for 10 s, Figure A.2 p. 17; ceramics about 79–85 °C for 1 s, Figure A.4 p. 19; plastics about 85–94 °C for 1 s, Figure A.5 p. 19; for 1 min: metal 51 °C, ceramics 56 °C, plastics 60 °C; 48 °C for 10 min and 43 °C for 8 h for all materials, Table A.1 p. 20)"
 
 # ---------------------------------------------------------------------------
 # §4 Datasheets and product manuals
@@ -443,7 +460,9 @@ yageo-cfr:
   edition: "Product specification V.3"
   year: "3 Apr. 2024"
   url: "https://www.yageogroup.com/content/Resource%20Library/Datasheet/YAGEO-CFR_DATASHEET.pdf"
-  modules: ["00-01 (1/4 W through-hole: CFR-25 power rating 1/4 W at 70 °C, Table 1)"]
+  modules:
+    - "00-01 (1/4 W through-hole: CFR-25 power rating 1/4 W at 70 °C, Table 1)"
+    - "00-06 (CFR-25: 1/4 W at 70 °C, maximum working voltage 250 V, body 6.3 × 2.4 mm; CFR-100: 1 W at 70 °C, 500 V, body 11.5 × 4.5 mm; Table 1 and Dimensions, p. 3; derating curve 100 % up to 70 °C, falling linearly to 0 % at 155 °C, p. 3; operating range -55 °C to +155 °C, Table 1; short-time overload test 2.5 × rated continuous working voltage for 5 s, IEC 60115-1 4.13, p. 4)"
 
 yageo-rc-l:
   section: "datasheet"
@@ -520,6 +539,27 @@ energizer-alkaline-ais:
   url: "https://data.energizer.com/pdfs/alkaline_ais.pdf"
   modules: ["00-04 safety callout (alkaline cells are \"not designed for recharging. Recharging can cause battery leakage or, in some cases, high pressure rupture\"; do not mix with other battery types; replace all batteries at the same time)"]
 
+stackpole-cf:
+  section: "datasheet"
+  authors: "Stackpole Electronics, Inc."
+  title: "CF / CFM Series Carbon Film Resistor"
+  year: "Rev. date 27 May 2026"
+  url: "https://www.seielect.com/catalog/sei-cf_cfm.pdf"
+  comment: "Checked 2026-10-28. The surface temperature rise is a curve (Surface Temperature Rise, p. 9), read at 100 % of rated power to about ±2 °C; the measurement point is the middle of the body. The datasheet gives no thermal resistance; θ is derived as rise / rated power."
+  modules:
+    - "00-06 (CF14: 0.25 W at 70 °C, maximum working voltage 350 V, maximum overload voltage 600 V; CF1: 1 W at 70 °C, 500 V, 1000 V; Electrical Specifications, p. 1; body CF14 6.00 × 2.30 mm, CF1 11.00 × 4.50 mm, Mechanical Specifications, p. 2; power derating 100 % to 70 °C, 0 % at 155 °C, operating range -55 °C to +155 °C, p. 3; surface temperature rise at 100 % rated power about 32 °C for CF14 and about 85 °C for CF1, read from the curve on p. 9, so θ ≈ 128 K/W for CF14 and ≈ 85 K/W for CF1, typical, derived)"
+
+vishay-mbx-sma:
+  section: "datasheet"
+  authors: "Vishay Beyschlag"
+  title: "MBA/SMA 0204, MBB/SMA 0207, MBE/SMA 0414 - Professional: Professional Metal Film Leaded Resistors"
+  edition: "Revision 11-Jul-2018"
+  identifier: "Document Number 28766"
+  url: "https://www.vishay.com/docs/28766/mbxsma.pdf"
+  comment: "Checked 2026-10-28. Corroborates stackpole-cf from a second maker. The temperature rise is a curve (p. 8), read to about ±3 K; the datasheet gives no thermal resistance figure."
+  modules:
+    - "00-06 (rated dissipation P70 in power mode 0.4 W, 0.6 W, 1.0 W for 0204, 0207, 0414, with 155 °C maximum film temperature; in standard mode 0.25 W, 0.4 W, 0.65 W with 125 °C, p. 2; derating from 70 °C to zero at 125 °C (standard) or 155 °C (power), p. 8; the rise of surface temperature at each size's power-mode rating is about 85 K, curve p. 8, so θ ≈ 210 K/W (0204), ≈ 140 K/W (0207) and ≈ 85 K/W (0414), typical, derived; the rise depends on heat flow into the circuit board, Application Information p. 2)"
+
 # ---------------------------------------------------------------------------
 # §5 Online courses, references and tools
 # ---------------------------------------------------------------------------
@@ -533,7 +573,9 @@ kuphaldt-liec:
   publisher: "All About Circuits"
   comment: "Design Science License; maintained by All About Circuits"
   url: "https://www.allaboutcircuits.com/textbook/"
-  modules: ["00–07"]
+  modules:
+    - "00–07"
+    - "00-06 (Vol. I ch. 2 \"Calculating Electric Power\": P = I²R and P = E²/R, Joule's law; ch. 2 \"Resistors\": resistors are rated in watts for the heat they can dissipate without overheating, and the power rating is roughly proportional to physical size; checked 2026-10-28 through a web.archive.org copy because the live site refuses scripted requests)"
 
 mit-6002-2007:
   section: "web"
@@ -643,7 +685,7 @@ openstax-fisica-u2-es:
   title: "Física universitaria, volumen 2"
   url: "https://openstax.org/books/física-universitaria-volumen-2"
   lang: "es"
-  modules: ["00", "01", "02"]
+  modules: ["00", "01", "02", "00-06 (§9.5 Energía eléctrica y potencia: P = IV = I²R = V²/R, a resistor dissipates the power as heat)"]
   comment: "Ch. 9 (current and resistance), 10 (DC circuits, Kirchhoff's rules, RC circuits), 14 (inductance), 15 (AC circuits); free, openly licensed"
 
 hyperphysics-es:
@@ -653,7 +695,7 @@ hyperphysics-es:
   publisher: "Georgia State University"
   url: "https://hyperphysics.gsu.edu/hbasees/electric/ohmlaw.html"
   lang: "es"
-  modules: ["00", "02"]
+  modules: ["00", "02", "00-06 (page \"Potencia Eléctrica\", hbasees/electric/elepow.html: P = VI and the power dissipated in a resistor)"]
 
 phet-cck-es:
   section: "es"

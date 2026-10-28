@@ -1,5 +1,126 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: 00-06 Power, heat and thermal resistance (2026-10-28)
+
+This is an independent check of branch `content/00-06-power-and-heat`: the
+uncommitted working tree against `main`, untracked files included. I re-ran
+every check, re-did every number and re-read every source myself rather than
+trusting the implementers' reports.
+
+**Ready to merge: no.** One Minor finding (m-1, a safety wording in the W-5
+paragraph) is open. Everything else passes; five Suggestions are listed.
+
+### What changed
+
+- New lesson `00-fundamentals/06-power-and-heat` (EN `power-and-heat`, ES
+  `potencia-y-calor`), six sections, one `power-dissipation` instance, two
+  `:::safety` callouts, a `:::key` and a closing `:::note`; 10 reference ids.
+- New instrument `src/app/widgets/power-dissipation/` (component, pure maths,
+  19-test spec), registered in `widget-registry.ts`; 14 new `ui.ts` keys in
+  EN and ES (`supply` and `power` reused).
+- New sources `stackpole-cf`, `vishay-mbx-sma`, `cenelec-guide-29` (YAML and
+  BIBLIOGRAPHY.md); 00-06 module notes on `ti-spra953`, `yageo-cfr`,
+  `kuphaldt-liec`, `openstax-fisica-u2-es`, `hyperphysics-es`; six new
+  BIBLIOGRAPHY §8 rows.
+- `docs/briefs/power-dissipation.md` (binding brief, D-1 to D-21); glossary
+  (00-06 section, planned θ row removed), ROADMAP and ARCHITECTURE updates.
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `pnpm build --verbose` (inside `flock`, copied to `/tmp/vf6-dist`) | Pass: content OK (6 lessons × 2), glyphs **943** strings all covered, **39 prerendered routes**. `main` 319.36 kB / 89.43 kB. `power-dissipation` chunk 6.06 kB / 2.51 kB; 00-06 lesson chunks 19.24 kB / 6.03 kB (EN) and 22.33 kB / 6.78 kB (ES). Rebuilt after my fixes: same. |
+| `pnpm test:ci` | **8 files, 143 tests pass** (format 33, ohm-law 12, resistor-network 14, divider 16, kirchhoff 14, meter-loading 23, power-dissipation 19, schematic 12). |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ `prefers-contrast: more`) pass; table current. |
+| `pnpm check:glyphs` | 943 instrument strings, all covered (θ through the JetBrains Mono Greek slice; `×` only in the `…Spoken` keys). |
+| axe on the private copy | **0 violations**, 39 routes × 4 theme states = **156 pages** (light 0, system-dark 0, dark 0, light-forced 0), before and after my fixes. |
+| Behaviour test (Playwright, outside the repo), EN and ES, keyboard only | **93 checks pass** (three clean runs on the final build; one earlier run had a single timing failure in the harness that did not reproduce). Every worked example typed into the controls, all four readouts (value, note, tone) checked: W-1 250 mW / 50 mA, 32 °C (θ = 128 °C/W), 57 °C "can burn skin" warn, 100% warn "of 250 mW at 25 °C"; W-2 (1 W by arrow key) 21 °C, 46 °C "middle of the body" plain, 25% signal; W-2b (`3.5`, ES `3,5`) 123 mW, 16 °C, 41 °C plain, 49% signal; W-3 1 W, 85 °C, 110 °C warn, 100%; W-4a 117 °C warn, 121.4% danger "of 206 mW at 85 °C", resistor `sch--hot`; W-4b 810 mW, 69 °C, 154 °C warn, 98.4% warn "of 824 mW", not hot; W-4c 155 °C warn at 70 °C, then 170 °C danger "above the part’s 155 °C limit", 121.4%; 1/4 W at 70 °C 102 °C; W-5 655 mW / 54.5 mA, rise and surface `—` danger with "past its rating: no maker data", 261.8% danger, hot, drawing shows 655 mW (never `—`); W-5 fix 56 °C, 81 °C, 65.5% warn; W-6 2.2 W, 880% / 220% and `—` (D-7). 5.01 V on the 1/4 W part: `—`, 100.4%. Clamps: supply 30 → 24 V, 0.2 → 1 V; ambient -5 → 10 °C, 200 → 150 °C (note "of 14.7 mW at 150 °C"); slider Home/End give 10 / 150 °C; Tab from the segment lands on the Supply box. ES: decimal comma, NBSP before `%`, «…» notes. No `NaN`, `Infinity`, `∞`, `undefined`, `×`, `≈` or `m°C` in visible widget text at 24 V / 10 Ω / 150 °C and at 1 V / 100 kΩ / 10 °C (spoken strings excluded). No console or page errors. No smoke, glow or animation state exists (D-1). |
+| Layout, 375 / 900 / 1280 px, light and dark, EN and ES | No horizontal page or widget overflow anywhere. Drawing texts (`+`, `5 V`, `R`, `100 Ω`, `250 mW`): no bounding-box overlaps at any width. Screenshots: the loop as in `ohm-law`, the power label bottom right in the accent colour, the resistor and its value in the hot colour past 100 %. At 375 px the Rating used note "of 206 mW at 85 °C" wraps between `85` and `°C` (S-2). |
+| Maths | Re-done by hand for every number in both lessons, the spec and brief §6: 5²/100 = 0.25 W; 32/0.25 = 128 and 85/1 = 85 °C/W; 0.25 · 85 = 21.25; 3.5²/100 = 122.5 mW, 49 %, 15.68 °C, 25 + 15.68 = 40.68 → 41 °C; 10²/100 = 1 W, 110 °C; (155 − 85)/85 = 0.8235, 205.9 mW, 121.4 %, 117 °C; 9²/100 = 810 mW, 823.5 mW, 98.36 %, 68.85 °C, 153.85 °C; 70 + 85 = 155; 85 + 85 = 170; (155 − 70)/128 = 0.6641 W = 664 mW; 70 + 32 = 102; 12²/220 = 654.5 mW, 54.5 mA, 261.8 %, 55.64 °C, 80.64 → 81 °C; 22²/220 = 2.2 W, 880 %, 220 %; 150 °C: 0.25 · 5/85 = 14.7 mW. The 1 W line: Ta + 85 · (155 − Ta)/85 = 155 for every Ta in (70, 155), checked in the spec at 71/85/100/120/150; the prose says "the numbers line up" and "by this estimate", never that the maker chose it, never that the 1/4 W part is fine to 0.66 W, and follows with "Follow the rating anyway". Derating formula in code matches `stackpole-cf` p. 3. Guards: `vin` 0, `r` 0, `r` ∞, NaN inputs, Ta 155/200 give no NaN; non-finite values format as `—`. |
+| Sources (PDFs downloaded again from the bibliography URLs and read, pages rendered) | `stackpole-cf` (Rev. 27 May 2026): p. 1 CF14 0.25 W, CF1 1 W at 70 °C (350/600 V and 500/1000 V); p. 2 CF 14 body 6.00 × 2.30 mm, CF 1 11.00 × 4.50 mm; p. 3 derating 100 % to 70 °C, 0 at 155 °C, operating range -55 to +155 °C; p. 9 "Surface Temperature Rise", measurement point mid-body: at 100 % CF14 ends at 31.7 °C and CF1 at 85.2 °C by pixel reading, inside ±2 °C of 32 and 85. `yageo-cfr` (V.3) p. 3: same derating (70 → 155 °C), CFR-25 1/4 W at 70 °C, CFR 100 1 W. `vishay-mbx-sma` p. 8: 0207 about 85 K at 0.6 W (≈ 142 K/W), 0414 about 85 K at 1 W; p. 2 rise depends on heat flow into the board. `ti-spra953` (SPRA953D) §1 p. 2: θ = (junction − ambient) / power in °C/W, and the test board dominates, so it holds only for that mounting; Table 1-1. `cenelec-guide-29` (Ed. 1, April 2007): Fig. A.2 p. 17 bare metal 1 s ≈ 65–70 °C, 10 s ≈ 54.5–59 °C; Table A.1 p. 20 uncoated metal 51 °C 1 min, 48 °C 10 min, 43 °C 8 h. No ISO or IEC number is cited for a figure in either lesson. `openstax-fisica-u2-es` §9.5 and `hyperphysics-es` "Potencia Eléctrica" fetched: P = IV = I²R = V²/R, dissipated in a resistor. `kuphaldt-liec` vol. I ch. 2 "Resistors" (archived copy): "The power rating of any resistor is roughly proportional to its physical size." `usb-if-usb2` (added beyond D-18) carries the same note as 00-01 ("A USB port gives 5 V"), already verified for 00-01/00-04; I did not re-open the spec package (a zip). Nothing from BIBLIOGRAPHY §8 is used. |
+| Safety (brief §8, D-19, ROADMAP §3.1) | Callout 1 "Resistors at their rating can burn you" / «Un resistor en su potencia nominal puede quemarte» sits in section 2 before the widget; callout 2 "Smoke means stop" / «Si sale humo, apaga» opens section 5 before W-5. Both give hazard, consequence and what to do, with no smoke temperature. Prose never suggests touch-testing, never says "safe to touch" (46 °C is "not harmless: it is above the 8-hour figure"), says the part stays hot after switch-off, the film is at least as hot as the surface and the board is not the maker's mounting; no overload-test recipe, no mains example, every supply ≤ 24 V; instrument clamps 1–24 V and 10–150 °C and never colours a temperature `signal`. One wording issue: m-1. |
+| EN/ES parity, SKILL.md | Same six sections, the same callouts in the same order, the same widget line, the same 10 references and the same numbers. ES: decimal comma, NBSP before every `%` (21 of 21), «…», tú, auto, tomar. Labels quoted in prose match `ui.ts` in both languages. Every new term is defined at first use and in the glossary (ambient temperature, temperature rise, θ, surface temperature, carbon-film resistor, mounting, derating, burn threshold, headroom, transistor); regulator comes from 00-03. |
+| Code | Same idiom as `meter-loading`: module-counter radio name, `linkedSignal` seeded through `parseValue` and clamped (R also E24-snapped), local `clamp`/`fill`, local tone and flow helpers (brief: D-6 of meter-loading), no cross-widget imports, θ, rating and burn constants with source comments, D-20 assumptions in the file comment. The deviation "surfaceTone is `danger` when the derated rating is 0" is acceptable: brief §5's edge-case table asks for exactly that at Ta ≥ 155 °C, and the ambient control cannot reach it. Prettier passes on every new source file and `ui.ts`/`widget-registry.ts`. |
+| Docs | ROADMAP status, A8 θ sentence (now says 00-06 shows θ through JetBrains Mono, D-12), module 00 row and counts (6 of 7, 63/60 to write), critical path and phase table match what was built; ARCHITECTURE tree, 39 routes and §5.5 widget list match. Stale figures fixed below. |
+| Hygiene | `git diff --check main` clean; untracked files LF, ending in a newline, no trailing spaces. `git status`: only the in-scope files. No `99-pd-scratch` page or other scratch file anywhere in the repo, `content-generated/` or the build output (39 routes = 37 + the two 00-06 pages). |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-1 | Minor | Pedagogy (safety) | `content/en/00-fundamentals/06-power-and-heat.md:241` ("Take a 220 Ω, 1/4 W resistor across a bench supply set to 12 V") and ES `:265` («Toma un resistor de 220 Ω y 1/4 W conectado a una fuente…») | The imperative "Take…" reads as a bench instruction to run a 1/4 W part at 262 % of its rating, one line after "Never overload a part on purpose" (brief §8: the prose must not suggest overloading a part on purpose). Make it a hypothetical worked only in the instrument, e.g. "Suppose a 220 Ω, 1/4 W resistor sits across a bench supply set to 12 V… Try it in the instrument, not on the bench: pick 1/4 W, then type…" (ES «Supón que…; pruébalo en el instrumento, no en el banco»). |
+| S-1 | Suggestion | Content parity | EN lesson, lines 117–261 (e.g. `:117` "100%", `:247` "261.8 %") | EN mixes "100%"/"49%"/"121.4%" (quoting the display) with "50 %", "121.4 %", "261.8 %" (prose and arithmetic); 00-05's EN prose writes a space throughout. Pick one style for EN prose. |
+| S-2 | Suggestion | Design | `power-dissipation.ts` `ratingOf` note; `formatSI` output | At 375 px the note "of 206 mW at 85 °C" breaks between `85` and `°C`, because `formatSI` writes a plain space. Consider a no-break space between value and unit in readout notes (a `core/format.ts` change, so a separate one). |
+| S-3 | Suggestion | Accessibility | `heatCircuitSpoken` / `heatOverSpoken` (`ui.ts`) | The drawing's spoken label says "121.4% of its rating" but not that this is past the derated rating, and at 170 °C does not say "above the part's 155 °C limit". The readouts carry both, so this is minor; consider one more spoken sentence for those states. |
+| S-4 | Suggestion | Content parity | `.claude/skills/course-writing/glossary.md` 00-06 section, "power rating (at 70 °C or below)" | Second row for a term the 00-01 row already holds (the same pattern as the 00-05 S-2). Fold "at 70 °C or below; 00-06 adds the temperature" into the 00-01 row. |
+| S-5 | Suggestion | Technical accuracy | EN `:190`, ES `:204` ("155 °C is also the hottest the maker allows the part to run at all") | `stackpole-cf` states an operating temperature range (-55 to +155 °C), not explicitly a surface or film limit. "The top of the maker's operating range" is closer to the datasheet; the D-8 note "above the part's 155 °C limit" is supported by `vishay-mbx-sma`'s 155 °C maximum film temperature, so no change is required. |
+
+### Fixed during verification
+
+- `ARCHITECTURE.md` §3 (method reproduces `main`'s 405 / 349 / 1921 + 804 /
+  6,502 / 15,674 exactly): `i18n/ui.ts` 405 → 454 lines, `lesson/` 349 →
+  351, `widgets/` 1921 → 2358 lines plus 804 → 1081 lines of specs (`core/`,
+  `pages/`, `schematic/`, `ui/` unchanged); "Roughly 6,500 lines of source"
+  → 7,000 (6,990); "~15,700 words of lesson prose" → ~21,000 (EN 9,912 +
+  ES 11,073 = 20,985, lesson bodies without front matter).
+- `ARCHITECTURE.md` §4.8: per-lesson chunk 7.8–17.5 kB / 2.7–5.7 kB →
+  7.8–22.3 kB / 2.7–6.8 kB, with the date note (per-instrument range
+  unchanged, `power-dissipation` 6.1 / 2.5 kB inside it). §4.3's
+  "5.6–10.3 kB" stays right.
+- `ARCHITECTURE.md` §5.5: "124 tests" → 143, and the line that ran past the
+  wrap re-wrapped.
+- `docs/ROADMAP.md` A7: "124 specs" → "143 specs", adding the
+  power-dissipation arithmetic to the list.
+- `content/bibliography.yaml` and `docs/BIBLIOGRAPHY.md` `usb-if-usb2`: added
+  "00-06 (a USB port gives 5 V)" to Modules, since 00-06 now cites it
+  (SKILL.md §4).
+- Lessons: re-wrapped three prose lines that ran to 89–94 characters (EN
+  "headroom" paragraph and "Where θ comes back"; ES «Dónde vuelve a aparecer
+  θ»). Whitespace only; the word counts are unchanged. Rebuilt, re-ran
+  `test:ci` (143), axe (156 pages, 0) and the behaviour test (93 pass).
+
+#### Ready to merge: no
+
+Open: m-1. With m-1 fixed in both languages (and nothing else changed), a
+re-check of the two paragraphs, `pnpm build` and axe on the two 00-06 routes
+is enough to turn this to yes.
+
+### Re-verification after the m-1, S-1 and S-3 to S-5 fixes (2026-10-28)
+
+The changes since the pass above: both lessons' opening and W-5 paragraphs
+are now hypotheticals ("Suppose…", «Supón que…»), and W-5 adds "Try it in
+the instrument, not on the bench" / «Pruébalo en el instrumento, no en la
+mesa de trabajo»; EN writes a space before `%` throughout; the drawing's
+spoken label adds `heatDeratedSpoken` when the power is past the derated
+rating and `heatAboveMaxSpoken` when the surface is above 155 °C (two new
+`ui.ts` keys, EN and ES); the glossary's second "power rating" row is folded
+into the 00-01 row; "155 °C is also the top of the part's operating
+temperature range" (ES «el tope del rango de temperatura de funcionamiento
+de la pieza»).
+
+| Check | Result |
+|---|---|
+| Both lessons re-read in full | No remaining invitation to build anything at or past a rating: the opening (5 V across 100 Ω, at the rating) and W-5 (12 V across 220 Ω, 262 %) are hypotheticals, and every other step is "type … in Supply" in the instrument. The two `:::safety` callouts are unchanged and still precede the hazards. EN and ES: the same six sections, callouts, widget line, 10 references and numbers; ES still has NBSP before all 21 `%`; EN has no `%` without a space. Labels quoted in prose still match `ui.ts`. |
+| `pnpm build --verbose` (inside `flock`, copied to `/tmp/vf6-dist`) | Pass, **39 routes**; glyphs **943** strings, all covered (the two new keys end in `Spoken` and are exempt by name, so the count is unchanged). `power-dissipation` 6.26 kB / 2.57 kB; 00-06 lesson chunks 19.29 / 6.02 kB (EN) and 22.39 / 6.79 kB (ES). |
+| `pnpm test:ci` | 8 files, **143 tests** pass. |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ more) pass; table current. |
+| axe on the private copy | **0 violations**, 156 pages (39 routes × 4 theme states). |
+| Behaviour test (same script plus seven spoken-label checks) | **101 checks pass**, three clean runs. Two earlier runs each logged `net::ERR_NETWORK_CHANGED` console errors on resource loads in the EN pass (a host network change during the run); they did not reproduce, and every functional check passed in those runs too. Spoken labels: W-1 has no extra sentence; W-4a ends "That is past its derated rating of 206 mW at 85 °C." / «Eso está por encima de su potencia nominal reducida, 206 mW a 85 °C.» and does not mention 155 °C; W-4c at 85 °C adds both sentences, ending "Its surface is above the part’s 155 °C limit." / «Su superficie está por encima del límite de 155 °C de la pieza.»; W-5 (off the data) keeps the `heatOverSpoken` form. Layout at 375 / 900 / 1280 px, light and dark: no overflow, no label overlaps. |
+| Code | The summary adds the sentences only within the data (`overRating`, `surface > T_MAX`), matching the readout tones. Prettier passes on the widget files, `ui.ts` and `widget-registry.ts`. |
+| `ARCHITECTURE.md` figures, re-measured with the same method | Changed by the fixes, now updated: `i18n/ui.ts` 454 → 463 lines, `widgets/` 2358 → 2372 lines (specs unchanged at 1081), per-lesson chunk 7.8–22.3 → 7.8–22.4 kB (gzip max still 6.8 kB), `power-dissipation` 6.1 / 2.5 → 6.3 / 2.6 kB in the §4.8 note. Re-checked and still right: `lesson/` 351, about 7,000 lines of source (7,013), about 21,000 words (EN 9,926 + ES 11,081 = 21,007), 143 tests, 39 routes, per-instrument chunk 5.6–10.3 kB / 2.0–3.2 kB. |
+| Hygiene | `git diff --check` clean; untracked files LF, newline-terminated, no trailing spaces; `git status --untracked-files=all` shows only the in-scope files (the two lessons, the brief, the three `power-dissipation` files and the eight modified tracked files, `docs/REVIEW.md` included). No scratch pages. |
+
+| # | Status |
+|---|---|
+| m-1 | Resolved |
+| S-1 | Resolved |
+| S-2 | Deferred: needs a no-break space in `core/format.ts`'s `formatSI`, a shared change outside this lesson |
+| S-3 | Resolved |
+| S-4 | Resolved |
+| S-5 | Resolved |
+
+#### Ready to merge: yes (re-verification)
+
 ## Verification: 00-05 Using a multimeter (2026-10-28)
 
 This is an independent check of branch `content/00-05-multimeter`: the

@@ -13,4 +13,6 @@ export const WIDGETS: Record<string, () => Promise<Type<unknown>>> = {
   kirchhoff: () => import('../widgets/kirchhoff/kirchhoff').then((m) => m.KirchhoffWidget),
   'meter-loading': () =>
     import('../widgets/meter-loading/meter-loading').then((m) => m.MeterLoadingWidget),
+  'power-dissipation': () =>
+    import('../widgets/power-dissipation/power-dissipation').then((m) => m.PowerDissipationWidget),
 };
