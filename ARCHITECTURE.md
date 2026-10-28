@@ -132,9 +132,9 @@ electronics/
 │       ├── i18n/ui.ts          ← every UI string, both languages (405 lines)
 │       ├── lesson/             ← the Markdown → components renderer (349 lines)
 │       ├── pages/              ← the five routed views (1051 lines)
-│       ├── schematic/          ← SVG symbol library (434 lines, plus a 214-line spec)
+│       ├── schematic/          ← SVG symbol library (444 lines, plus a 218-line spec)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
-│       ├── widgets/            ← the instruments (1885 lines, plus 804 lines of maths specs)
+│       ├── widgets/            ← the instruments (1921 lines, plus 804 lines of maths specs)
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── .github/workflows/build.yml ← CI: build, unit tests + contrast, axe (§5.5)

@@ -93,7 +93,7 @@ output impedance is 10 kΩ in parallel with 10 kΩ, which is 5 kΩ. The meter's
 
 **Two 10 MΩ resistors.** Type `10M` into R1 and R2. The true value is still
 4.5 V, because the ratio has not changed. The output impedance is now 5 MΩ,
-the same size as the meter. R2 in parallel with the meter's 10 MΩ is 5 MΩ, so
+the same order as the meter's 10 MΩ. R2 in parallel with that 10 MΩ is 5 MΩ, so
 the reading is `9 V · 5 MΩ / (10 MΩ + 5 MΩ) = 3 V`. Error shows 33.33 % low.
 This is the opening question. It is the same drop from 4.5 V to 3 V that a
 10 kΩ load caused in lesson 03, with resistors a thousand times larger. The

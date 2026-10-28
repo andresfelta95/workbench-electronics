@@ -112,7 +112,6 @@ interface ReadoutRow {
             <svg:g schGround [x]="14" [y]="13" />
             <svg:g schJunction [x]="14" [y]="7" />
             <svg:g schJunction [x]="14" [y]="13" />
-            <svg:g schJunction [x]="25" [y]="7" />
             <svg:g
               schLabel
               [x]="21"
@@ -147,6 +146,7 @@ interface ReadoutRow {
               [value]="text(rLoad(), 'Ω')"
             />
             <svg:g schGround [x]="14" [y]="13" />
+            <!-- A T: the ground lead taps the return wire, so three conductors meet. -->
             <svg:g schJunction [x]="14" [y]="13" />
             <svg:g
               schLabel

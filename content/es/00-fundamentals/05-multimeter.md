@@ -101,8 +101,8 @@ debajo.
 
 **Dos resistores de 10 MΩ.** Escribe `10M` en R1 y en R2. El valor real sigue
 siendo 4,5 V, porque la proporción no cambió. La impedancia de salida ahora es
-de 5 MΩ, del mismo orden que el multímetro. R2 en paralelo con los 10 MΩ del
-multímetro da 5 MΩ, así que la lectura es `9 V · 5 MΩ / (10 MΩ + 5 MΩ) = 3 V`.
+de 5 MΩ, del mismo orden que los 10 MΩ del multímetro. R2 en paralelo con esos
+10 MΩ da 5 MΩ, así que la lectura es `9 V · 5 MΩ / (10 MΩ + 5 MΩ) = 3 V`.
 «Error» marca un 33,33 % por debajo. Esta es la pregunta del principio. Es la
 misma caída de 4,5 V a 3 V que provocó una carga de 10 kΩ en la lección 03,
 con resistores mil veces más grandes. Ahora la carga son los 10 MΩ del

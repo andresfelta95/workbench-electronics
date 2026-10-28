@@ -46,7 +46,7 @@ change's scope. Four Suggestions are listed below.
 | EN/ES parity, SKILL.md | Same four sections plus the closing note, the same callouts in the same order, the same two widget lines, the same references and numbers. ES uses the decimal comma, NBSP before `%`, «…», tú, "lazo" (as 00-04). Every new term is defined at first use and listed in the glossary (00-05 section, EN and ES); the ES instrument label «Caída del amperímetro» matches the glossary row and `ui.ts` (D-5). Prose that names controls uses the labels the widget shows. |
 | Code | Same idiom as `ohm-law` and `divider`: module-counter radio names, `linkedSignal` seeded from `props()` through `parseValue` and clamped, `computed` readouts, `@if` per mode, `headingAlt` for a stable plate. Widgets do not import each other (D-6). `schMeter` matches brief §4 (pins, 24 × 24 staircase body, letter, name/value positions, `plus`), uses `SYMBOL_STYLES`, no `<circle>`; the spec checks closure, whole units, symmetry, `dim`/`highlight` classes. |
 | Docs | ROADMAP status, A1 row, module 00 table, counts (5 done, 64/61 to write) and phase table match what was built; ARCHITECTURE tree, §3 text, 37 routes, §5.5 and §6 brief pointer match. Stale figures fixed below. |
-| Hygiene | `git diff --check` clean; all new files LF, ending in a newline. Changes are only the in-scope files; untracked files are the two lessons, `docs/briefs/`, `schematic.spec.ts` and `widgets/meter-loading/`. No scratch files, screenshots or temp files in the repo; `dist/`, `.angular/`, `content-generated/` and `public/sitemap.xml` stay ignored. Prettier: every new file now passes; `schematic.ts` has prettier deviations only in lines that are the same on `main`. |
+| Hygiene | `git diff --check` clean; all new files LF, ending in a newline. Changes are only the in-scope files; untracked files are the two lessons, `docs/briefs/`, `schematic.spec.ts` and `widgets/meter-loading/`. No scratch files, screenshots or temp files in the repo; `dist/`, `.angular/`, `content-generated/` and `public/sitemap.xml` stay ignored. Prettier: every new source file now passes (the lesson `.md` files are not prettier-formatted, like every existing lesson on `main`); `schematic.ts` has prettier deviations only in lines that are the same on `main`. |
 
 ### Findings
 
@@ -99,7 +99,7 @@ through a `baseline` computed (4 units below the body centre for `V` and
 | Behaviour test (same script) | All 102 checks pass, EN and ES, at 375 / 900 / 1280 px, light and dark. |
 | Letter centring (pixel scan, device scale 4) | V: horizontal +0.48 unit, vertical +0.58 unit (was +1.5); A: +0.09 and 0.00 (was +1.0). Both under 1 CSS px at 1280 px, and the screenshots look centred. `Ω` is not drawn on any page; its spec case renders. |
 | S-2, S-3 | One "short circuit" row remains (00-03 section, "defined in 00-05"). EN line 137 and ES line 149 read "On its mA and A ranges" / «En sus rangos de mA y A». |
-| Hygiene | `git diff --check` clean; prettier passes on the new files; `git status` shows only the in-scope files and no stray files. |
+| Hygiene | `git diff --check` clean; prettier passes on the new source files (lesson `.md` files are not prettier-clean, like the existing lessons); `git status` shows only the in-scope files and no stray files. |
 
 | # | Status |
 |---|---|
@@ -109,6 +109,43 @@ through a `baseline` computed (4 units below the body centre for `V` and
 | S-4 | Deferred: out of scope (pre-existing prettier deviations in `schematic.ts`) |
 
 #### Ready to merge: yes (re-verification)
+
+### PR #6 review fixes (2026-10-28)
+
+The independent PR review of `de0bda2` returned CHANGES NEEDED with one
+Minor (m-1) and five Suggestions. The changes since then, in the working
+tree: the EN "Two 10 MΩ resistors" paragraph says "the same order as the
+meter's 10 MΩ" (ES matched: «del mismo orden que los 10 MΩ del
+multímetro»); voltage mode no longer draws a junction dot at (25, 7), where
+only the wire meets the meter's pin; current mode keeps the dot at (14, 13),
+a real three-way T (comment added); `ARCHITECTURE.md` §3 and this file (my
+edits, below).
+
+| Check | Result |
+|---|---|
+| `pnpm build --verbose` (inside `flock`, copied to `/tmp/ver-dist`) | Pass, 37 routes. `meter-loading` 10.28 kB / 3.17 kB. |
+| `pnpm test:ci` | 7 files, **124 tests** pass. |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ more) pass; table current. |
+| `pnpm check:glyphs` | **855** strings, all covered. The drop from 856 is the removed `<svg:g schJunction [x]="25" [y]="7" />`: the tool checks each template element's text, and that element contributed one (empty) entry. Logging every checked string on copies of `HEAD` and the working tree, the only difference is that one `""` entry in `meter-loading.ts`. The added HTML comment and the lesson edits add nothing. |
+| axe on the private copy | **0 violations**, 148 pages (37 routes × 4 theme states). |
+| Behaviour test (same script) | All 102 checks pass, EN and ES, 375 / 900 / 1280 px, light and dark. Letter centring unchanged (V +0.48 / +0.58 unit, A +0.09 / 0.00). |
+| Schematic screenshots | Voltage mode: dots only at (14, 7) and (14, 13), none at the meter's top corner. Current mode: the ground tap at (14, 13) keeps its dot. No label collisions. |
+| `ARCHITECTURE.md` figures, re-measured on the final tree with the method that reproduces `main`'s numbers | `schematic/` 444 lines plus a 218-line spec, `widgets/` 1921 lines plus 804 of specs (fixed, m-1; my earlier 434 / 214 / 1885 were measured before the S-1 and prettier passes). Re-checked and still right: `core/` 596 + 269, `ui.ts` 405, `lesson/` 349, about 6,500 lines of source (6,502), about 15,700 words (7,426 + 8,248), 124 tests, 37 routes, per-instrument chunk 5.6–10.3 kB / 2.0–3.2 kB (5.57–10.28 / 1.96–3.17), per-lesson chunk 7.8–17.5 kB / 2.7–5.7 kB. |
+| Hygiene | `git diff --check` clean, LF throughout; `git status` (untracked files included) shows only `ARCHITECTURE.md`, the two lessons and `meter-loading.ts` (plus this file); no stray files. |
+
+| # | Status |
+|---|---|
+| m-1 (ARCHITECTURE §3 line counts) | Resolved |
+| S-1 (EN "the same size as the meter") | Resolved |
+| S-2 (two-way junction dot at (25, 7)) | Resolved |
+| S-3 (this file said "prettier passes on the new files") | Resolved: both Hygiene rows now say new source files, and note that lessons are not prettier-formatted |
+| S-4 (`control.ts` keeps the raw typed text when a clamp lands on the value already held) | Deferred: out of scope, pre-existing in `Control`, reproduces on `main` |
+| S-5 (IEC marking "CAT O" for circuits not connected to mains) | Deferred: out of scope, needs IEC 61010-2-030 to be checked (BIBLIOGRAPHY §8) |
+
+My earlier S-4 (pre-existing prettier drift in `schematic.ts`) also stays
+deferred.
+
+#### Ready to merge: yes (PR #6 review fixes)
 
 ## Verification: A7 quality gates (2026-10-27)
 
