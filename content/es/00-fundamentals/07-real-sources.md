@@ -2,7 +2,7 @@
 slug: fuentes-reales
 title: "Fuentes reales: resistencia interna y Thévenin"
 summary: Por qué baja la tensión de una pila cuando le conectas una carga, cómo medir con tu multímetro la resistencia que tiene adentro, cuánta potencia puede dar y por qué un divisor de tensión se comporta igual.
-minutes: 14
+minutes: 17
 references:
   - id: energizer-ir-bulletin
     note: "La resistencia interna y cómo la miden los fabricantes. Pilas alcalinas nuevas: unos 150 a 300 mΩ, medidos con un consumo de 5 mA y un pulso de 505 mA de 100 ms (p. 1). Una prueba rápida de impedancia a 1000 Hz suele dar menos que este método de continua (p. 1). Tensión con carga = tensión en vacío − resistencia efectiva total · corriente, con el ejemplo 1,6 V − 1,0 A · 0,1 Ω = 1,5 V, que hay que tomar como una guía general (p. 2). Pila AA nueva: unos 0,13 Ω a 20 °C y unos 0,4 Ω a −20 °C, leídos de la curva de la figura 2 (p. 2), valores típicos."
@@ -44,9 +44,9 @@ Supón que tu multímetro marca 1,6 V sobre una pila AA nueva. Conectas un
 resistor de 10 Ω entre sus terminales, y la lectura baja a 1,561 V. ¿Adónde
 fueron los otros 39 mV?
 
-La lección 04 dibujó sus fuentes como ideales: mantienen su tensión pase la
-corriente que pase. Dijo que en una pila real la tensión baja un poco. Esta
-lección muestra cuánto, y por qué.
+Las fuentes ideales de la lección 04 mantenían su tensión pasara la corriente
+que pasara, y la lección dijo que en una pila real la tensión baja un poco.
+Esta lección muestra cuánto, y por qué.
 
 ## Una resistencia dentro de la pila
 
@@ -67,11 +67,12 @@ los terminales les llega lo que queda:
 `V = Voc − I · Rint`
 
 El boletín de Energizer sobre resistencia interna da un ejemplo: 1,6 V en
-vacío, 0,1 Ω adentro y 1,0 A dan `1,6 V − 1,0 A · 0,1 Ω = 1,5 V`.
+vacío, 0,1 Ω adentro y 1,0 A. La caída es `1,0 A · 0,1 Ω = 0,1 V`, así que los
+terminales dan `1,6 V − 0,1 V = 1,5 V`.
 
-El instrumento escribe la fórmula arriba, con `I · Rint`, la tensión que se
-pierde adentro, resaltada. El recuadro de líneas cortadas del dibujo es la
-pila, y lo que hay dentro es el modelo. La fuente ideal lleva el símbolo de
+El instrumento escribe la fórmula arriba, con `I · Rint` resaltado. El
+recuadro de líneas cortadas del dibujo es la pila; lo que hay dentro es el
+modelo. La fuente ideal lleva el símbolo de
 pila: una placa larga y delgada y una placa corta y gruesa. La placa larga es
 el +. Cuál extremo es el + y cuál el − es la **polaridad** de la pila: el + es
 el extremo que está a mayor tensión.
@@ -83,15 +84,15 @@ alcalina de 9 V y NiMH una pila AA recargable de NiMH. El instrumento empieza
 en la AA, con 1,6 V y 0,25 Ω (Energizer da para una AA nueva unos 0,25 Ω) y
 una carga de 10 Ω:
 
-- `I = 1,6 V / (0,25 Ω + 10 Ω) = 156 mA`
-- `V = 1,6 V − 156 mA · 0,25 Ω = 1,561 V`, así que se pierden 39 mV adentro
+- `0,25 Ω + 10 Ω = 10,25 Ω`, así que `I = 1,6 V / 10,25 Ω = 156 mA`
+- Adentro se pierden `156 mA · 0,25 Ω = 39 mV`, así que
+  `V = 1,6 V − 39 mV = 1,561 V`
 - `P = I² · R` (lección 01), con la corriente sin redondear: 244 mW en la carga
   y 6,09 mW en Rint
 
-«Tensión en los terminales» marca 1,561 V, «caen 39 mV dentro». «Corriente de
-carga» marca 156 mA, «Potencia en la carga» 244 mW y «Calor interno» 6,09 mW.
-La lección 06 anunció potencia convertida en calor dentro de la propia pila:
-es esta, `P = I² · R` con R = Rint.
+«Tensión en los terminales» marca 1,561 V, «caen 39 mV dentro»; «Corriente de
+carga», 156 mA; «Potencia en la carga», 244 mW. «Calor interno» marca 6,09 mW:
+el calor dentro de la propia pila que anunció la lección 06.
 
 Ahora apaga el interruptor «Carga». No circula corriente, así que no se pierde
 nada adentro, y «Tensión en los terminales» marca 1,6 V, «en vacío».
@@ -112,8 +113,7 @@ Con carga, la tensión en los terminales de una pila baja `I · Rint`, e
 
 ## Medirla con tu multímetro
 
-Puedes hallar Rint con el multímetro de la lección 05 y un resistor. Primero,
-el peligro.
+Puedes hallar Rint con el multímetro de la lección 05 y un resistor.
 
 :::safety Nunca pongas una pila en cortocircuito
 Un cable, una moneda, unas llaves o un multímetro en su borne de corriente
@@ -149,10 +149,11 @@ La ley de Ohm sobre el resistor conocido da la corriente, así que no necesitas
 amperímetro:
 
 - `I = 1,561 V / 10 Ω = 156 mA`
-- `Rint = (1,6 V − 1,561 V) / 156 mA = 0,039 V / 0,156 A = 0,25 Ω`
+- `Rint = (Voc − V) / I`
+- `1,6 V − 1,561 V = 0,039 V`, y `0,039 V / 0,156 A = 0,25 Ω`
 
 Necesitas un multímetro que muestre cuatro cifras. Con tres, la lectura con
-carga es 1,56 V y el resultado, `0,04 V / 0,156 A = 0,256 Ω`.
+carga es 1,56 V y el resultado es `0,04 V / 0,156 A`, o sea 0,256 Ω.
 
 Los 10 MΩ del multímetro no cambian nada aquí. Según la regla de la lección
 05, son cuarenta millones de veces los 0,25 Ω de la pila, así que la lectura
@@ -162,9 +163,9 @@ sale un 0,0000025 % baja.
 9,6 V, el medio de los 9,5 a 9,7 V que da Duracell para una nueva, y 2,3 Ω.
 Presiona 9 V y escribe `220` en «Carga»:
 
-- `V = 9,6 V · 220 / 222,3 = 9,501 V`
-- `I = 9,501 V / 220 Ω = 43,2 mA`, y el resistor recibe 410 mW
-- `Rint = (9,6 V − 9,501 V) / 43,2 mA = 0,099 V / 0,0432 A = 2,29 Ω`
+- `V = 9,6 V · 220 / 222,3`, que da 9,501 V
+- `I = 9,501 V / 220 Ω`, que da 43,2 mA; el resistor recibe 410 mW
+- `9,6 V − 9,501 V = 0,099 V`, y `0,099 V / 0,0432 A = 2,29 Ω`
 
 Eso se acerca a los 2,3 Ω del instrumento; la última cifra de la lectura lo
 limita. Una AA de NiMH con 10 Ω le da 143 mW a su resistor. El error del
@@ -208,9 +209,9 @@ paso igual multiplica la resistencia por diez, de 10 mΩ a 10 kΩ. El marcador
 relleno es la carga actual. El marcador hueco es el pico, «máx. 2,56 W» para la
 AA.
 
-Presiona AA, escribe `10` en «Carga» y arrastra «Carga» hacia abajo. El
-marcador relleno sube hasta el pico y baja por el otro lado. El pico está donde
-la carga es igual a Rint.
+Presiona AA, escribe `10` en «Carga» y arrastra «Carga» hacia abajo: el
+marcador relleno sube hasta el pico, donde la carga es igual a Rint, y baja por
+el otro lado.
 
 Una carga diez veces mayor que Rint y una diez veces menor reciben la misma
 potencia: escribe `2,5` y después `0,025`, y las dos dan 846 mW. Eso vale para
@@ -231,13 +232,15 @@ casi un cortocircuito.
 - `V = 800 mV`, la mitad de la tensión en vacío
 - `P = 3,2² · 0,25 = 2,56 W` en la carga, y 2,56 W dentro de la pila
 
-«Potencia en la carga» marca 2,56 W, el 100 % de su máximo, y el marcador
-relleno queda sobre el hueco. El modelo predice estos vatios; ningún
-fabricante especifica una AA para 3,2 A.
+El marcador relleno queda sobre el hueco. El modelo predice estos vatios;
+ningún fabricante especifica una AA para 3,2 A.
 
 «Calor interno» también marca 2,56 W, con una eficiencia del 50 %. La
 **eficiencia** es la parte de la potencia de la fuente que llega a la carga:
-`potencia en la carga / (potencia en la carga + calor interno)`. Por RL y por
+
+`eficiencia = potencia en la carga / (potencia en la carga + calor interno)`
+
+Por RL y por
 Rint pasa una sola corriente, así que, por `P = I² · R`, la potencia se reparte
 en la proporción de sus resistencias. En el pico son iguales, así que la mitad
 calienta la fuente. La máxima transferencia de potencia no es la máxima
@@ -282,11 +285,11 @@ La cuarta tecla, CR2032, es esa pila de botón, solo en el instrumento. Usa
 3,2 V y 10 Ω (Energizer da para una nueva unos 10 Ω). Presiona CR2032 con la
 carga en 10 Ω.
 
-Con «Carga» apagada marca 3,2 V; `Isc = 3,2 V / 10 Ω = 320 mA` y
+Con «Carga» apagada marca 3,2 V. `Isc = 3,2 V / 10 Ω`, que da 320 mA, y
 `Pmax = 3,2² / 40 = 256 mW`. Con «Carga» encendida, `I = 3,2 V / 20 Ω = 160 mA`
 y `V = 1,6 V`: la mitad de la tensión se pierde adentro. «Potencia en la
-carga» marca 256 mW, el 100 % de su máximo, con una eficiencia del 50 %. Esta
-carga común de 10 Ω queda en el pico de la pila de botón.
+carga» marca 256 mW con una eficiencia del 50 %: esta carga común de 10 Ω queda
+en el pico de la pila de botón.
 
 Los mismos 10 Ω le quitaron 39 mV a la AA. Con `100`, la pila de botón marca
 2,909 V y pierde 291 mV, donde la AA pierde 3,99 mV; da 29,1 mA y 84,6 mW (el
@@ -297,7 +300,8 @@ parte de su potencia máxima, porque su resistencia es cuarenta veces mayor.
 El manual de pilas de botón de Energizer muestra lo mismo. Una 2032 nueva marcó
 3,279 V con solo una carga de 1 MΩ, y 2,429 V durante un **pulso**, una carga
 conectada por un tiempo corto: 50 ms sobre 25 Ω, unos 97 mA. Así,
-`(3,279 V − 2,429 V) / 0,097 A = 9 Ω` (8,76 Ω antes de redondear). Escribe `25`
+`3,279 V − 2,429 V = 0,85 V`, y `0,85 V / 0,097 A = 9 Ω` (8,76 Ω antes de
+redondear). Escribe `25`
 en «Carga»: 2,286 V y 91,4 mA. El fabricante mide con pulsos cortos, no con una
 carga fija.
 
@@ -334,13 +338,12 @@ objetos de metal.
 
 Presiona 9 V y escribe `1` en «Carga», solo en el instrumento:
 
-- `I = 9,6 V / 3,3 Ω = 2,91 A`, y `V = 9,6 V · 1 / 3,3 = 2,909 V`: se pierden
-  6,69 V adentro
+- `I = 9,6 V / 3,3 Ω = 2,91 A`
+- `V = 9,6 V · 1 / 3,3`, que da 2,909 V: se pierden 6,69 V adentro
 - Potencia en la carga de 8,46 W, el 84,5 % del máximo de 10 W
 - Calor interno de 19,5 W, eficiencia del 30,3 %
 
-Ahora la pila se calienta más del doble de lo que alimenta a la carga. Son
-predicciones del modelo, no valores para los que esté especificada una pila de
+Son predicciones del modelo, no valores para los que esté especificada una pila de
 9 V real.
 
 La lección 05 dijo que una pila de 9 V empujaría hasta 5 A por los 1,8 Ω del
@@ -375,7 +378,8 @@ Este instrumento empieza en «Divisor» con el circuito de la lección 03: 9 V,
 dos resistores de 10 kΩ y una carga de 10 kΩ. El recuadro contiene el divisor,
 con Vth y Rth al lado:
 
-- `Vth = 9 V · 10 / 20 = 4,5 V`, y `Rth = 10 kΩ · 10 kΩ / 20 kΩ = 5 kΩ`
+- `Vth = 9 V · 10 / 20`, que da 4,5 V
+- `Rth = 10 kΩ · 10 kΩ / 20 kΩ`, que da 5 kΩ
 - `V = 4,5 V · 10 / 15 = 3 V`, el número de la lección 03
 - `I = 3 V / 10 kΩ = 300 µA`, y `P = 3 V · 300 µA = 900 µW`
 
@@ -385,9 +389,9 @@ de su máximo de 1,01 mW. Escribe `5k` en «Carga» para llegar al pico: 2,25 V,
 450 µA, 1,01 mW. Apaga el interruptor «Carga» y «Salida» marca 4,5 V, el valor
 en vacío de la lección 03.
 
-Una fuente de 4,5 V detrás de 5 kΩ da los mismos números:
-`4,5 V / 15 kΩ = 300 µA`, y `300 µA · 10 kΩ = 3 V`. Es el dibujo del primer
-instrumento con otros valores.
+Una fuente de 4,5 V detrás de 5 kΩ, el dibujo del primer instrumento con otros
+valores, da los mismos números: `4,5 V / 15 kΩ = 300 µA`, y
+`300 µA · 10 kΩ = 3 V`.
 
 Pero el equivalente no te dice el calor de adentro. Sus 5 kΩ convertirían
 `(300 µA)² · 5 kΩ = 450 µW` en calor, mientras que R1 y R2 convierten en

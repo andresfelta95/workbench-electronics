@@ -2,7 +2,7 @@
 slug: real-sources
 title: "Real Sources: Internal Resistance and Thévenin"
 summary: Why a battery's voltage drops under load, how to measure the resistance inside it with your meter, how much power it can give, and why a voltage divider behaves the same way.
-minutes: 14
+minutes: 17
 references:
   - id: energizer-ir-bulletin
     note: "Internal resistance and how makers measure it. Fresh alkaline cells about 150 to 300 mΩ, measured with a 5 mA drain and a 505 mA pulse of 100 ms (p. 1). A quick 1000 Hz impedance test typically reads lower than this DC method (p. 1). Loaded voltage = open-circuit voltage − total effective resistance · current, with the example 1.6 V − 1.0 A · 0.1 Ω = 1.5 V, to be taken as a general guideline (p. 2). Fresh AA about 0.13 Ω at 20 °C and about 0.4 Ω at −20 °C, read from the curve in fig. 2 (p. 2), typical."
@@ -44,9 +44,8 @@ Suppose your meter reads 1.6 V across a fresh AA cell. You clip a 10 Ω
 resistor across it, and the reading falls to 1.561 V. Where did the other
 39 mV go?
 
-Lesson 04 drew its sources as ideal: they hold their voltage whatever current
-flows. It said that a real battery sags a little. This lesson shows how much,
-and why.
+Lesson 04's ideal sources held their voltage whatever current flowed, and it
+said a real battery sags a little. This lesson shows how much, and why.
 
 ## A resistance inside the battery
 
@@ -66,11 +65,11 @@ Ohm's law Rint takes `I · Rint`. The terminals get what is left:
 `V = Voc − I · Rint`
 
 Energizer's bulletin on internal resistance gives an example: 1.6 V open
-circuit, 0.1 Ω inside and 1.0 A give `1.6 V − 1.0 A · 0.1 Ω = 1.5 V`.
+circuit, 0.1 Ω inside and 1.0 A. The drop is `1.0 A · 0.1 Ω = 0.1 V`, so the
+terminals give `1.6 V − 0.1 V = 1.5 V`.
 
-The instrument writes the formula at the top, with `I · Rint`, the voltage lost
-inside, highlighted. The dashed box in the drawing is the battery, and what is
-inside it is the model. The ideal source has the battery symbol: a long thin
+The instrument writes the formula at the top, with `I · Rint` highlighted. The
+dashed box in the drawing is the battery; what is inside it is the model. The ideal source has the battery symbol: a long thin
 plate and a short thick plate. The long plate is +. Which end is + and which
 is − is the battery's **polarity**: the + end is at the higher voltage.
 
@@ -81,15 +80,15 @@ The Source keys pick the battery: AA is an alkaline AA cell, 9 V the alkaline
 AA, with 1.6 V and 0.25 Ω (Energizer puts a fresh AA near 0.25 ohms) and a
 10 Ω load:
 
-- `I = 1.6 V / (0.25 Ω + 10 Ω) = 156 mA`
-- `V = 1.6 V − 156 mA · 0.25 Ω = 1.561 V`, so 39 mV is lost inside
+- `0.25 Ω + 10 Ω = 10.25 Ω`, so `I = 1.6 V / 10.25 Ω = 156 mA`
+- `156 mA · 0.25 Ω = 39 mV` is lost inside, so
+  `V = 1.6 V − 39 mV = 1.561 V`
 - `P = I² · R` (lesson 01), with the unrounded current: 244 mW in the load and
   6.09 mW in Rint
 
-Terminal voltage reads 1.561 V, "39 mV lost inside". Load current reads
-156 mA, Load power 244 mW and Heat inside 6.09 mW. Lesson 06 promised power
-turning into heat inside the battery itself: this is it, `P = I² · R` with
-R = Rint.
+Terminal voltage reads 1.561 V, "39 mV lost inside"; Load current 156 mA;
+Load power 244 mW. Heat inside reads 6.09 mW: the heat inside the battery
+itself that lesson 06 promised.
 
 Now switch Load off. No current flows, so nothing is lost inside, and Terminal
 voltage reads 1.6 V, "open circuit".
@@ -110,7 +109,7 @@ turns into heat inside the battery.
 
 ## Measuring it with your meter
 
-You can find Rint with lesson 05's meter and one resistor. First, the hazard.
+You can find Rint with lesson 05's meter and one resistor.
 
 :::safety Never short a battery
 A wire, a coin, keys or a meter on its current jack across a battery's
@@ -143,10 +142,11 @@ on is reading 2.
 Ohm's law on the known resistor gives the current, so you need no ammeter:
 
 - `I = 1.561 V / 10 Ω = 156 mA`
-- `Rint = (1.6 V − 1.561 V) / 156 mA = 0.039 V / 0.156 A = 0.25 Ω`
+- `Rint = (Voc − V) / I`
+- `1.6 V − 1.561 V = 0.039 V`, and `0.039 V / 0.156 A = 0.25 Ω`
 
 You need a meter that shows four digits. With three, the loaded reading is
-1.56 V and the result `0.04 V / 0.156 A = 0.256 Ω`.
+1.56 V and the result is `0.04 V / 0.156 A`, or 0.256 Ω.
 
 The meter's 10 MΩ changes nothing here. By lesson 05's rule, it is forty
 million times the cell's 0.25 Ω, so the reading is 0.0000025 % low.
@@ -155,9 +155,9 @@ million times the cell's 0.25 Ω, so the reading is 0.0000025 % low.
 9.6 V, the middle of the 9.5 to 9.7 V Duracell gives for a fresh one, and
 2.3 Ω. Press 9 V and type `220` in Load:
 
-- `V = 9.6 V · 220 / 222.3 = 9.501 V`
-- `I = 9.501 V / 220 Ω = 43.2 mA`, and the resistor takes 410 mW
-- `Rint = (9.6 V − 9.501 V) / 43.2 mA = 0.099 V / 0.0432 A = 2.29 Ω`
+- `V = 9.6 V · 220 / 222.3`, which is 9.501 V
+- `I = 9.501 V / 220 Ω`, which is 43.2 mA; the resistor takes 410 mW
+- `9.6 V − 9.501 V = 0.099 V`, and `0.099 V / 0.0432 A = 2.29 Ω`
 
 That is about the preset's 2.3 Ω; the reading's last digit limits it. A NiMH
 AA on 10 Ω puts 143 mW into its resistor. The resistor's own error counts too:
@@ -199,8 +199,8 @@ horizontal axis is a **logarithmic scale**: each equal step multiplies the
 resistance by ten, from 10 mΩ to 10 kΩ. The filled marker is the load now. The
 hollow marker is the peak, "max 2.56 W" for the AA.
 
-Press AA, type `10` in Load and drag Load down. The filled marker climbs to the
-peak and comes down the other side. The peak is where the load equals Rint.
+Press AA, type `10` in Load and drag Load down: the filled marker climbs to the
+peak, where the load equals Rint, and comes down the other side.
 
 A load ten times Rint and a load ten times smaller get the same power: type
 `2.5`, then `0.025`, and both give 846 mW. That holds for any factor, so on
@@ -220,12 +220,15 @@ short.
 - `V = 800 mV`, half the open-circuit voltage
 - `P = 3.2² · 0.25 = 2.56 W` in the load, and 2.56 W inside the cell
 
-Load power reads 2.56 W, 100 % of its maximum, and the filled marker sits on
-the hollow one. The model predicts these watts; no maker rates an AA for 3.2 A.
+The filled marker sits on the hollow one. The model predicts these watts; no
+maker rates an AA for 3.2 A.
 
 Heat inside also reads 2.56 W, at 50 % efficiency. **Efficiency** is the share
 of the source's power that reaches the load:
-`load power / (load power + heat inside)`. One current flows through RL and
+
+`efficiency = load power / (load power + heat inside)`
+
+One current flows through RL and
 Rint, so by `P = I² · R` the power splits in the ratio of their resistances.
 At the peak they are equal, so half heats the source. Maximum power transfer
 is not maximum efficiency. Batteries work far to the right of the peak: on
@@ -266,11 +269,11 @@ load or open one at the bench.
 
 The fourth key, CR2032, is that coin cell, in the instrument only. It uses
 3.2 V and 10 Ω (Energizer puts a fresh one near 10 ohms). Press CR2032 with
-the load at 10 Ω. With Load off it reads 3.2 V;
-`Isc = 3.2 V / 10 Ω = 320 mA` and `Pmax = 3.2² / 40 = 256 mW`. With Load on,
+the load at 10 Ω. With Load off it reads 3.2 V.
+`Isc = 3.2 V / 10 Ω`, which is 320 mA, and `Pmax = 3.2² / 40 = 256 mW`. With Load on,
 `I = 3.2 V / 20 Ω = 160 mA` and `V = 1.6 V`: half the voltage is lost inside.
-Load power reads 256 mW, 100 % of its maximum, at 50 % efficiency. This
-ordinary 10 Ω load sits on the coin cell's peak.
+Load power reads 256 mW at 50 % efficiency: this ordinary 10 Ω load sits on
+the coin cell's peak.
 
 The same 10 Ω took 39 mV from the AA. On `100` the coin cell reads 2.909 V and
 loses 291 mV, where the AA loses 3.99 mV; it gives 29.1 mA and 84.6 mW
@@ -280,7 +283,7 @@ because its resistance is forty times larger.
 
 Energizer's coin-cell manual shows the same. A fresh 2032 read 3.279 V with
 only a 1 MΩ load, and 2.429 V during a **pulse**, a load connected for a short
-time: 50 ms on 25 Ω, about 97 mA. So `(3.279 V − 2.429 V) / 0.097 A = 9 Ω`
+time: 50 ms on 25 Ω, about 97 mA. So `3.279 V − 2.429 V = 0.85 V`, and `0.85 V / 0.097 A = 9 Ω`
 (8.76 Ω before rounding). Type `25` in Load: 2.286 V and 91.4 mA. The maker
 tests in short pulses, not with a steady load.
 
@@ -312,12 +315,11 @@ closed inside, or a protected cell with a ready-made charger board
 
 Press 9 V and type `1` in Load, in the instrument only:
 
-- `I = 9.6 V / 3.3 Ω = 2.91 A`, and `V = 9.6 V · 1 / 3.3 = 2.909 V`: 6.69 V
-  is lost inside
+- `I = 9.6 V / 3.3 Ω = 2.91 A`
+- `V = 9.6 V · 1 / 3.3`, which is 2.909 V: 6.69 V is lost inside
 - Load power 8.46 W, 84.5 % of the 10 W maximum
 - Heat inside 19.5 W, efficiency 30.3 %
 
-The battery now heats itself more than twice as much as it feeds the load.
 These are the model's predictions, not what a real 9 V battery is rated for.
 
 Lesson 05 said a 9 V battery would push up to 5 A through the mA jack's 1.8 Ω
@@ -349,7 +351,8 @@ This instrument starts on Divider with lesson 03's circuit: 9 V, two 10 kΩ
 resistors and a 10 kΩ load. The box holds the divider, with Vth and Rth
 beside it:
 
-- `Vth = 9 V · 10 / 20 = 4.5 V`, and `Rth = 10 kΩ · 10 kΩ / 20 kΩ = 5 kΩ`
+- `Vth = 9 V · 10 / 20`, which is 4.5 V
+- `Rth = 10 kΩ · 10 kΩ / 20 kΩ`, which is 5 kΩ
 - `V = 4.5 V · 10 / 15 = 3 V`, lesson 03's number
 - `I = 3 V / 10 kΩ = 300 µA`, and `P = 3 V · 300 µA = 900 µW`
 
@@ -358,9 +361,9 @@ Output reads 3 V, "1.5 V lost inside"; Load current 300 µA, "short circuit:
 `5k` in Load to reach the peak: 2.25 V, 450 µA, 1.01 mW. Switch Load off and
 Output reads 4.5 V, lesson 03's unloaded value.
 
-A 4.5 V source behind 5 kΩ gives the same numbers: `4.5 V / 15 kΩ = 300 µA`,
-and `300 µA · 10 kΩ = 3 V`. It is the first instrument's drawing with other
-values.
+A 4.5 V source behind 5 kΩ, the first instrument's drawing with other values,
+gives the same numbers: `4.5 V / 15 kΩ = 300 µA`, and
+`300 µA · 10 kΩ = 3 V`.
 
 The equivalent does not tell you the heat inside, though. Its 5 kΩ would turn
 `(300 µA)² · 5 kΩ = 450 µW` into heat, but R1 and R2 really turn 4.5 mW into

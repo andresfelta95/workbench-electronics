@@ -197,7 +197,7 @@ source controls render (`@if`), as `meter-loading` does per mode.
 
 | # | Control | Kind | Label EN / ES | Unit | Range | Travel | E24 | Family |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Source | `pix-segment`, six radio keys in two fixed rows (below) | legend **Source** / **Fuente**; row 1 `AA`, `9 V`, `NiMH`, `CR2032` (same in both languages); row 2 **Custom** / **Libre**, **Divider** / **Divisor** | — | — | — | — | both |
+| 1 | Source | `pix-segment`, six radio keys in three fixed rows of two (below) | legend **Source** / **Fuente**; row 1 `AA`, `9 V`; row 2 `NiMH`, `CR2032` (rows 1 and 2 the same in both languages); row 3 **Custom** / **Libre**, **Divider** / **Divisor** | — | — | — | — | both |
 | 2 | Open-circuit voltage | `app-control` | **Open-circuit voltage** / **Tensión en vacío** | V | 1 – 24 | linear | no | battery |
 | 3 | Internal resistance | `app-control` | **Internal resistance** / **Resistencia interna** | Ω | 10 mΩ – 100 Ω | log | **no** (a cell's resistance is not a bought part) | battery |
 | 2' | Vin | `app-control` | `Vin` (same in both) | V | 1 – 24 | linear | no | divider |
@@ -211,7 +211,8 @@ source controls render (`@if`), as `meter-loading` does per mode.
   would repeat "battery". `AA` means the alkaline AA, `NiMH` the
   rechargeable AA and `CR2032` the lithium coin cell; the prose says so once,
   and the spoken source names (§4) say it in full.
-- **Segment layout at 375 px: two fixed rows (D-9, D-11).** Estimate from the
+- **Segment layout: three fixed rows of two at every width (D-9, D-11; amended
+  2026-10-30, see the note at the end of this item).** Estimate from the
   kit's metrics at `--px` = 2 px (375 px viewport): a key is 12 px padding
   each side + a 6 px LED + a 6 px gap + its text at 20 px VT323 with 0.04 em
   tracking (about 8.8 px a character); keys sit 8 px apart. Widths: `AA`
@@ -229,8 +230,16 @@ source controls render (`@if`), as `meter-loading` does per mode.
   keys still move through all six. The rows read as "a battery" and "or
   something else". If row 1 itself wraps (viewports under about 340 px),
   that is accepted: the break does not depend on the selection, so the
-  segment's height never changes when a key is pressed. The instrument agent
+    segment's height never changes when a key is pressed. The instrument agent
   measures at 320, 375, 900 and 1280 px, EN and ES, and records the result.
+  *Amended 2026-10-30 (coordinator):* the two-row layout above is superseded.
+  Measured, the four-battery row (about 300 px) wrapped on its own at 900 and
+  1280 px, where the controls column is 256–311 px. The segment now has three
+  fixed rows of two at every width: `AA` | `9 V`, `NiMH` | `CR2032`, Custom |
+  Divider (ES Libre | Divisor). Each break is an `aria-hidden` empty element
+  (`flex-basis: 100%`, widget CSS, tokens only); the six radios stay one group
+  and the arrow-key order is unchanged. Measured row widths at 320–900 px
+  (EN): 124, 168 and 194 px.
 - **Presets load values; the controls are always shown (D-11).** In the battery
   family the Open-circuit voltage and Internal resistance controls are always
   rendered and show the active source's values. Pressing `AA`, `9 V`, `NiMH`
@@ -1198,9 +1207,13 @@ NiMH, 9 V and USB power banks).
   (draft): "Why a battery's voltage drops under load, how to measure the
   resistance inside it with your meter, how much power it can give, and why a
   voltage divider behaves the same way."
-- **Minutes:** 14 (D-23). The coin cell (callout 3 and W-8) adds about half a
-  minute to section 4; section 6 gives it back by cutting W-7 to one sentence,
-  so the total stays 14.
+- **Minutes:** 17 (D-23). The coin cell (callout 3 and W-8) adds about half a
+  minute to section 4; section 6 gives some of it back by cutting W-7 to one
+  sentence. *Note, 2026-10-30:* the prose came to about 2,980 EN words (06 has
+  about 2,220 for 13 minutes), so 17 is the honest figure, not the 14 first
+  planned. This is a maintainer-approved exception to ROADMAP §3 step 1's
+  "~15 min" guideline. The per-section minutes in the table below are the
+  original plan and scale up roughly in proportion.
 - **Misconception corrected:** a battery always gives its printed voltage, so
   a higher-voltage battery can always deliver more power.
 - **Takeaway (one sentence):** every real source acts like an ideal voltage
@@ -1310,7 +1323,7 @@ item is open.
 | D-8 | **Preset values:** AA 1.6 V / 0.25 Ω; 9 V 9.6 V / 2.3 Ω; NiMH 1.2 V / 30 mΩ (sources and reasons in §2). The prose gives the spread (method, charge, cold, maker). | §2, §5 |
 | D-9 | **CR2032 is a fourth battery preset, simulation only** (reverses the proposal to leave it out): 3.2 V / 10 Ω (`energizer-lithium-coin-manual` p. 4; IR over life in prose), key `CR2032`, prop value `cr2032`, single-cell `schBattery`. The prose suggests no bench step with a coin cell and carries a third `:::safety` callout on swallowing (`energizer-coin-ais` p. 3), placed before the coin cell's first mention. The docs agent amends ROADMAP §3.1 (00-07 row; CR2032 noted as a simulation preset, not a bench battery). | §1, §2, §3 (segment rows), §4, §5, §6 W-4 and W-8, §7, §8 callout 3, §9 |
 | D-10 | **Lead-acid out of the presets and the prose:** `csb-gp1272`'s stated 23 mΩ and 276 A do not satisfy `Isc = Voc / Rint` and have no test conditions. | §1, §8 |
-| D-11 | **One Source segment, six keys in two fixed rows:** `AA`, `9 V`, `NiMH`, `CR2032` / Custom, Divider, with a forced break before Custom (all six need about 500 px against about 300–315 px of controls column). Preset keys write their values into always-visible Voc and Rint controls; editing either selects Custom. | §3 |
+| D-11 | **One Source segment, six keys in three fixed rows of two:** `AA`, `9 V` / `NiMH`, `CR2032` / Custom, Divider, each break an `aria-hidden` element, one radio group, arrow order unchanged (all six need about 500 px against 256–315 px of controls column). Amended 2026-10-30 from two rows (four batteries, then Custom and Divider): the four-battery row (about 300 px) wrapped on its own at 900 and 1280 px; three rows measure 124 / 168 / 194 px (EN) at 320–900 px. Preset keys write their values into always-visible Voc and Rint controls; editing either selects Custom. | §3 |
 | D-12 | **Two instances:** battery (`source="aa"`) in section 2, divider (`source="divider"`) in section 6; each can switch to any source. | §2, §9 |
 | D-13 | **Load not E24**, log, battery 10 mΩ – 10 kΩ (unchanged for the coin cell: its 10 Ω is mid-range), divider 100 Ω – 1 MΩ, 3 significant figures. R1 and R2 stay E24. | §2, §3 |
 | D-14 | **A Load switch**, default on, `loaded` prop; the Load control stays rendered while off. Off = the open-circuit reading. | §2, §3, §4 |
@@ -1322,7 +1335,7 @@ item is open.
 | D-20 | **Symbols:** `schBattery` (`kind` `cell` / `battery`, vertical only, + at the top, thick short plate, 4 units); AA, NiMH and CR2032 as `cell`, 9 V as `battery`; `schBox` (dashed enclosure); Custom and Vin use `schSource`; Rint is a `schResistor` in the box; divider mode draws the divider in the box with `Vth` / `Rth` labels. | §4 |
 | D-21 | **Nameplate** `V = Voc − I · Rint` / `V = Vth − I · Rth`, accent on `I · Rint`, U+2212 minus. | §4 |
 | D-22 | **Callouts 1 and 2:** "Never short a battery" before the bench measurement (section 3); "Shorted lithium-ion cells start fires" before W-5 (section 5). Callout 3 per D-9 (section 4). | §8, §9 |
-| D-23 | **One lesson, 14 minutes, two instances:** id `00-fundamentals/07-real-sources`, slugs `real-sources` / `fuentes-reales`, seven sections. The coin cell's half minute in section 4 is offset by shortening W-7 in section 6. | §9 |
+| D-23 | **One lesson, 17 minutes, two instances:** id `00-fundamentals/07-real-sources`, slugs `real-sources` / `fuentes-reales`, seven sections. The coin cell's half minute in section 4 is partly offset by shortening W-7 in section 6. Amended 2026-10-30 from 14 minutes: the prose came to about 2,980 EN words, so 17 is the honest figure; a maintainer-approved exception to ROADMAP §3 step 1's "~15 min" guideline. | §9 |
 | D-24 | **Heat tone:** warn when the heat inside exceeds the load power (efficiency < 50 %), plain otherwise, both families; Rint drawn hot in that state (battery family). No `danger`, no `signal`, no current threshold. | §4 |
 | D-25 | **Ranges and model:** Voc 1–24 V linear; Rint 10 mΩ – 100 Ω log, not E24; custom defaults 5 V / 1 Ω (model no device); Rint and Voc constant, with the three stated assumptions. | §2, §3, §5 |
 | D-26 | **Canvas `w=32 h=16`** in both families. | §4 |

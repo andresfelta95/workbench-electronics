@@ -255,7 +255,7 @@ interface SourceOption {
               />
               {{ option.label }}
             </label>
-            @if (option.key === 'cr2032') {
+            @if (option.key === '9v' || option.key === 'cr2032') {
               <span class="row-break" aria-hidden="true"></span>
             }
           }
@@ -343,9 +343,12 @@ interface SourceOption {
       margin-top: calc(4 * var(--px));
     }
 
-    /* The forced break between the four batteries and Custom / Divider
-       (brief D-11): it does not depend on the selection, so the segment's
-       height never changes when a key is pressed. */
+    /* Forced breaks after 9 V and after CR2032: three fixed rows of two
+       (AA | 9 V, NiMH | CR2032, Custom | Divider) at every width, since the
+       four batteries do not fit one row of the controls column at 900 or
+       1280 px (coordinator's decision, superseding brief D-11's two rows).
+       The breaks do not depend on the selection, so the segment's height
+       never changes when a key is pressed. */
     .row-break {
       flex-basis: 100%;
       height: 0;
