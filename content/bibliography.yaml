@@ -359,6 +359,57 @@ steinhart-hart-1968:
   identifier: "DOI 10.1016/0011-7471(68)90057-0"
   modules: ["10"]
 
+energizer-ir-bulletin:
+  section: "note"
+  authors: "Energizer"
+  title: "Battery Internal Resistance"
+  container: "Technical Bulletin"
+  edition: "Version 2.0"
+  year: "August 2026"
+  url: "https://data.energizer.com/wp-content/uploads/2026/10/Internal-Resistance-Bulletin.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/general-info. Version 1.1.0 (December 2005) is still served at data.energizer.com/pdfs/batteryir.pdf with the same text, plus \"depending on size\" after the 150 to 300 milliohm range. Fig. 2 is a curve, read to about ±0.03 Ω; its y-axis top label is printed \"10\" where 1.0 is meant. The fig. 2 reading at 20 °C (about 0.13 Ω) is below the 150–300 mΩ stated on p. 1: the curve and the text need not use the same test."
+  modules:
+    - "00-07 (internal resistance is electronic plus ionic resistance, the \"total effective resistance\"; a 1000 Hz impedance test may not capture all of the ionic part, so it typically reads lower; dual-pulse method: total effective resistance = change in voltage ÷ change in current, example 5 mA then a 505 mA pulse, 1.485 V to 1.378 V, 0.107 V / 500 mA = 0.214 Ω; fresh Energizer alkaline cylindrical cells about 150 to 300 mΩ with a 5 mA drain and a 505 mA 100 ms pulse; p. 1 and fig. 1)"
+    - "00-07 (expected loaded voltage = open-circuit voltage − total effective resistance × current, example 1.6 V − 1.0 A × 0.1 Ω = 1.5 V; internal resistance rises during discharge and as temperature drops; \"internal resistance can be calculated based on the voltage drop of the battery under a known load\" and should be taken as a general guideline, not a precise value; p. 2)"
+    - "00-07 (fresh E91 AA total effective resistance vs temperature, fig. 2 p. 2, read from the curve, typical: about 0.9 Ω at -40 °C, 0.4 Ω at -20 °C, 0.22 Ω at 0 °C, 0.13 Ω at 20 °C, 0.1 Ω at 40 °C)"
+
+energizer-alkaline-handbook:
+  section: "note"
+  authors: "Energizer Brands, LLC"
+  title: "Alkaline Manganese Dioxide Handbook and Application Manual"
+  titleStyle: "italic"
+  year: "2018"
+  url: "https://data.energizer.com/pdfs/alkaline_appman.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/battery-handbook-crosssections. Footers read \"©2018 Energizer Brands, LLC\" and \"Page n of 14\" (the file has a 15th page, shipping). Fig. 10 is a curve, read to about ±0.03 Ω."
+  modules:
+    - "00-07 (devices are designed for a range such as 1.6 V to 0.9 V per cell, p. 3; cold raises internal resistance and high drains in the cold cause a large voltage drop, p. 4; abusive conditions such as charging or electrically shorting can produce high levels of hydrogen, p. 4; fresh alkaline cylindrical cells about 150 to 300 mΩ with a 5 mA drain and a 505 mA 100 ms pulse, p. 8; AA/LR6 discharged at 50 mA with 10 mA / 500 mA 1 s pulses at 21 °C: about 0.13 Ω fresh, about 0.2 Ω at mid-life and about 0.65 Ω at the end (about 54 h, 0.8 V), fig. 10 p. 9, read from the curve, typical; a fresh cell tests at about 1.5 V on a load of about 10 Ω for 1–2 s, p. 13)"
+    - "00-07 safety callout (\"Don't carry loose batteries in a pocket or purse with metal objects like coins, paper clips, etc. This could potentially short-circuit the battery, generating high heat.\" and \"Short circuits may cause battery leakage which may result in bodily injury.\", p. 14)"
+
+energizer-lithium-coin-manual:
+  section: "note"
+  authors: "Energizer"
+  title: "Primary Lithium Coin Handbook and Application Manual"
+  titleStyle: "italic"
+  year: "2026"
+  url: "https://data.energizer.com/wp-content/uploads/2026/05/Lithium-Coin-app-manual-0526.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/battery-handbook-crosssections. Undated; the file name says 05/26 and it was uploaded in May 2026. Six pages, no printed page numbers (counted from the first page). The IR-vs-capacity curve is read to about ±3 Ω."
+  modules:
+    - "00-07 (CR2032 internal resistance: \"the starting IR of a 2032 battery is near 10 ohms. the starting IR of AA alkaline batteries is near 0.25 ohms\"; dual-pulse example on a fresh 2032 with a 1 MΩ background drain and a 25 Ω 50 ms pulse: (3.279 V − 2.429 V) ÷ (0.097 A − 0.000003 A) = 9 Ω; IR rises during discharge: with a 75 Ω (about 30 mA) pulse, about 10 Ω fresh, about 15 Ω at 100 mAh, about 36 Ω at 200 mAh, about 65 Ω at the end near 210 mAh, read from the curve, typical; p. 4)"
+    - "00-07 (nominal 3 V, Li/MnO2, p. 1; cold temporarily raises the internal resistance and the effect reverses when the cell warms up, p. 3; swallowing a coin cell is a serious hazard, p. 6)"
+
+energizer-nimh-handbook:
+  section: "note"
+  authors: "Energizer"
+  title: "Nickel Metal Hydride (NiMH) Handbook and Application Manual"
+  titleStyle: "italic"
+  edition: "Version NiMH02.01"
+  year: "2010"
+  url: "https://data.energizer.com/wp-content/uploads/2020/11/nimhhandbook_ver2-2.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/battery-handbook-crosssections. Footers read \"©2010 Energizer\" and \"Page n of 15\"."
+  modules:
+    - "00-07 (\"The IR of fresh, fully charged NiMH batteries is typically less than 50 milliohms\"; it stays relatively constant during discharge until near the end, where it rises sharply, and it rises with age and cycling; at the 0.2C rate the voltage drops quickly from an open-circuit voltage of about 1.4 V to the 1.2 V plateau; p. 6)"
+    - "00-07 safety callout (\"Nickel metal hydride batteries can generate high currents if shorted. These currents are sufficient to cause burns or ignition of flammable materials.\", p. 14)"
+
 # ---------------------------------------------------------------------------
 # §3 Standards and specifications
 # ---------------------------------------------------------------------------
@@ -560,6 +611,85 @@ vishay-mbx-sma:
   modules:
     - "00-06 (rated dissipation P70 in power mode 0.4 W, 0.6 W, 1.0 W for 0204, 0207, 0414, with 155 °C maximum film temperature; in standard mode 0.25 W, 0.4 W, 0.65 W with 125 °C, p. 2; derating from 70 °C to zero at 125 °C (standard) or 155 °C (power), p. 8; the rise of surface temperature at each size's power-mode rating is about 85 K, curve p. 8, so θ ≈ 210 K/W (0204), ≈ 140 K/W (0207) and ≈ 85 K/W (0414), typical, derived; the rise depends on heat flow into the circuit board, Application Information p. 2)"
 
+energizer-nh15-2500:
+  section: "datasheet"
+  authors: "Energizer Holdings, Inc."
+  title: "Energizer NH15-2500"
+  container: "Product Datasheet"
+  identifier: "Form No. EBC-7102T"
+  url: "https://data.energizer.com/pdfs/nh15-2500.pdf"
+  comment: "Checked 2026-10-30. Energizer's product index lists the NH15-2500mAh as Obsolete but still serves this datasheet; no datasheet was found for the active NH15-2300mAh (data.energizer.com product pages no longer link technical data sheets). Undated."
+  modules:
+    - "00-07 (AA NiMH, nominal 1.2 V, 2500 mAh at 0.2C to 1.0 V; internal resistance 30 mΩ charged and 40 mΩ half discharged, ±20 %; AC impedance 12 mΩ at 1000 Hz, charged cell, 1.0 A AC; p. 1)"
+
+duracell-mn1500:
+  section: "datasheet"
+  authors: "Duracell"
+  title: "MN1500 Size: AA (LR6) Alkaline-Manganese Dioxide Battery"
+  identifier: "MN15CTUS0413"
+  url: "https://cdn.prod.website-files.com/6835fa821f0f20d8b0b5851c/6899df9f44f36b0ff09313c0_MN1500_US_CT.pdf"
+  comment: "Checked 2026-10-30; linked from duracell.com/techlibrary/product-technical-data-sheets. Corroborates the Energizer alkaline figures from a second maker. The DC resistance is a curve (Typical Duracell AA Performance, p. 2), read to about ±0.02 Ω; the chart gives a high-rate (1 A 5 min, 2 A 1 s) and a low-rate (0.1 A 1 h, 0.5 A 1 s) test but one resistance line without saying which."
+  modules:
+    - "00-07 (nominal 1.5 V; impedance 120 mΩ at 1 kHz, p. 1; DC resistance about 0.09 Ω near the start, about 0.15 Ω at 50 % and about 0.30 Ω at 100 % depth of discharge, read from the curve on p. 2, typical)"
+
+duracell-mn1604:
+  section: "datasheet"
+  authors: "Duracell"
+  title: "MN1604 Size: 9V (6LR61) Alkaline-Manganese Dioxide Battery"
+  identifier: "MN9VCTUS0413"
+  url: "https://cdn.prod.website-files.com/6835fa821f0f20d8b0b5851c/6899e0514f55483c85ab418c_MN1604_US_CT.pdf"
+  comment: "Checked 2026-10-30; linked from duracell.com/techlibrary/product-technical-data-sheets. Energizer gives no internal resistance for its 522 9 V battery (form 522GL1019), so the 9 V figures come from Duracell. The DC resistance is a curve (Typical Duracell 9V Performance, p. 2), read to about ±0.2 Ω."
+  modules:
+    - "00-07 (nominal 9 V, ANSI 1604A, IEC 6LR61; impedance 1,700 mΩ at 1 kHz, p. 1; DC resistance about 2.3 Ω near the start, about 3.1 Ω at 50 % and about 4.1 Ω at 100 % depth of discharge, high rate 30 mA 1 h / 250 mA 1 s, read from the curve on p. 2, typical; fresh voltage under light loads starts at about 9.5–9.7 V, constant-current and constant-power curves, pp. 1–2)"
+
+energizer-alkaline-ais-2025:
+  section: "datasheet"
+  authors: "Energizer Brands, LLC"
+  title: "Alkaline Manganese Dioxide-Zinc Batteries"
+  container: "Article Information Sheet/Safety Data Sheet"
+  year: "December 2025"
+  identifier: "Document Number 1225-Alk"
+  url: "https://data.energizer.com/wp-content/uploads/2026/01/alkaline-12-25-Energizer.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/ais-sds. Marked valid until December 2028. It replaces document 0318-Alk (energizer-alkaline-ais), whose URL returned 404 on 2026-10-30; the 00-04 recharging sentence is still in it word for word (p. 3)."
+  modules:
+    - "00-07 safety callout (\"Accidental short circuit for a few seconds will not seriously affect the battery. Prolonged short circuit will cause the battery to lose energy through heating, and can cause the safety release vent to open.\"; the label insulates the can and damage to it increases the potential for a short circuit; Section 7, p. 3)"
+
+energizer-coin-ais:
+  section: "datasheet"
+  authors: "Energizer Brands, LLC"
+  title: "Coin/Button Lithium Manganese Dioxide Battery"
+  container: "Article Information Sheet/Safety Data Sheet"
+  year: "December 2025"
+  identifier: "Document Number 1223 – Lithium Coin"
+  url: "https://data.energizer.com/wp-content/uploads/2026/01/Lithium-Coin-Batteries-AIS-SDS-12-25-Energizer.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/ais-sds. Marked valid until December 2028; the document number reads 1223 and the footers ©2024, although it is dated December 2025. Covers CR2032 among other sizes. No printed page numbers; pages counted from the first."
+  modules:
+    - "00-07 safety callout (\"Prolonged short circuit will cause the battery to lose energy, generate significant heat and can cause the safety release vent to open.\"; \"Battery can explode or leak and cause burns if installed backwards, disassembled, charged, or exposed to water, fire or high temperature.\"; \"Swallowing may lead to serious injury or death in as little as 2 hours due to chemical burns and potential perforation of the esophagus. Immediately see doctor […] Keep in original package until ready to use. Dispose of used batteries immediately.\"; Section 7, p. 3; ingestion: \"Do not induce vomiting or give food or drink. Seek medical attention immediately.\", Section 4, p. 2; dispose of in accordance with applicable local regulations, Sections 12 and 13, pp. 4–5)"
+
+energizer-nimh-ais:
+  section: "datasheet"
+  authors: "Energizer Brands, LLC"
+  title: "Nickel Metal Hydride Batteries"
+  container: "Article Information Sheet/Safety Data Sheet"
+  year: "December 2025"
+  identifier: "Document Number 1225-NiMH"
+  url: "https://data.energizer.com/wp-content/uploads/2026/01/Nickel-Metal-Hydride-AIS-SDS-12-25-Energizer.pdf"
+  comment: "Checked 2026-10-30; linked from data.energizer.com/ais-sds. Marked valid until December 2028. Its Mechanical Containment paragraph says \"alkaline batteries\", apparently copied from the alkaline sheet."
+  modules:
+    - "00-07 safety callout (\"Accidental short circuit for a few seconds will not seriously affect the battery. Prolonged short circuit will cause the battery to lose energy through heating, and can cause the safety release vent to open.\", Section 7, p. 3)"
+
+csb-gp1272:
+  section: "datasheet"
+  authors: "CSB Battery Co., Ltd."
+  title: "GP1272 Datasheet"
+  container: "GP Series, 12V Top Terminal VRLA-AGM"
+  year: "31 Jan. 2026"
+  identifier: "RA260131"
+  url: "https://csb-battery.com/wp-content/uploads/2026/03/CSB-Datasheet-GP1272-01312026.pdf"
+  comment: "Checked 2026-10-30. No test conditions are given for the internal resistance or the short-circuit current. 12 V ÷ 23 mΩ would be about 520 A, so the stated 276 A is not simply V/R and was presumably measured another way. Sealed lead-acid is not among the batteries ROADMAP §3.1 allows."
+  modules:
+    - "00-07 (12 V sealed lead-acid, 7.46 Ah at the 8 h rate: internal resistance approx. 23.0 mΩ, short circuit current 276 A, max discharge current 130 A (100 A with F1 terminals), p. 1)"
+
 # ---------------------------------------------------------------------------
 # §5 Online courses, references and tools
 # ---------------------------------------------------------------------------
@@ -576,6 +706,7 @@ kuphaldt-liec:
   modules:
     - "00–07"
     - "00-06 (Vol. I ch. 2 \"Calculating Electric Power\": P = I²R and P = E²/R, Joule's law; ch. 2 \"Resistors\": resistors are rated in watts for the heat they can dissipate without overheating, and the power rating is roughly proportional to physical size; checked 2026-10-28 through a web.archive.org copy because the live site refuses scripted requests)"
+    - "00-07 (Vol. I ch. 10 \"DC Network Analysis\", section \"Thevenin's Theorem\": any linear circuit can be simplified to a single voltage source and series resistance connected to a load, and the theorem is especially useful when the load resistance changes; section \"Maximum Power Transfer Theorem\": \"the maximum amount of power will be dissipated by a load resistance when that load resistance is equal to the Thevenin/Norton resistance of the network supplying the power\", and maximum power transfer does not coincide with maximum efficiency; checked 2026-10-30 on the author's original copy at ibiblio.org/kuphaldt/electricCircuits/DC/DC_10.html because allaboutcircuits.com and web.archive.org returned 403)"
 
 mit-6002-2007:
   section: "web"
@@ -585,7 +716,7 @@ mit-6002-2007:
   publisher: "MIT OpenCourseWare"
   year: "Spring 2007"
   url: "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/"
-  modules: ["00", "02", "03", "06"]
+  modules: ["00", "02", "03", "06", "00-07 (Lecture 3 \"Superposition, Thévenin and Norton\", listed on the course's Lecture Notes page, checked 2026-10-30; the page says the notes are from Fall 2000)"]
 
 bu-403:
   section: "web"
@@ -596,6 +727,17 @@ bu-403:
   modules:
     - "00-03"
     - "00-04 (lead-acid charge limit 2.30–2.45 V per cell, 13.8–14.7 V for six cells; float 2.25–2.27 V per cell; 2.10 V per cell, 12.6 V, is about 90 % charged)"
+
+wa-battery-burn-2021:
+  section: "web"
+  authors: "Government of Western Australia, Department of Local Government, Industry Regulation and Safety (Building and Energy)"
+  title: "Battery burn warning after pocket fires like 'flares and fireworks'"
+  container: "Media release"
+  year: "23 June 2021"
+  url: "https://www.wa.gov.au/government/announcements/battery-burn-warning-after-pocket-fires-flares-and-fireworks"
+  comment: "Checked 2026-10-30. A state energy-safety regulator's release, quoting WA's Director of Energy Safety; the page shows a later \"last updated\" date. Chosen because no cell maker's handling sheet with an explicit external-short-to-fire statement could be retrieved (see BIBLIOGRAPHY.md §8)."
+  modules:
+    - "00-07 safety callout (Li-ion: \"Loose lithium-ion batteries can ignite if they touch coins or keys\"; WA's Director of Energy Safety \"said lithium-ion batteries are at risk of short-circuiting and exploding if metal objects like keys and coins make contact with the exposed terminals\"; a loose vape cell shorted by coins in a pocket caught fire and caused burns that needed skin grafts)"
 
 kicad-9-docs:
   section: "web"
@@ -685,7 +827,7 @@ openstax-fisica-u2-es:
   title: "Física universitaria, volumen 2"
   url: "https://openstax.org/books/física-universitaria-volumen-2"
   lang: "es"
-  modules: ["00", "01", "02", "00-06 (§9.5 Energía eléctrica y potencia: P = IV = I²R = V²/R, a resistor dissipates the power as heat)"]
+  modules: ["00", "01", "02", "00-06 (§9.5 Energía eléctrica y potencia: P = IV = I²R = V²/R, a resistor dissipates the power as heat)", "00-07 (§10.1 Fuerza electromotriz, subsection \"Resistencia interna y voltaje de los terminales\": a real battery has internal resistance r, the terminal voltage is the emf minus Ir and falls as the current rises, and r generally rises as the battery runs down; checked 2026-10-30 at openstax.org/books/física-universitaria-volumen-2/pages/10-1-fuerza-electromotriz)"]
   comment: "Ch. 9 (current and resistance), 10 (DC circuits, Kirchhoff's rules, RC circuits), 14 (inductance), 15 (AC circuits); free, openly licensed"
 
 hyperphysics-es:
@@ -695,7 +837,7 @@ hyperphysics-es:
   publisher: "Georgia State University"
   url: "https://hyperphysics.gsu.edu/hbasees/electric/ohmlaw.html"
   lang: "es"
-  modules: ["00", "02", "00-06 (page \"Potencia Eléctrica\", hbasees/electric/elepow.html: P = VI and the power dissipated in a resistor)"]
+  modules: ["00", "02", "00-06 (page \"Potencia Eléctrica\", hbasees/electric/elepow.html: P = VI and the power dissipated in a resistor)", "00-07 (page \"Teorema de Thevenin\", hbasees/electric/thevenin.html: any two-terminal combination of batteries and resistors can be replaced by one voltage source and one series resistor, the voltage being the open-circuit terminal voltage and the resistance that voltage divided by the short-circuit current; page \"Fuentes de Voltaje y de Corriente\", hbasees/electric/visource.html: a real voltage source is an ideal source with a series resistance; checked 2026-10-30)"]
 
 phet-cck-es:
   section: "es"

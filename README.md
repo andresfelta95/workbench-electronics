@@ -144,8 +144,9 @@ written" rather than disappearing — the full path is public from day one.
 3. Reference it from any lesson with `::widget{type="your-type"}`, unindented
    on a line of its own; a malformed `::widget` line fails the build.
 
-Reuse `app-panel`, `app-control` and `app-readout` from `src/app/ui/`, and the
-symbols in `src/app/schematic/`. Every instrument must be operable from the
+Reuse `app-panel`, `app-control` and `app-readout` from `src/app/ui/` (and
+`app-curve` there for a static XY plot), and the symbols in
+`src/app/schematic/`. Every instrument must be operable from the
 keyboard: `app-control` pairs its slider with a real text box for that reason.
 Before you start, work through the "Adopting the skin in a new widget" checklist
 in [docs/DESIGN-PIXEL-ART.md](docs/DESIGN-PIXEL-ART.md).

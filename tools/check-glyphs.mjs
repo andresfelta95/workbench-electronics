@@ -50,6 +50,7 @@ const CODE_DIRS = ['src/app/widgets', 'src/app/ui', 'src/app/schematic'];
 const SPOKEN_INPUTS = [
   { selector: 'app-panel', input: 'headingLabel' },
   { selector: 'sch-canvas', input: 'label' },
+  { selector: 'app-curve', input: 'label' },
 ];
 
 const rel = (file) => path.relative(ROOT, file).split(path.sep).join('/');
