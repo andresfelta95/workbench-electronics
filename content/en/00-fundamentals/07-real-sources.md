@@ -69,9 +69,10 @@ circuit, 0.1 Ω inside and 1.0 A. The drop is `1.0 A · 0.1 Ω = 0.1 V`, so the
 terminals give `1.6 V − 0.1 V = 1.5 V`.
 
 The instrument writes the formula at the top, with `I · Rint` highlighted. The
-dashed box in the drawing is the battery; what is inside it is the model. The ideal source has the battery symbol: a long thin
-plate and a short thick plate. The long plate is +. Which end is + and which
-is − is the battery's **polarity**: the + end is at the higher voltage.
+dashed box in the drawing is the battery; what is inside it is the model. The
+ideal source has the battery symbol: a long thin plate and a short thick
+plate. The long plate is +. Which end is + and which is − is the battery's
+**polarity**: the + end is at the higher voltage.
 
 ::widget{type="thevenin" source="aa" rload="10"}
 
@@ -228,9 +229,9 @@ of the source's power that reaches the load:
 
 `efficiency = load power / (load power + heat inside)`
 
-One current flows through RL and
-Rint, so by `P = I² · R` the power splits in the ratio of their resistances.
-At the peak they are equal, so half heats the source. Maximum power transfer
+One current flows through RL and Rint, so by `P = I² · R` the power splits in
+the ratio of their resistances. At the peak they are equal, so half heats the
+source. Maximum power transfer
 is not maximum efficiency. Batteries work far to the right of the peak: on
 10 Ω the AA runs at 97.6 %. The peak matters where a source's resistance is
 fixed and its power small, such as a headphone output (module 08).
@@ -269,8 +270,8 @@ load or open one at the bench.
 
 The fourth key, CR2032, is that coin cell, in the instrument only. It uses
 3.2 V and 10 Ω (Energizer puts a fresh one near 10 ohms). Press CR2032 with
-the load at 10 Ω. With Load off it reads 3.2 V.
-`Isc = 3.2 V / 10 Ω`, which is 320 mA, and `Pmax = 3.2² / 40 = 256 mW`. With Load on,
+the load at 10 Ω. With Load off it reads 3.2 V. `Isc = 3.2 V / 10 Ω`, which
+is 320 mA, and `Pmax = 3.2² / 40 = 256 mW`. With Load on,
 `I = 3.2 V / 20 Ω = 160 mA` and `V = 1.6 V`: half the voltage is lost inside.
 Load power reads 256 mW at 50 % efficiency: this ordinary 10 Ω load sits on
 the coin cell's peak.
@@ -283,9 +284,9 @@ because its resistance is forty times larger.
 
 Energizer's coin-cell manual shows the same. A fresh 2032 read 3.279 V with
 only a 1 MΩ load, and 2.429 V during a **pulse**, a load connected for a short
-time: 50 ms on 25 Ω, about 97 mA. So `3.279 V − 2.429 V = 0.85 V`, and `0.85 V / 0.097 A = 9 Ω`
-(8.76 Ω before rounding). Type `25` in Load: 2.286 V and 91.4 mA. The maker
-tests in short pulses, not with a steady load.
+time: 50 ms on 25 Ω, about 97 mA. So `3.279 V − 2.429 V = 0.85 V`, and
+`0.85 V / 0.097 A = 9 Ω` (8.76 Ω before rounding). Type `25` in Load: 2.286 V
+and 91.4 mA. The maker tests in short pulses, not with a steady load.
 
 Rint also rises with use, from about 10 Ω to about 65 Ω near the end of life
 (read from the manual's curve, typical). Type `65` in Internal resistance,

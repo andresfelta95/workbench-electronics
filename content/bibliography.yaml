@@ -664,7 +664,7 @@ energizer-coin-ais:
   url: "https://data.energizer.com/wp-content/uploads/2026/01/Lithium-Coin-Batteries-AIS-SDS-12-25-Energizer.pdf"
   comment: "Checked 2026-10-30; linked from data.energizer.com/ais-sds. Marked valid until December 2028; the document number reads 1223 and the footers ©2024, although it is dated December 2025. Covers CR2032 among other sizes. No printed page numbers; pages counted from the first."
   modules:
-    - "00-07 safety callout (\"Prolonged short circuit will cause the battery to lose energy, generate significant heat and can cause the safety release vent to open.\"; \"Battery can explode or leak and cause burns if installed backwards, disassembled, charged, or exposed to water, fire or high temperature.\"; \"Swallowing may lead to serious injury or death in as little as 2 hours due to chemical burns and potential perforation of the esophagus.\"; Section 7, p. 3)"
+    - "00-07 safety callout (\"Prolonged short circuit will cause the battery to lose energy, generate significant heat and can cause the safety release vent to open.\"; \"Battery can explode or leak and cause burns if installed backwards, disassembled, charged, or exposed to water, fire or high temperature.\"; \"Swallowing may lead to serious injury or death in as little as 2 hours due to chemical burns and potential perforation of the esophagus. Immediately see doctor […] Keep in original package until ready to use. Dispose of used batteries immediately.\"; Section 7, p. 3; ingestion: \"Do not induce vomiting or give food or drink. Seek medical attention immediately.\", Section 4, p. 2; dispose of in accordance with applicable local regulations, Sections 12 and 13, pp. 4–5)"
 
 energizer-nimh-ais:
   section: "datasheet"

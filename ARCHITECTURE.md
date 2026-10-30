@@ -131,13 +131,13 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (596 lines, plus a 269-line spec)
-│       ├── i18n/ui.ts          ← every UI string, both languages (463 lines)
-│       ├── lesson/             ← the Markdown → components renderer (351 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (572 lines)
+│       ├── lesson/             ← the Markdown → components renderer (352 lines)
 │       ├── pages/              ← the five routed views (1051 lines)
-│       ├── schematic/          ← SVG symbol library (444 lines, plus a 218-line spec)
-│       ├── ui/                 ← panel, control, readout primitives (627 lines)
+│       ├── schematic/          ← SVG symbol library (532 lines, plus a 485-line spec)
+│       ├── ui/                 ← panel, control, readout, curve primitives (1004 lines, plus a 274-line spec)
 │       │   └── curve.ts        ← app-curve: static XY plot (00-07), with curve.spec.ts
-│       ├── widgets/            ← the instruments (2372 lines, plus 1081 lines of maths specs)
+│       ├── widgets/            ← the instruments (3326 lines, plus 1553 lines of maths specs)
 │       │   └── thevenin/       ← 00-07's instrument; arithmetic in thevenin-math.ts + spec
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
@@ -148,7 +148,7 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 7,000 lines of source, plus ~21,000 words of lesson prose so far.
+Roughly 8,500 lines of source, plus ~28,000 words of lesson prose so far.
 
 ---
 
@@ -256,7 +256,7 @@ makes the prerenderer wait.
 
 The widget registry is a plain map of `type → () => import(...)`, so a lesson
 downloads only the instruments it references. Each instrument is its own lazy
-chunk of 5.6–10.3 kB.
+chunk of 5.6–22.8 kB.
 
 ### 4.4 The instruments
 
@@ -364,15 +364,18 @@ not injected after hydration.
 |---|---|---|
 | `main.js` | 314 kB | **88 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
-| Per-lesson chunk | 7.8–22.4 kB | 2.7–6.8 kB |
-| Per-instrument chunk | 5.6–10.3 kB | 2.0–3.2 kB |
+| Per-lesson chunk | 7.8–33.4 kB | 2.7–10.2 kB |
+| Per-instrument chunk | 5.6–22.8 kB | 2.0–6.7 kB |
 
 Gzipped figures are the build's "estimated transfer size" (2026-10-02, from
 `pnpm build --verbose`, which lists every lazy chunk; per-lesson row updated
 2026-10-21, when the lessons gained `references:`; per-lesson and
 per-instrument rows updated 2026-10-28, with 00-05 and `meter-loading`, and
 the per-lesson row again on 2026-10-28, with 00-06; `power-dissipation` is
-6.3 kB / 2.6 kB, inside the per-instrument range).
+6.3 kB / 2.6 kB, inside the per-instrument range; both rows updated
+2026-10-30, with 00-07: its lesson chunks are 29.6 / 8.9 kB (EN) and
+33.4 / 10.2 kB (ES), and `thevenin`, which bundles `app-curve`, is
+22.8 / 6.7 kB).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -551,9 +554,8 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   one `*-math.spec.ts` per widget (Ohm's law, series/parallel, divider,
   Kirchhoff, meter loading, power dissipation, Thévenin),
   `ui/curve.spec.ts` (the `app-curve` plot) and
-  `schematic/schematic.spec.ts` (the meter, battery and box symbols), 143 tests. `pnpm test:ci`
-  runs them once and needs no
-  `pnpm content` first.
+  `schematic/schematic.spec.ts` (the meter, battery and box symbols), 198
+  tests. `pnpm test:ci` runs them once and needs no `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
   `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x
   ratios for a fixed pair list and regenerates the table in

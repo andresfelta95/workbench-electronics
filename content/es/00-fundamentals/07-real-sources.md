@@ -72,10 +72,10 @@ terminales dan `1,6 V − 0,1 V = 1,5 V`.
 
 El instrumento escribe la fórmula arriba, con `I · Rint` resaltado. El
 recuadro de líneas cortadas del dibujo es la pila; lo que hay dentro es el
-modelo. La fuente ideal lleva el símbolo de
-pila: una placa larga y delgada y una placa corta y gruesa. La placa larga es
-el +. Cuál extremo es el + y cuál el − es la **polaridad** de la pila: el + es
-el extremo que está a mayor tensión.
+modelo. La fuente ideal lleva el símbolo de pila: una placa larga y delgada y
+una placa corta y gruesa. La placa larga es el +. Cuál extremo es el + y cuál
+el − es la **polaridad** de la pila: el + es el extremo que está a mayor
+tensión.
 
 ::widget{type="thevenin" source="aa" rload="10"}
 
@@ -240,9 +240,8 @@ ningún fabricante especifica una AA para 3,2 A.
 
 `eficiencia = potencia en la carga / (potencia en la carga + calor interno)`
 
-Por RL y por
-Rint pasa una sola corriente, así que, por `P = I² · R`, la potencia se reparte
-en la proporción de sus resistencias. En el pico son iguales, así que la mitad
+Por RL y por Rint pasa una sola corriente, así que, por `P = I² · R`, la
+potencia se reparte en la proporción de sus resistencias. En el pico son iguales, así que la mitad
 calienta la fuente. La máxima transferencia de potencia no es la máxima
 eficiencia. Las pilas trabajan muy a la derecha del pico: con 10 Ω, la AA
 funciona al 97,6 %. El pico importa donde la resistencia de una fuente es fija
@@ -301,9 +300,8 @@ El manual de pilas de botón de Energizer muestra lo mismo. Una 2032 nueva marc�
 3,279 V con solo una carga de 1 MΩ, y 2,429 V durante un **pulso**, una carga
 conectada por un tiempo corto: 50 ms sobre 25 Ω, unos 97 mA. Así,
 `3,279 V − 2,429 V = 0,85 V`, y `0,85 V / 0,097 A = 9 Ω` (8,76 Ω antes de
-redondear). Escribe `25`
-en «Carga»: 2,286 V y 91,4 mA. El fabricante mide con pulsos cortos, no con una
-carga fija.
+redondear). Escribe `25` en «Carga»: 2,286 V y 91,4 mA. El fabricante mide con
+pulsos cortos, no con una carga fija.
 
 Rint también sube con el uso, de unos 10 Ω a unos 65 Ω cerca del final de la
 vida de la pila (leído de la curva del manual, valores típicos). Escribe `65`
@@ -343,8 +341,8 @@ Presiona 9 V y escribe `1` en «Carga», solo en el instrumento:
 - Potencia en la carga de 8,46 W, el 84,5 % del máximo de 10 W
 - Calor interno de 19,5 W, eficiencia del 30,3 %
 
-Son predicciones del modelo, no valores para los que esté especificada una pila de
-9 V real.
+Son predicciones del modelo, no valores para los que esté especificada una
+pila de 9 V real.
 
 La lección 05 dijo que una pila de 9 V empujaría hasta 5 A por los 1,8 Ω del
 borne mA y 300 A por los 0,03 Ω del borne A, menos en la práctica por la

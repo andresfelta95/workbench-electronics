@@ -1,5 +1,103 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: 00-07 Real sources: internal resistance and Thévenin (2026-10-30)
+
+This is an independent check of branch `content/00-07-real-sources` at
+`b9e525d` (five commits on `main` `d9ea7a1`), plus the trivial fixes listed
+below, which are left uncommitted. I re-ran every gate, typed every worked
+example into both instances in both languages, re-did the arithmetic, and
+re-downloaded and re-read the sources from their published URLs instead of
+relying on the implementers' reports.
+
+**Ready to merge: yes.** No Blocker, Major or Minor finding is open. Eight
+Suggestions are listed; four of them concern shared code or earlier lessons
+outside this change.
+
+### What changed
+
+- New lesson `00-fundamentals/07-real-sources` (EN `real-sources`, ES
+  `fuentes-reales`, 17 minutes, a maintainer-approved exception, brief D-23):
+  five sections plus the opening, two `thevenin` instances (`source="aa"`
+  and `source="divider"`), three `:::safety` callouts, two `:::key`, a
+  closing `:::note`; 17 reference ids, the same in EN and ES.
+- New instrument `src/app/widgets/thevenin/` (component, pure maths, 27-test
+  spec), registered in `widget-registry.ts`; 30 new `ui.ts` keys in EN and ES.
+- New shared code from step 3: `schBattery` and `schBox` in
+  `schematic/schematic.ts` (spec 12 → 30 tests) and the `app-curve`
+  primitive `ui/curve.ts` (10-test spec); `app-curve` `label` added to
+  `SPOKEN_INPUTS` in `tools/check-glyphs.mjs`.
+- 12 new sources in `content/bibliography.yaml` and `docs/BIBLIOGRAPHY.md`,
+  00-07 notes on `kuphaldt-liec`, `mit-6002-2007`, `openstax-fisica-u2-es`,
+  `hyperphysics-es`, six new BIBLIOGRAPHY §8 rows.
+- `docs/briefs/thevenin.md` (binding, D-1 to D-30 with the 2026-10-30
+  amendments to D-11 and D-23); glossary 00-07 section; ROADMAP (module 00
+  7 of 7, A1, A2 note, §3.1 coin-cell rows), ARCHITECTURE, DESIGN-PIXEL-ART,
+  README.
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `pnpm build --verbose` (inside `flock`, copied to `/tmp/vf7-dist`) | Pass, before and after my fixes: content OK (7 lessons × 2), glyphs **1278** instrument strings all covered, **41 prerendered routes** (39 + the two 00-07 pages). `main` 325.54 kB / 90.84 kB. `thevenin` chunk 22.82 kB / 6.68 kB (it bundles `app-curve`); 00-07 lesson chunks 29.57 / 8.94 kB (EN) and 33.38 / 10.15 kB (ES). |
+| `pnpm test:ci` | **10 files, 198 tests pass** (format 33, ohm-law 12, resistor-network 14, divider 16, kirchhoff 14, meter-loading 23, power-dissipation 19, thevenin 27, curve 10, schematic 30). |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ `prefers-contrast: more`) pass; table current (the plot uses existing tokens only). |
+| `pnpm check:glyphs` | 1278 strings, all covered; no `×`, `∞`, `≈`, `η` or subscripts in visible instrument text. |
+| axe on the private copy | **0 violations**, 41 routes × 4 theme states = **164 pages** (light 0, system-dark 0, dark 0, light-forced 0), before and after my fixes. |
+| Behaviour test (Playwright, outside the repo), EN and ES, both instances, keyboard only | **219 checks pass**, 0 fail, no console or page errors. Every number typed into the controls, value + note + tone of all four readouts: W-1 1.561 V "39 mV lost inside", 156 mA "short circuit: 6.4 A (computed)", 244 mW "9.5% of its 2.56 W maximum", 6.09 mW "efficiency 97.6%"; Load off (Space on the switch): 1.6 V "open circuit", 0 A (Isc note kept), 0 W "0%…", 0 W "no load", switch "Load: None", RL and its wires gone, no flow, filled marker and guide gone, hollow peak kept, Load control still rendered; 100 Ω → 1.596 V / 3.99 mV; 1k → 1.6 V / 400 µV; 9 V at 10 Ω 7.805 V, 6.09 W, 60.8%, 1.4 W, 81.3%; W-2 9.501 V "99.3 mV", 43.2 mA "4.17 A", 410 mW "4.1% of its 10 W", 4.29 mW 99%; NiMH at 10 Ω 1.196 V, 120 mA, 143 mW 1.2% of 12 W, 429 µW, Isc 40 A; W-3 at 0.25 800 mV / 800 mV, 3.2 A, 2.56 W 100%, 2.56 W 50% **plain**, Rint not hot, filled marker centred on the hollow one; mirror 2.5 / 0.025 both 846 mW; 0.24 → 49% **warn**, Rint hot; 0.1 → 2.09 W 81.6%, 5.22 W 28.6% warn; CR2032 off 3.2 V, on 1.6 V "1.6 V lost inside", 160 mA "320 mA (computed)", 256 mW 100%, 50% plain, peak at mid-plot; 100 Ω 2.909 V "291 mV", 29.1 mA, 84.6 mW 33.1%, 8.46 mW 90.9%; 25 Ω 2.286 V / 91.4 mA; typing 65 in Internal resistance selects Custom (radio, box name, `schSource` drawn), 100 Ω → 1.939 V, Isc 49.2 mA; W-5 9 V at 1 Ω 2.909 V "6.69 V", 2.91 A, 8.46 W 84.5%, 19.5 W 30.3% warn, Rint hot, spoken label ends "That is more than the load gets."; 1.8 → 2.34 A, 0.03 → 4.12 A; AA then 0.13 in Internal resistance → Custom, Isc 12.3 A, max 4.92 W; editing Voc selects Custom and keeps Rint; pressing Custom keeps values, a preset overwrites them; the battery load survives a trip through Divider. Divider instance: W-6 3 V "1.5 V lost inside", 300 µA "900 µA (computed)", 900 µW 88.9% of 1.01 mW, 4.5 mW 16.7% warn, drawing `Vth = 4.5 V`, `Rth = 5 kΩ`; 5k → 2.25 V, 450 µA, 1.01 mW 100%, 5.06 mW; off → 4.5 V, 4.05 mW "no load"; W-7 100 Ω / 100 Ω → 4.48 V, 2 mW 2% of 101 mW, 405 mW 0.5%; 10 k / 4.7 k → 2.18 V; divider state restored after a battery key. The 00-03 `divider` widget at its defaults with its load on shows 3 V, Output impedance 5 kΩ, 300 µA: the same numbers. Clamps: Voc 30 → 24 V, 0.5 → 1 V; Rint 0 → 10 mΩ, 1000 → 100 Ω; battery load 0 → 10 mΩ, 1M → 10 kΩ; Vin 30 → 24 V; R1 50 → 100 Ω; R2 4.8k → 4.7 kΩ (E24); divider load 10 → 100 Ω, 10M → 1 MΩ. Extremes (24 V / 10 mΩ / 10 mΩ: 12 V, 1.2 kA, Isc 2.4 kA, 14.4 kW; 1 V / 100 Ω / 10 kΩ: 990.1 mV, 99 µA, 980 nW): no `NaN`, `Infinity`, `∞`, `undefined`, `×` or `≈` in visible text. Keyboard: one radio group of six per instance (distinct names), arrows move through all six in order and wrap; Tab from the segment goes Voc box → slider → Rint box → slider → load switch → Load box → slider; Enter commits typed values; ES accepts decimal commas (`0,25`, `1,8`). Spoken labels read in full in EN and ES (canvas: plate + circuit + values; curve: range, peak, load, fraction; load-off forms). |
+| Layout, 320 / 375 / 900 / 1280 px, light and dark, EN and ES | No horizontal page or widget overflow at any width. The segment is three rows of two (AA \| 9 V, NiMH \| CR2032, Custom \| Divider / Libre \| Divisor) at every width. Schematic and plot screenshots at 375 and 1280 px, both themes, for AA, 9 V at 10 Ω and 1 Ω, CR2032, Custom at the extremes, divider defaults and 1 MΩ parts: no visible label collisions (the only bounding-box contacts are stacked name/value lines and `0` / `10 mΩ`, `RL` / `10 kΩ` at the plot corners, which do not touch on screen); S-4 notes one edge case. ES «Tensión en los terminales» wraps to two lines at 375–1280 px with the row the same height as its neighbour (the note wraps too), so the brief's condition for keeping it holds. Forced colours: the curve and both markers turn `CanvasText`, hollow vs filled still distinct; reduced motion stops the wire flow; `prefers-contrast: more` matches. |
+| The `+` on the 9 V battery | The step-3 agent kept the brief's position (−18, 8) and relaxed the spec to "glyph centre level with or above the first plate". For `battery` the first long plate is at y = 6, so the `+` sits level with it; for `cell` (plate at 16) it sits above it beside the lead. On screen both read clearly as the long-plate side and nothing collides with `Voc`. I accept it; S-3 asks for the brief's spec text to be amended to match. |
+| Maths | Re-done by hand for every number in both lessons, brief §6 and the spec: 1.6/10.25 = 156.1 mA; 0.1561·0.25 = 39.0 mV; 1.561 V; 0.1561²·10 = 243.7 mW, ·0.25 = 6.09 mW; 1.6·100/100.25 = 1.5960 (3.99 mV); 1.6·1000/1000.25 (400 µV, 1.600 → "1.6 V"); 9.6·10/12.3 = 7.805 V, 6.092 W = 60.8 % of 10.017 W, 1.401 W inside, 81.3 %; 9.6·220/222.3 = 9.5007 V, 43.18 mA, 410.3 mW, 0.099/0.0432 = 2.29 Ω; 0.04/0.156 = 0.256 Ω; 0.25/10 MΩ = 2.5 × 10⁻⁸ = 0.0000025 %, "forty million"; 1.2/10.03 = 119.6 mA, 143.1 mW; 1.6²/1 = 2.56 W; 3.2 A, 800 mV; 1.6/2.75 = 0.5818 A → 846 mW (mirror); 9.6²/9.2 = 10.02 W; 1.44/0.12 = 12 W at 20 A; Isc 6.4 / 4.17 / 40 A; coin 320 mA, 3.2²/40 = 256 mW, 160 mA, 1.6 V; 3.2·100/110 = 2.909 V, 291 mV, 29.09 mA, 84.6 mW = 33.1 %, 90.9 %; ratios 1/20, 1/10, ×40; (3.279 − 2.429)/(0.097 − 0.000003) = 8.763 → 9 Ω; 2.429/25 = 97.2 mA; 3.2·25/35 = 2.286 V, 91.4 mA; 3.2·100/165 = 1.939 V, 3.2/65 = 49.2 mA; 1 mA·10 Ω = 10 mV; 9.6/3.3 = 2.909 A, 6.69 V lost, 8.46 W = 84.5 %, 19.46 W, 30.3 %; 9.6/4.1 = 2.34 A, 9.6/2.33 = 4.12 A, 2.34/0.44 = 5.3 ("more than five times"); 1.6/0.13 = 12.3 A, 2.56/0.52 = 4.92 W; divider 4.5 V, 5 kΩ, 3 V, 300 µA, 900 µW, 4.5²/20 k = 1.0125 mW, 88.9 %, heat 3.6 + 0.9 = 4.5 mW, 0.9/5.4 = 16.7 %, 450 µW equivalent (×10); 5 kΩ: 2.25 V, 450 µA, 4.556 + 0.506 = 5.06 mW; 81/20 k = 4.05 mW; 100/100: 4.4776 V, 2.005 mW, 101.25 mW, 1.98 % → "2%", 405 mW, 0.49 %; 5 k/10 MΩ = 0.05 %. Formulas in code match brief §5 (efficiency as RL/(RL + Rint), divider heat from the real R1 and R2, Isc = Vin/R1). The mirror argument P(k·Rint) = P(Rint/k) is stated and checked in the spec (case 10); the 50 % is derived in prose from equal current through equal resistances and is not attributed to any source. Guards: rint 0, rload 0, voc 0, rint + rload 0, r1 + r2 0, NaN inputs give no NaN; Infinity formats as `—`. |
+| Sources (downloaded again into `scratchpad/vf7-pdfs` from the bibliography URLs; text per page with Ghostscript; curve pages rendered) | `energizer-ir-bulletin` v2.0: p. 1 1000 Hz test reads lower, 150–300 mΩ fresh with 5 mA / 505 mA 100 ms; p. 2 1.6 V − 1.0 A × 0.1 Ω = 1.5 V, "general guideline and not as a precise value"; fig. 2 about 0.13 Ω at 20 °C and about 0.4 Ω at −20 °C (top label misprinted "10", as noted). `energizer-lithium-coin-manual` p. 4: "starting IR of a 2032 battery is near 10 ohms … AA alkaline … near 0.25 ohms"; 1000 K drain, 50 ms 25 Ω pulse, (3.279 − 2.429) ÷ (.097 − .000003) = 9 Ω; 75 Ω pulse curve about 10 Ω fresh to about 65 Ω near 210 mAh; p. 1 3 V Li/MnO2; p. 3 cold; p. 6 swallowing. `energizer-alkaline-handbook`: p. 3 1.6–0.9 V; p. 9 fig. 10 about 0.13 / 0.2 / 0.65 Ω; p. 13 about 10 Ω, one to two seconds, about 1.5 V CCV; p. 14 coins/keys and "Short circuits may cause battery leakage which may result in bodily injury". `energizer-nimh-handbook` p. 6 "< 50 milliohms", 1.4 V → 1.2 V plateau; p. 14 "high currents if shorted … burns or ignition". `energizer-nh15-2500` p. 1: 1.2 V, 30 / 40 mΩ, ±20 %, 12 mΩ at 1000 Hz. `duracell-mn1500` p. 1 120 m-ohm @ 1 kHz; `duracell-mn1604` p. 1 1,700 m-ohm @ 1 kHz, p. 2 DC resistance curve about 2.3 → 3.1 → 4.1 Ω (30 mA 1 h / 250 mA 1 s), fresh voltages about 9.5–9.7 V. AIS/SDS alkaline 1225-Alk, NiMH 1225-NiMH and coin 1223: Section 7 p. 3 "Prolonged short circuit … safety release vent to open"; coin Section 7 p. 3 "Swallowing may lead to serious injury or death in as little as 2 hours … Immediately see doctor … Keep in original package until ready to use. Dispose of used batteries immediately.", Section 4 p. 2 "Do not induce vomiting or give food or drink. Seek medical attention immediately.", Sections 12–13 pp. 4–5 local regulations: the callout's first-aid and disposal sentences match. `wa-battery-burn-2021`: "Loose lithium-ion batteries can ignite if they touch coins or keys", a vape battery and coins in a pocket, skin grafts, the Director of Energy Safety on keys and coins shorting terminals. `kuphaldt-liec` ch. 10 (ibiblio copy): maximum power at load = Thevenin resistance; "does not coincide with maximum efficiency". `hyperphysics-es` "Teorema de Thevenin" (e = open-circuit voltage, r = e / short-circuit current) and "Fuentes de Voltaje y de Corriente"; `openstax-fisica-u2-es` §10.1 «Resistencia interna y voltaje de los terminales», ε − Ir; `mit-6002-2007` lecture notes list "Superposition, Thévenin and Norton". `fluke-80v-manual` figures (10 MΩ, 1.8 Ω, 0.03 Ω, 440 mA) are 00-05's, verified there; not reopened. Nothing from BIBLIOGRAPHY §8 is used for a figure; `csb-gp1272` is not cited (D-10). |
+| Safety (brief §8, ROADMAP §3.1) | Callout 1 "Never short a battery" opens section 2 ("Measuring it with your meter") before the two readings; callout 3 "Keep coin cells away from children" sits directly before the first prose mention of a coin cell (no "coin cell"/CR2032 earlier in either body; the AA/9 V/NiMH key sentence omits CR2032); callout 2 "Shorted lithium-ion cells start fires" follows the left-of-peak paragraph and precedes W-5. EN and ES have the same three callouts in the same order with the same claims. No short-circuit measurement: Isc is always "computed", every state left of the peak is "simulation only" / "in the instrument only" / "Never try it". Bench steps only with a 10 Ω 1 W resistor on an AA (NiMH mentioned at 10 Ω) and 220 Ω 1 W on a 9 V, for a few seconds, probes on the terminals, resistor where nothing touches it, disconnected before the open-circuit reading. No bench step with a coin cell; Li-ion only in callout 2 with no figure and the power bank / protected-cell advice; no lead-acid, no recharging alkalines, no heating or cooling a cell. The instrument has no `danger` or `signal` tone and no state at 0 Ω. ROADMAP §3.1 amended consistently (Batteries row: CR2032 simulation-only preset; 00-07 callout row adds coin cells). |
+| EN/ES parity, SKILL.md | Same sections, widgets with the same props, callouts, 17 references and numbers. ES: decimal commas throughout the body, NBSP before all 18 `%`, «…», tú; EN writes a space before all 18 `%`. No em dashes. Labels quoted in the prose match `ui.ts` in both languages (Terminal voltage / «Tensión en los terminales», "39 mV lost inside" / «caen 39 mV dentro», "open circuit" / «en vacío», "short circuit: 6.4 A (computed)" / «en cortocircuito: 6,4 A (calculada)», "max 2.56 W" / «máx. 2,56 W», Custom / «Libre», Divider / «Divisor», Heat in R1 and R2 / «Calor en R1 y R2», «Desperdiciado en el divisor»). New terms defined at first use and in the glossary (open-circuit voltage, terminal voltage, internal resistance, polarity, safety vent, short-circuit current, DC step, pulse, alternating current, logarithmic scale, maximum power transfer, efficiency, coin cell, Thévenin equivalent/voltage/resistance; tolerance as a one-line pointer). Earlier promises kept: 00-04 "a real battery sags a little" (39 mV, 3.99 mV); 00-05 "lower, because the battery's own resistance (lesson 07)" (2.34 A, 4.12 A) and the two readings with the same meter; 00-06 heat inside the battery (6.09 mW). |
+| Code | Same idiom as `power-dissipation` and `meter-loading`: module-counter radio name, `linkedSignal` seeded through `parseValue` (fallback as the second argument) and clamped, local `clamp`/`fill`/tone/flow helpers, no cross-widget imports (the spec writes 00-03's formula inline), constants with source comments and the D-25 assumptions. `app-curve` is generic (no Thévenin maths; data units in, caller-formatted labels), `role="img"` with the spoken `label` as `aria-label` (decorative and `aria-hidden` when empty), no live region, nothing focusable. `schBattery`/`schBox` extend `SchSymbol`, use `SYMBOL_STYLES`, `currentColor`, whole units, even strokes, butt caps for the dashes; highlight and dim are covered by the spec. Prettier passes on every new or changed source file. The box sits one unit higher than the brief (allowed by §4). |
+| Docs | ROADMAP status, module 00 (7 of 7), counts (69 / 62 to write, 66 / 59 new), A1, A2 note, §3.1, phase table; ARCHITECTURE tree, §4.4 `Curve`, §4.5 symbols, 41 routes, §5.5 glyph inputs; DESIGN-PIXEL-ART file table and non-colour cues; README: all match what was built. Stale figures fixed below. |
+| Hygiene | `git diff --check` clean; edited files LF, no CR; `git status` shows only my six in-scope edits plus this file; no scratch page, screenshot or stray file in the repo, `content-generated/` or the build output (41 routes = 39 + 2). |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| S-1 | Suggestion | Code | `src/app/ui/control.ts` `commitText` / `set` (shared, pre-existing) | Typing a value that clamps or snaps to the value already held (R1 at 100 Ω, type `50`) leaves the typed `50` in the box, even after blur, because `entry` is set to the string it already holds and the DOM is not rewritten. Reproduced in the 00-03 `divider` too. Write the formatted value to the input element directly (or force the signal) in a separate change. |
+| S-2 | Suggestion | Design | `core/format.ts` `formatSI` (00-06 S-2, still deferred) | Readout notes wrap between number and unit ("2.56 / W maximum", «6,4 / A (calculada)») at 375 and 1280 px. A no-break space in `formatSI` would fix it everywhere. |
+| S-3 | Suggestion | Plan | `docs/briefs/thevenin.md` §5 "Spec cases (step 3)", schBattery case 5 | The case still says the `+` has "y < the first plate's y"; the spec (and the drawing) put its glyph centre level with the 9 V battery's first plate. Amend the brief line to what shipped, which reads well on screen. |
+| S-4 | Suggestion | Design | `thevenin.ts` plot with Custom Rint at 10 mΩ | The peak (and the load marker at 10 mΩ) sits on the plot's left edge, touching the `P` title, and its "max 14.4 kW" label starts at the axis. The brief accepts the edge case; consider moving the `P` title above the axis top or anchoring the label one marker-width right. |
+| S-5 | Suggestion | Pedagogy | 00-03 `divider` "Wasted in the divider" vs 00-07 "Heat in R1 and R2" | With the load on, 00-03's readout still shows 4.05 mW (Vin²/(R1 + R2)) while 00-07 shows the real 4.5 mW. 00-07's prose only quotes 4.05 mW with the load off, so it is consistent; a reader comparing the two loaded instruments may wonder. Consider a note in 00-03 or 00-07 later. |
+| S-6 | Suggestion | Content parity | `.claude/skills/course-writing/glossary.md`, 00-07 "terminal voltage" ES cell | The parenthetical «si el instrumento la acorta a «Tensión en terminales»…» is now moot: the long label shipped. Drop it. |
+| S-7 | Suggestion | Code | `src/app/schematic/schematic.ts` (`SchSource`, `SchTerminal`, `SchWire` templates) | Prettier re-wrapped three untouched templates. Harmless, but it is churn outside the new symbols; fine to keep. |
+| S-8 | Suggestion | Design | `thevenin.ts` battery family, `schBox` at (1, 1) | The box name's baseline is at canvas y = 6, so the tallest glyphs rise just past the canvas edge (visible because the canvas overflows into the screen padding). Readable at every width; a half-unit lower box or a name inside the box would keep it inside the canvas. |
+
+### Fixed during verification
+
+- `ARCHITECTURE.md` §3 (method reproduces `main`'s 463 / 351 / 444 + 218 /
+  627 / 2372 + 1081 / 7,013 lines and 9,926 + 11,081 words exactly):
+  `i18n/ui.ts` 463 → 572 lines, `lesson/` 351 → 352, `schematic/` 444 → 532
+  lines plus 218 → 485 lines of spec, `ui/` 627 → 1004 lines plus a new
+  274-line spec ("panel, control, readout, curve primitives"), `widgets/`
+  2372 → 3326 lines plus 1081 → 1553 lines of specs; "Roughly 7,000 lines of
+  source" → 8,500 (8,542); "~21,000 words" → ~28,000 (EN 13,289 + ES 14,895 =
+  28,184, lesson bodies without front matter; 00-07 is 3,363 EN / 3,814 ES).
+- `ARCHITECTURE.md` §4.3: per-instrument chunk "5.6–10.3 kB" → 5.6–22.8 kB.
+  §4.8: per-lesson 7.8–22.4 / 2.7–6.8 kB → 7.8–33.4 / 2.7–10.2 kB,
+  per-instrument 5.6–10.3 / 2.0–3.2 kB → 5.6–22.8 / 2.0–6.7 kB, with a dated
+  note giving the 00-07 chunks and `thevenin` (which bundles `app-curve`).
+- `ARCHITECTURE.md` §5.5: "143 tests" → 198, and the over-long line
+  re-wrapped. `docs/ROADMAP.md` A7: "runs 143 specs" → 198 (its spec list was
+  already updated).
+- `content/bibliography.yaml` and `docs/BIBLIOGRAPHY.md` `energizer-coin-ais`:
+  added the Section 7 "see doctor / original package / dispose immediately"
+  sentences, Section 4 p. 2 ingestion first aid and Sections 12–13 disposal
+  to the 00-07 module note, since the lesson's callout and reference note now
+  use them (SKILL.md §4).
+- Lessons: re-wrapped prose lines that ran to 85–126 characters or broke
+  early (EN: the battery-symbol paragraph, the efficiency paragraph, the
+  CR2032 paragraph, the coin-manual paragraph; ES: the same four places and
+  "Son predicciones del modelo…"). Whitespace only; the word counts are
+  unchanged. Rebuilt (41 routes), re-ran `test:ci` (198), contrast, glyphs,
+  axe (164 pages, 0) and the behaviour test (219 pass).
+
+#### Ready to merge: yes
+
 ## Verification: 00-06 Power, heat and thermal resistance (2026-10-28)
 
 This is an independent check of branch `content/00-06-power-and-heat`: the
@@ -1433,4 +1531,52 @@ Reviewer: ____  Date: ____  Commit: ____
 
 ## 7. Module checklists
 
-*(Empty. Each module adds its ticked copy of §6 here when it reaches step 8.)*
+*(Each module adds its ticked copy of §6 here when it reaches step 8.)*
+
+### Module 00: Fundamentals. Review checklist
+
+Reviewer: 00-07 verification agent  Date: 2026-10-30  Commit: `b9e525d` (branch `content/00-07-real-sources`, plus the uncommitted fixes in the 00-07 section above)
+
+Evidence for 00-01 to 00-06 is in their own verification sections below
+(and REVIEW §0 for 00-01 to 00-03); 00-07's is in the section at the top. The
+course-wide items (build, axe, glyphs, contrast) were re-run on this commit.
+
+**Plan and pedagogy**
+- [x] Every lesson depends only on earlier lessons (forward references are pointers only: 00-03 → "full in 00-07" output impedance, 00-05 → lesson 07's battery resistance, 00-06 → lesson 07's heat inside the battery, 00-07 → module 01 tolerance, module 02 alternating current, module 08 headphone output; each is kept or is a one-line pointer)
+- [x] Every promise in `_module.md` summary is covered by a lesson (Ohm's law, series and parallel, the divider, Kirchhoff, the multimeter, power and heat, real sources and Thévenin: 00-01 to 00-07)
+- [x] No lesson over ~15 min; each has a single stated takeaway (00-07 is 17 min, a maintainer-approved exception recorded in `docs/briefs/thevenin.md` D-23; every other lesson ≤ 15)
+- [x] Every instrument passes ARCHITECTURE §6: `ohm-law` (what current flows?), `resistor-network` (what is the combined resistance?), `divider` (what does a load do to the output?), `kirchhoff` (do currents and voltages balance?), `meter-loading` (what does the meter do to the reading?), `power-dissipation` (how hot does the resistor get?), `thevenin` (why does a battery's voltage drop under load, and how much power can it give?)
+
+**Technical accuracy**
+- [x] Every number and worked example recomputed by hand (arithmetic in each lesson's verification section)
+- [x] Prose numbers match the instrument at displayed precision (typed in, both languages, each lesson's behaviour test)
+- [x] Units, SI prefixes and sign conventions consistent; locale decimals in ES (`4,5 V`)
+- [x] Safety callout present wherever mains, >50 V, stored energy, batteries or meters-on-mains appear (00-04 alkaline/Li-ion, 00-05 meter categories and current jack, 00-06 burns and smoke, 00-07 shorts, Li-ion and coin cells)
+
+**Content parity**
+- [x] EN and ES make the same claims with the same strength
+- [x] Same widgets, same directive props, same callouts in both languages
+- [x] `pnpm content` cross-check passes (7 lessons × 2)
+
+**References**
+- [x] ≥ 2 `references:` per lesson, all ids resolve in `bibliography.yaml`
+- [x] Every rule of thumb, standard figure and datasheet number traceable to a cited source (the 50 % efficiency at maximum power is derived in 00-07, not cited, per BIBLIOGRAPHY §8)
+- [x] ES lessons cite the Spanish edition where one exists (`openstax-fisica-u2-es`, `hyperphysics-es` cited in both languages)
+
+**Accessibility (instrument)**
+- [x] axe: 0 violations on every route in all four theme states (41 routes, 164 pages)
+- [x] Keyboard-only: every control reachable and operable; visible focus; focus never lost to `<body>`
+- [x] 375 px: no horizontal scroll; tap targets ≥ 44 px; schematic labels legible (00-07 also at 320 px)
+- [x] Tone changes have a non-colour cue (readout tone glyphs; hot = thicker stroke; plot markers hollow vs filled); no new colour in 00-07
+- [x] Reduced motion, `prefers-contrast: more` and `forced-colors` checked (00-07: flow stops, contrast tokens apply, plot turns `CanvasText` with shapes intact)
+- [x] Traces/audio (A2–A4): not used in module 00; 00-07's static plot has a spoken text equivalent
+- [x] Every instrument string renders within the instrument font stack (glyph check: 1278 strings)
+
+**Design and code**
+- [x] Uses `app-panel` / `app-control` / `app-readout` / `app-curve` / `sch-*` / kit classes; no inline symbols; widget CSS reads only `--pix-*` and `--px`
+- [x] Drawing fills its screen; labels do not collide (00-07 S-4 and S-8 are edge-case Suggestions)
+- [x] Arithmetic in a pure function with a spec; `ng test` green (198)
+- [x] CLAUDE.md Angular rules (no `standalone: true`, `OnPush`, `@HostBinding`, `ngClass`, `any`)
+- [x] `pnpm build` passes; 41 routes; sitemap and hreflang include the new lessons; prev/next chain intact
+
+**Findings:** none open at Minor or above; 00-07's Suggestions S-1 to S-8 are in its section.
