@@ -130,6 +130,42 @@ export interface UiStrings {
     heatDeratedSpoken: string;
     /** Added to heatCircuitSpoken when the surface is above 155 °C. */
     heatAboveMaxSpoken: string;
+    /** Thévenin instrument (real sources). */
+    source: string;
+    custom: string;
+    dividerKey: string;
+    openCircuitVoltage: string;
+    internalResistance: string;
+    terminalVoltage: string;
+    loadPower: string;
+    heatInside: string;
+    heatInDivider: string;
+    openCircuit: string;
+    /** `{drop}` is the voltage lost inside the source. */
+    lostInside: string;
+    /** `{isc}` is the computed short-circuit current. */
+    shortCircuitComputed: string;
+    /** `{fraction}` of the maximum power `{pmax}`. */
+    ofMaximum: string;
+    efficiencyNote: string;
+    noLoadNote: string;
+    /** The plot's peak label; `{pmax}` is the maximum power. */
+    curvePeak: string;
+    sourceSpoken: string;
+    dividerSourceSpoken: string;
+    sourceCircuitSpoken: string;
+    sourceOpenSpoken: string;
+    /** Added to sourceCircuitSpoken when the heat inside exceeds the load power. */
+    sourceHeatSpoken: string;
+    dividerCircuitSpoken: string;
+    dividerOpenSpoken: string;
+    curveSpoken: string;
+    curveOpenSpoken: string;
+    sourceNameAaSpoken: string;
+    sourceName9vSpoken: string;
+    sourceNameNimhSpoken: string;
+    sourceNameCr2032Spoken: string;
+    sourceNameCustomSpoken: string;
   };
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
@@ -281,6 +317,42 @@ const en: UiStrings = {
       'A {vin} supply drives {current} through R, {r}, a {rating} resistor in {ambient} air. It turns {power} into heat, {used} of its rating at this temperature. That is past its rating, where the maker gives no temperature figure.',
     heatDeratedSpoken: 'That is past its derated rating of {ratedNow} at {ambient}.',
     heatAboveMaxSpoken: 'Its surface is above the part’s 155 °C limit.',
+    source: 'Source',
+    custom: 'Custom',
+    dividerKey: 'Divider',
+    openCircuitVoltage: 'Open-circuit voltage',
+    internalResistance: 'Internal resistance',
+    terminalVoltage: 'Terminal voltage',
+    loadPower: 'Load power',
+    heatInside: 'Heat inside',
+    heatInDivider: 'Heat in R1 and R2',
+    openCircuit: 'open circuit',
+    lostInside: '{drop} lost inside',
+    shortCircuitComputed: 'short circuit: {isc} (computed)',
+    ofMaximum: '{fraction} of its {pmax} maximum',
+    efficiencyNote: 'efficiency {efficiency}',
+    noLoadNote: 'no load',
+    curvePeak: 'max {pmax}',
+    sourceSpoken: 'Terminal voltage = open-circuit voltage − current × internal resistance',
+    dividerSourceSpoken: 'Output voltage = Thévenin voltage − current × Thévenin resistance',
+    sourceCircuitSpoken:
+      'Inside the dashed box, the {sourceName} is drawn as an ideal {voc} source in series with its internal resistance, {rint}. A {rload} load across its terminals has {v} across it and {i} through it. The load takes {p}, and {heat} turns to heat inside the battery.',
+    sourceOpenSpoken:
+      'Inside the dashed box, the {sourceName} is drawn as an ideal {voc} source in series with its internal resistance, {rint}. Nothing is connected to its terminals, so no current flows and they read {v}, the open-circuit voltage.',
+    sourceHeatSpoken: 'That is more than the load gets.',
+    dividerCircuitSpoken:
+      'Inside the dashed box, a {vin} supply feeds R1, {r1}, and R2, {r2}. Seen from its two terminals it acts like a {vth} source behind {rth}. A {rload} load has {v} across it and {i} through it and takes {p}; R1 and R2 turn {heat} into heat.',
+    dividerOpenSpoken:
+      'Inside the dashed box, a {vin} supply feeds R1, {r1}, and R2, {r2}. Seen from its two terminals it acts like a {vth} source behind {rth}. Nothing is connected, and the terminals read {v}.',
+    curveSpoken:
+      'Plot of load power against load resistance, {xmin} to {xmax} on a logarithmic scale. The power peaks at {pmax} when the load equals {rint}. The load now, {rload}, takes {p}, {fraction} of that peak.',
+    curveOpenSpoken:
+      'Plot of load power against load resistance, {xmin} to {xmax} on a logarithmic scale. The power peaks at {pmax} when the load equals {rint}. No load is connected.',
+    sourceNameAaSpoken: 'AA alkaline cell',
+    sourceName9vSpoken: '9 V alkaline battery',
+    sourceNameNimhSpoken: 'AA NiMH rechargeable cell',
+    sourceNameCr2032Spoken: 'CR2032 lithium coin cell',
+    sourceNameCustomSpoken: 'custom source',
   },
   theme: { toggle: 'Switch theme', light: 'Light', dark: 'Dark' },
   langSwitch: { label: 'Language', other: 'Español' },
@@ -444,6 +516,43 @@ const es: UiStrings = {
     heatDeratedSpoken:
       'Eso está por encima de su potencia nominal reducida, {ratedNow} a {ambient}.',
     heatAboveMaxSpoken: 'Su superficie está por encima del límite de 155 °C de la pieza.',
+    source: 'Fuente',
+    custom: 'Libre',
+    dividerKey: 'Divisor',
+    openCircuitVoltage: 'Tensión en vacío',
+    internalResistance: 'Resistencia interna',
+    terminalVoltage: 'Tensión en los terminales',
+    loadPower: 'Potencia en la carga',
+    heatInside: 'Calor interno',
+    heatInDivider: 'Calor en R1 y R2',
+    openCircuit: 'en vacío',
+    lostInside: 'caen {drop} dentro',
+    shortCircuitComputed: 'en cortocircuito: {isc} (calculada)',
+    ofMaximum: 'el {fraction} de su máximo de {pmax}',
+    efficiencyNote: 'eficiencia {efficiency}',
+    noLoadNote: 'sin carga',
+    curvePeak: 'máx. {pmax}',
+    sourceSpoken: 'Tensión en los terminales = tensión en vacío − corriente × resistencia interna',
+    dividerSourceSpoken:
+      'Tensión de salida = tensión de Thévenin − corriente × resistencia de Thévenin',
+    sourceCircuitSpoken:
+      'Dentro del recuadro discontinuo, la {sourceName} se dibuja como una fuente ideal de {voc} en serie con su resistencia interna, {rint}. Una carga de {rload} conectada a sus terminales tiene {v} y la recorren {i}. La carga recibe {p}, y {heat} se convierten en calor dentro de la pila.',
+    sourceOpenSpoken:
+      'Dentro del recuadro discontinuo, la {sourceName} se dibuja como una fuente ideal de {voc} en serie con su resistencia interna, {rint}. No hay nada conectado a sus terminales, así que no circula corriente y marcan {v}, la tensión en vacío.',
+    sourceHeatSpoken: 'Eso es más de lo que recibe la carga.',
+    dividerCircuitSpoken:
+      'Dentro del recuadro discontinuo, una fuente de {vin} alimenta R1, {r1}, y R2, {r2}. Vista desde sus dos terminales, se comporta como una fuente de {vth} detrás de {rth}. Una carga de {rload} tiene {v}, la recorren {i} y recibe {p}; R1 y R2 convierten {heat} en calor.',
+    dividerOpenSpoken:
+      'Dentro del recuadro discontinuo, una fuente de {vin} alimenta R1, {r1}, y R2, {r2}. Vista desde sus dos terminales, se comporta como una fuente de {vth} detrás de {rth}. No hay nada conectado, y los terminales marcan {v}.',
+    curveSpoken:
+      'Gráfica de la potencia en la carga frente a la resistencia de carga, de {xmin} a {xmax} en escala logarítmica. La potencia alcanza su máximo, {pmax}, cuando la carga es igual a {rint}. La carga actual, {rload}, recibe {p}, el {fraction} de ese máximo.',
+    curveOpenSpoken:
+      'Gráfica de la potencia en la carga frente a la resistencia de carga, de {xmin} a {xmax} en escala logarítmica. La potencia alcanza su máximo, {pmax}, cuando la carga es igual a {rint}. No hay ninguna carga conectada.',
+    sourceNameAaSpoken: 'pila alcalina AA',
+    sourceName9vSpoken: 'pila alcalina de 9 V',
+    sourceNameNimhSpoken: 'pila recargable NiMH AA',
+    sourceNameCr2032Spoken: 'pila de botón de litio CR2032',
+    sourceNameCustomSpoken: 'fuente libre',
   },
   theme: { toggle: 'Cambiar tema', light: 'Claro', dark: 'Oscuro' },
   langSwitch: { label: 'Idioma', other: 'English' },
