@@ -183,7 +183,10 @@ export class SchCapacitor extends SchSymbol {
   selector: 'svg:g[schSource]',
   template: `
     <svg:g [attr.transform]="transform()" [attr.class]="klass()">
-      <svg:path class="stroke" d="M0 0 v12 M-12 12 h24 M-6 19 h12 M-12 26 h24 M-6 33 h12 M0 33 v12" />
+      <svg:path
+        class="stroke"
+        d="M0 0 v12 M-12 12 h24 M-6 19 h12 M-12 26 h24 M-6 33 h12 M0 33 v12"
+      />
       <svg:text class="label" x="-18" y="8" text-anchor="end">+</svg:text>
       <svg:text class="value" x="18" y="26">{{ value() }}</svg:text>
     </svg:g>
@@ -192,6 +195,88 @@ export class SchCapacitor extends SchSymbol {
 })
 export class SchSource extends SchSymbol {
   readonly value = input('');
+}
+
+export type SchBatteryKind = 'cell' | 'battery';
+
+/**
+ * IEC cell or battery: a long thin plate (+) over a short thick plate (−).
+ * Vertical only: 4 grid units long like the vertical resistor and meter, pins
+ * at (0, 0) and (0, 40), so both land on the grid (unlike schSource's 45).
+ * The long plate and the top pin are always the + side.
+ *
+ * `cell` is one plate pair. `battery` (several cells in one case, such as a
+ * 9 V) is two pairs joined by a dotted link, the IEC way of drawing a battery
+ * of cells. The short plates are 12 × 4 filled rects, so they stay 4 thick
+ * when a highlight thickens the stroked parts from 2 to 4.
+ */
+@Component({
+  selector: 'svg:g[schBattery]',
+  template: `
+    <svg:g [attr.transform]="transform()" [attr.class]="klass()">
+      @if (kind() === 'battery') {
+        <svg:path class="stroke" d="M0 0 V6 M-12 6 H12 M-12 26 H12 M0 34 V40" />
+        <svg:rect class="fill" x="-6" y="10" width="12" height="4" />
+        <svg:rect class="fill" x="-1" y="16" width="2" height="2" />
+        <svg:rect class="fill" x="-1" y="20" width="2" height="2" />
+        <svg:rect class="fill" x="-6" y="30" width="12" height="4" />
+      } @else {
+        <svg:path class="stroke" d="M0 0 V16 M-12 16 H12 M0 26 V40" />
+        <svg:rect class="fill" x="-6" y="22" width="12" height="4" />
+      }
+      @if (plus()) {
+        <svg:text class="label" x="-18" y="8" text-anchor="end">+</svg:text>
+      }
+      @if (name()) {
+        <svg:text class="label" x="16" y="17">{{ name() }}</svg:text>
+      }
+      @if (value()) {
+        <svg:text class="value" x="16" y="29">{{ value() }}</svg:text>
+      }
+    </svg:g>
+  `,
+  styles: SYMBOL_STYLES,
+})
+export class SchBattery extends SchSymbol {
+  readonly kind = input<SchBatteryKind>('cell');
+  readonly name = input('');
+  readonly value = input('');
+  readonly plus = input(true);
+}
+
+/**
+ * Dashed enclosure: what is inside this outline is one thing seen from its
+ * terminals (a real battery around its model, a divider around its Thévenin
+ * equivalent). `w` and `h` are grid units; the outline's corner is at the
+ * symbol's (x, y). Draw it first in the canvas so the parts sit on top.
+ *
+ * The dash array is an attribute (so a spec can read it) and the caps are
+ * butt: the square caps of the other strokes would lengthen each 6-unit dash
+ * by 2 and close the 4-unit gaps.
+ */
+@Component({
+  selector: 'svg:g[schBox]',
+  template: `
+    <svg:g [attr.transform]="transform()" [attr.class]="klass()">
+      <svg:path class="stroke box" [attr.d]="path()" stroke-dasharray="6 4" />
+      @if (name()) {
+        <svg:text class="label" x="4" y="-4">{{ name() }}</svg:text>
+      }
+    </svg:g>
+  `,
+  styles: `
+    ${SYMBOL_STYLES}
+    .stroke.box {
+      stroke-linecap: butt;
+    }
+  `,
+})
+export class SchBox extends SchSymbol {
+  readonly w = input.required<number>();
+  readonly h = input.required<number>();
+  readonly name = input('');
+
+  protected readonly path = computed(() => `M0 0 H${this.w() * GRID} V${this.h() * GRID} H0 Z`);
 }
 
 export type SchMeterKind = 'V' | 'A' | 'Ω';
@@ -278,7 +363,12 @@ export class SchGround extends SchSymbol {}
   template: `
     <svg:g [attr.transform]="transform()" [attr.class]="klass()">
       <svg:rect class="stroke" x="-4" y="-4" width="8" height="8" />
-      <svg:text class="label" [attr.x]="right() ? 10 : -10" [attr.text-anchor]="right() ? 'start' : 'end'" y="4">
+      <svg:text
+        class="label"
+        [attr.x]="right() ? 10 : -10"
+        [attr.text-anchor]="right() ? 'start' : 'end'"
+        y="4"
+      >
         {{ name() }}
       </svg:text>
     </svg:g>
@@ -361,11 +451,7 @@ export class SchCurrent extends SchSymbol {
     <svg:g [attr.class]="klass()">
       <svg:path class="stroke" [attr.d]="d()" />
       @if (flow() > 0) {
-        <svg:path
-          class="flow"
-          [attr.d]="d()"
-          [style.animation-duration.s]="duration()"
-        />
+        <svg:path class="flow" [attr.d]="d()" [style.animation-duration.s]="duration()" />
       }
     </svg:g>
   `,
@@ -434,6 +520,8 @@ export const SCHEMATIC = [
   SchResistor,
   SchCapacitor,
   SchSource,
+  SchBattery,
+  SchBox,
   SchMeter,
   SchGround,
   SchTerminal,

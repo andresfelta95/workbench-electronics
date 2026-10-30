@@ -98,7 +98,8 @@ electronics/
 │   │   ├── 03-voltage-divider.md
 │   │   ├── 04-kirchhoff.md
 │   │   ├── 05-multimeter.md
-│   │   └── 06-power-and-heat.md
+│   │   ├── 06-power-and-heat.md
+│   │   └── 07-real-sources.md
 │   ├── es/00-fundamentals/     ← same ids, translated slugs and prose
 │   ├── bibliography.yaml       ← every source, keyed by id; lessons cite ids
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
@@ -135,7 +136,9 @@ electronics/
 │       ├── pages/              ← the five routed views (1051 lines)
 │       ├── schematic/          ← SVG symbol library (444 lines, plus a 218-line spec)
 │       ├── ui/                 ← panel, control, readout primitives (627 lines)
+│       │   └── curve.ts        ← app-curve: static XY plot (00-07), with curve.spec.ts
 │       ├── widgets/            ← the instruments (2372 lines, plus 1081 lines of maths specs)
+│       │   └── thevenin/       ← 00-07's instrument; arithmetic in thevenin-math.ts + spec
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── .github/workflows/build.yml ← CI: build, unit tests + contrast, axe (§5.5)
@@ -278,6 +281,16 @@ Three shared primitives under `ui/` mean a new instrument is mostly arithmetic:
 - **`Readout`** — one measured value with a label, optional note, and a semantic
   tone that colours it when a number crosses into trouble.
 
+A fourth, smaller one serves instruments that need a graph:
+
+- **`Curve`** (`app-curve`, `ui/curve.ts`, added in 00-07) — a static XY plot:
+  one series, log or linear x, linear y from 0, tick labels, axis titles and
+  markers (hollow or filled, with an optional dashed guide to the x axis). It
+  renders one `<svg role="img">` whose spoken `label` carries the headline
+  numbers; nothing on it is interactive, so a widget drives it from an
+  `app-control`. It is not ROADMAP A2's `app-trace` (cursors, scope and Bode
+  traces), which may later absorb it.
+
 `core/format.ts` holds the shared arithmetic: engineering notation with SI
 prefixes (`formatSI`), locale-correct decimal separators (`4.5 V` / `4,5 V`),
 log↔linear slider mapping, E24 snapping, and `parallel()`.
@@ -298,11 +311,18 @@ Circuits are components, not images. Symbols are **attribute selectors on
 
 Everything sits on a 10-unit grid. Symbols share an abstract base class giving
 them `x`, `y`, `dim` and `highlight`. The library (`SCHEMATIC`) holds the
-canvas and the resistor, capacitor, source, meter, ground, terminal, junction,
-current arrow, wire and label symbols. The meter, `svg:g[schMeter]`, is a round
-body with `V`, `A` or `Ω` inside (`kind`), drawn vertical or horizontal, and is
-how the multimeter lesson puts a voltmeter or ammeter into a circuit.
-`schematic.spec.ts` renders it with `dim` and `highlight`.
+canvas and the resistor, capacitor, source, battery, meter, box, ground,
+terminal, junction, current arrow, wire and label symbols. The meter,
+`svg:g[schMeter]`, is a round body with `V`, `A` or `Ω` inside (`kind`), drawn
+vertical or horizontal, and is how the multimeter lesson puts a voltmeter or
+ammeter into a circuit. The battery, `svg:g[schBattery]` (00-07), is the IEC
+cell symbol, vertical only, + at the top: `kind="cell"` draws one long thin
+plate over one short thick plate, `kind="battery"` two such pairs joined by a
+dashed link. The box, `svg:g[schBox]` (00-07), is a dashed enclosure of `w` by
+`h` units with an optional `name`, drawn first so the parts sit on top: what is
+inside it is one thing seen from its terminals (a battery's model, or a divider
+and its Thévenin equivalent). `schematic.spec.ts` renders the meter with `dim`
+and `highlight`, and covers the battery and the box.
 
 > **Trap worth knowing.** That abstract base class **must** carry an
 > `@Directive()` decorator. Without it Angular silently ignores every inherited
@@ -437,7 +457,7 @@ the parameterised ones from the generated curriculum:
 
 Adding a lesson to `content/` is therefore all it takes to get a new static
 page — the route list is derived, never hand-maintained. The current build
-produces **39 prerendered routes**.
+produces **41 prerendered routes**.
 
 `lessonResolver` matters here. Loading the lesson in a resolver rather than
 inside the component makes the router *wait* for the content chunk, which is what
@@ -523,14 +543,15 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   fail in visible text. Spoken-only text is exempt: `ui.ts` keys ending in
   `Spoken` or `Label` (or documented as spoken in `UiStrings`), `aria-*`
   bindings, and the inputs listed in `SPOKEN_INPUTS` in `check-glyphs.mjs`
-  (`app-panel` `headingLabel`, `sch-canvas` `label`). It also
+  (`app-panel` `headingLabel`, `sch-canvas` `label`, `app-curve` `label`). It also
   fails if `--pix-font` no longer lists the families in the coverage file's
   order. The Dockerfile runs `pnpm build`, so an image cannot be built past
   either check.
 - **Unit tests**: `ng test` (Vitest in jsdom) runs `core/format.spec.ts`,
   one `*-math.spec.ts` per widget (Ohm's law, series/parallel, divider,
-  Kirchhoff, meter loading, power dissipation) and
-  `schematic/schematic.spec.ts` (the meter symbol), 143 tests. `pnpm test:ci`
+  Kirchhoff, meter loading, power dissipation, Thévenin),
+  `ui/curve.spec.ts` (the `app-curve` plot) and
+  `schematic/schematic.spec.ts` (the meter, battery and box symbols), 143 tests. `pnpm test:ci`
   runs them once and needs no
   `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the

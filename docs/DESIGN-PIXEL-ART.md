@@ -39,6 +39,7 @@ from the two Edge shots of the other instruments.
 | `src/app/ui/panel.ts` | Adds `host: { class: 'pix' }`, which is the scope root. Draws the case, nameplate, recessed screen, engraved groove and dithered readout bay, and lays them out with a container query on the panel's own width (see [Layout](#layout)). `heading` takes a string, or an array of `{ text, accent? }` runs where an accent run is set in inverse video. The optional `headingLabel` is the heading's spoken form: when set, the visible formula is `aria-hidden` and the label is read instead. The optional `headingAlt` is the heading's other form: both share one grid cell, the inactive one `visibility: hidden` and `aria-hidden`, so the strip always has the larger form's size and switching moves nothing. Without `headingAlt` nothing is reserved and the rendering is unchanged (a plain-string heading gains only a wrapper `<span>`). |
 | `src/app/ui/control.ts` | Pixel fader and LCD entry field. |
 | `src/app/ui/readout.ts` | LCD window plus a pixel glyph for each tone. |
+| `src/app/ui/curve.ts` | `app-curve` (00-07): a static XY plot on the screen. Axes and guides in `--pix-screen-muted`, the curve and hollow markers in `--pix-screen-ink`, filled markers in `--pix-hot`; stroke 2, square caps, `crispEdges`, whole-unit coordinates, square markers (no circles); text at `--pix-sch-text`. No new colour, so no new contrast pair. |
 | `src/app/schematic/schematic.ts` | Crisp rendering, whole-unit strokes, square caps and mitred joins, square junctions and terminals, stepped current flow. |
 | `src/app/widgets/*` | Each widget lost its local copies of mode buttons, toggle, action buttons and readout strip. They use the kit classes now. |
 | `src/index.html` | Adds `family=VT323`, `family=JetBrains+Mono` and `family=Iosevka+Charon+Mono` to the existing Google Fonts `<link>`. That is still one stylesheet request. Font files are fetched per glyph range, only when a glyph on screen needs them (see [Glyph coverage](#glyph-coverage)). |
@@ -430,6 +431,8 @@ which is expected.
 | Switch on/off | Knob changes side. The label text also states the value. |
 | Schematic highlight | Stroke goes from 2 to 4 units thick. It is an even width, so on whole-unit coordinates both edges land on unit boundaries. The old 3-unit stroke rendered as 2 or 4 device pixels depending on scale. |
 | Schematic dim | Strokes drop to 0.55 opacity. Labels switch from ink to muted ink. |
+| Plot markers (`app-curve`) | Shape, not only colour: a reference point (in `thevenin`, the maximum-power point) is a hollow 8 × 8 square in ink; the present value is a filled 6 × 6 square in the hot colour, with a dashed guide down to the x axis. In forced colours both turn `CanvasText` and the hollow/filled shapes still tell them apart. |
+| Enclosure (`schBox`) | A dashed outline (`stroke-dasharray="6 4"`, butt caps so the gaps stay open), never a colour fill: "what is inside is one thing seen from its terminals". |
 
 The tone glyphs are 7×7 grids of whole rectangles, drawn with
 `shape-rendering: crispEdges` and marked `aria-hidden`. They are for sighted
