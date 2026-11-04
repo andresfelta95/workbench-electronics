@@ -410,6 +410,52 @@ energizer-nimh-handbook:
     - "00-07 (\"The IR of fresh, fully charged NiMH batteries is typically less than 50 milliohms\"; it stays relatively constant during discharge until near the end, where it rises sharply, and it rises with age and cycling; at the 0.2C rate the voltage drops quickly from an open-circuit voltage of about 1.4 V to the 1.2 V plateau; p. 6)"
     - "00-07 safety callout (\"Nickel metal hydride batteries can generate high currents if shorted. These currents are sufficient to cause burns or ignition of flammable materials.\", p. 14)"
 
+tt-tn004:
+  section: "note"
+  authors: "TT Electronics"
+  title: "Methods for Marking Values on Resistors"
+  container: "Technical Note TN004"
+  year: "09.24"
+  url: "https://www.ttelectronics.com/TTElectronics/media/ProductFiles/Application-Note/TN004-Methods-for-Marking-Values-on-Resistors.pdf"
+  comment: "Checked 2026-11-04. A resistor maker's note (BI Technologies, IRC, Welwyn brands); \"09.24\" is the footer date code. Used for the full colour and letter code because IEC 60062 is paywalled and neither Yageo datasheet lists ±10 % or K."
+  modules:
+    - "01-01 (colour code for band-marked resistors, \"reference IEC60062\": tolerance silver 10 % K, gold 5 % J, brown 1 % F, red 2 % G, green 0.5 % D, blue 0.25 % C, violet 0.1 % B, grey 0.05 % A, no band 20 % M; multipliers silver × 0.01, gold × 0.1, black × 1 to white × 1G; the tolerance band is wider than, or further from, the other bands; 5-band example 4-7-0-×100-1 % = 47K 1 %, 4-band example 8-2-×1K-5 % = 82K 5 %; p. 1; on chip resistors \"Tolerance is not marked\", E96 values on 0603 use the EIA-96 two-digit-plus-letter code, p. 2)"
+
+ti-snva112:
+  section: "note"
+  authors: "Texas Instruments"
+  title: "AN-1378 Method for Calculating Output Voltage Tolerances in Adjustable Regulators"
+  container: "Application Report SNVA112A"
+  year: "July 2005, revised May 2013"
+  url: "https://www.ti.com/lit/pdf/snva112"
+  comment: "Checked 2026-11-04. No author is printed. Fig. 6 is a histogram with no sample size, maker or nominal value stated; the nominal of about 133 Ω and the spread are read from the plot. Table 1 prints 2.64 % for Vout = 3.3 V, ΔVref ±5.0 %, 0.5 % resistors, which repeats the ±2.0 % row and looks like a misprint. Gives worst case and a Taylor-series statistical method; it has no Monte Carlo (see `knudtsen-2022`)."
+  modules:
+    - "01-01 (divider tolerance stack-up: worst case takes all tolerances \"simultaneously at their worst case extremes\" and gives \"excessively conservative\" limits, §1 and §3 p. 2; worst-case error of Vout = Vref × (R1 + R2)/R1 with Vref = 1.275 V, e.g. Vout 5.0 V, ΔVref ±1 %: ±2.54 % with 1 % resistors and ±9.02 % with 5 % resistors, Table 1 p. 3; the resistor sensitivity runs from 0 to 1 and is highest at high Vout, §4 and Fig. 4 pp. 3–4; R1, R2 and Vref are independent random variables, and even parts from one reel tend to cancel because the two sensitivities have equal magnitude and opposite sign, §5 p. 4; the note assumes resistors are made \"under a 'six sigma' paradigm and have Gaussian variation\" (an assumption, not a vendor statement: \"the vendor may be reluctant to release this data\"), §6 p. 4)"
+    - "01-01 (measured distribution: Fig. 6 \"Typical Resistor Variation: 1% General Purpose 0805 SMD\", a single-peaked histogram with its peak near 133 Ω, most bars between about 132.5 and 133.5 Ω and every bar between about 132 and 134 Ω (within about ±0.8 %), inside the dotted ±1 % lines, no gap at the centre, read from the plot to about ±0.2 Ω; the text says the 1 % resistor is \"controlled to greater than ±6σ and is also approximately Gaussian\", p. 5)"
+    - "01-01 (statistical result: \"RSS (root sum squares) method is only valid for the case when independent Gaussian random variables are combined as sums\", §7 p. 6; with tolerances taken as ±6σ the equivalent output tolerance for Vout 5.0 V, ΔVref ±1 % is ±1.45 % with 1 % resistors and ±5.36 % with 5 % resistors, against ±2.54 % and ±9.02 % worst case, Table 4 p. 8)"
+
+knudtsen-2022:
+  section: "note"
+  authors: "Knudtsen, S. (Analog Devices)"
+  title: "How to Model Statistical Tolerance Analysis for Complex Circuits Using LTspice"
+  container: "Electronic Design"
+  year: "1 Feb. 2022"
+  url: "https://www.electronicdesign.com/technologies/test-measurement/article/21215610/analog-devices-how-to-model-statistical-tolerance-analysis-for-complex-circuits-using-ltspice"
+  comment: "Checked 2026-11-04 on the Electronic Design copy. Analog Devices also hosts the article at analog.com/en/resources/technical-articles/how-to-model-statistical-tolerance-analysis.html, but analog.com timed out or refused scripted requests on 2026-11-04, so that copy was not seen. The article makes no claim about how real resistor values are distributed."
+  modules:
+    - "01-01 (Monte Carlo vs worst case: \"WCA requires determining which parameters must be maximized or minimized for a true worst-case result\"; \"WCA results often violate design specification requirements, leading to expensive component selection\"; \"WCA results statistically don't represent commonly observed results\"; a statistical analysis gives \"a distribution that reflects what should be commonly measured in physical systems\"; \"both worst-case and statistical analysis provide valuable insights\"; \"worst-case limits are statistically improbable\"; LTspice {mc(1, tol)} gives a resistor \"nominally 1 with a Monte Carlo distribution defined by the parameter tol\", Appendix D; Gaussian runs with sigma = 1/3 and 1/5 of a 1 % tolerance, Appendix B; trimmed IC references are \"Gaussian before being trimmed and Monte Carlo after trimming\", and units that cannot be trimmed are discarded, Appendix A)"
+
+johnson-2010:
+  section: "note"
+  authors: "Johnson, H."
+  title: "7% Solution"
+  container: "EDN"
+  year: "10 June 2010"
+  url: "https://www.sigcon.com/Pubs/edn/SevenPercent.htm"
+  comment: "Checked 2026-11-04 on the author's own site (Signal Consulting), which reprints the EDN column. An anecdote, not a measurement report: no values or histogram are given, the parts are 10 % carbon-composition resistors from 1983, and the explanation of a gap is the author's mentor's, drawn on a napkin. Cite it only as the origin of the folk claim, never as evidence about modern 5 % film resistors. See BIBLIOGRAPHY.md §8 (binned distribution)."
+  modules:
+    - "01-01 (the folk claim, as an anecdote: in 1983 the author checked 300 resistors rated 10 % (carbon composition) and found none within ±1 % of nominal; with a flat spread the chance of that is 0.9^300 = 1.8 × 10^-14; his mentor's explanation was that the maker tested every part, discarded those outside ±10 % and \"pulled out all the good parts and sold them at a higher price with a ±5% tolerance\", leaving a gap in the middle)"
+
 # ---------------------------------------------------------------------------
 # §3 Standards and specifications
 # ---------------------------------------------------------------------------
@@ -420,7 +466,8 @@ iec-60063-2015:
   title: "IEC 60063:2015, Preferred number series for resistors and capacitors"
   edition: "Ed. 3.0"
   year: "2015"
-  modules: ["01 (E-series)", "00 (E24 in `Control`)"]
+  modules: ["01 (E-series)", "00 (E24 in `Control`)", "01-01 (the standard that defines the E series; cite it for that fact only, and take the values and the tolerance pairing from `vishay-std-ohmic-values` and `vishay-decade-table`)"]
+  comment: "Paywalled; the full text was not seen. Checked 2026-11-04 through the free preview that VDE Verlag hosts (vde-verlag.de/iec-normen/preview-pdf/info_iec60063{ed3.0}b.pdf), which stops before the tables: Ed. 3.0, 2015-03, cancels and replaces the second edition (1963); TC 40; the contents list Table 1 \"Number series with two significant digits\", Table 2 \"Number series with three significant digits\" and Table 3 \"Tolerances and recommended E series\" (p. 8); §4.1 says E24, E12, E6 and E3 have two significant digits; the note in §1 says the series are based on ratios of the r-th root of 10 with r = 3 · 2^i, i = 0 to 6, a system set before the 1952 first edition \"as a consequence of the standardisation of tolerances at ± 5 %, ±10 % and ± 20 %\". Table 3 itself was not seen (see BIBLIOGRAPHY.md §8)."
 
 ipc-2152:
   section: "standard"
@@ -507,13 +554,14 @@ yageo-cfr:
   section: "datasheet"
   authors: "YAGEO Corporation"
   title: "Carbon Film Resistors, General Purpose, CFR Series"
-  comment: "through-hole"
+  comment: "through-hole. 01-01, checked 2026-11-04: the Marking table on p. 14 gives grey and white multipliers of 0.001 Ω and 0.0001 Ω, which disagree with `tt-tn004` (×100M, ×1G) and `stackpole-cf`; lessons should not quote grey or white multipliers from it."
   edition: "Product specification V.3"
   year: "3 Apr. 2024"
   url: "https://www.yageogroup.com/content/Resource%20Library/Datasheet/YAGEO-CFR_DATASHEET.pdf"
   modules:
     - "00-01 (1/4 W through-hole: CFR-25 power rating 1/4 W at 70 °C, Table 1)"
     - "00-06 (CFR-25: 1/4 W at 70 °C, maximum working voltage 250 V, body 6.3 × 2.4 mm; CFR-100: 1 W at 70 °C, 500 V, body 11.5 × 4.5 mm; Table 1 and Dimensions, p. 3; derating curve 100 % up to 70 °C, falling linearly to 0 % at 155 °C, p. 3; operating range -55 °C to +155 °C, Table 1; short-time overload test 2.5 × rated continuous working voltage for 5 s, IEC 60115-1 4.13, p. 4)"
+    - "01-01 (carbon film: tolerance codes G = ±2 % and J = ±5 % only, resistance values from the E24 series, Ordering Information p. 2; temperature coefficient for CFR-12/-25/-50: -500 to +350 ppm/°C under 100 kΩ, -700 to 0 ppm/°C from 100 kΩ to 1 MΩ, -1500 to 0 ppm/°C from 1 MΩ to 10 MΩ, Table 2 p. 4, tested between -55 °C and +155 °C, IEC 60115-1 4.8, p. 4; endurance at 70 °C, rated voltage for 1,000 h (1.5 h on, 0.5 h off): ±3.0 % + 0.05 Ω, p. 4; colour code: red ±2 % (G), gold ±5 % (J), 4-band code for ±2 % and ±5 %, Marking p. 14; checked 2026-11-04)"
 
 yageo-rc-l:
   section: "datasheet"
@@ -523,7 +571,9 @@ yageo-rc-l:
   edition: "Product specification V.14"
   year: "14 Nov. 2025"
   url: "https://yageogroup.com/content/datasheet/asset/file/PYU-RC_GROUP_51_ROHS_L"
-  modules: ["00-01 (1/10 W surface-mount: RC0603 rated power 1/10 W at 70 °C; a high-power 0603 option is 1/5 W)"]
+  modules:
+    - "00-01 (1/10 W surface-mount: RC0603 rated power 1/10 W at 70 °C; a high-power 0603 option is 1/5 W)"
+    - "01-01 (thick-film chip: tolerance codes B = ±0.1 %, D = ±0.5 %, F = ±1.0 %, J = ±5.0 %, Ordering Information p. 2; 5 % parts from E24, 1 % and 0.5 % from E24/E96, marking p. 3 and Table 2; RC0603 1/10 W temperature coefficient ±100 ppm/°C for 10 Ω < R ≤ 10 MΩ and ±200 ppm/°C for 1–10 Ω and 10–22 MΩ, Table 2 p. 5, measured at +25/-55 °C and +25/+125 °C, MIL-STD-202 Method 304, Table 5 p. 8; \"the resistor is laser trimmed to the rated resistance value\", Construction p. 4; life/endurance at 70 °C, 1,000 h, RCWV 1.5 h on 0.5 h off: ±(1 % + 50 mΩ) for B/D/F tolerances and ±(3 % + 50 mΩ) for J, Table 5 p. 8; checked 2026-11-04)"
 
 kingbright-wp7113id:
   section: "datasheet"
@@ -599,6 +649,7 @@ stackpole-cf:
   comment: "Checked 2026-10-28. The surface temperature rise is a curve (Surface Temperature Rise, p. 9), read at 100 % of rated power to about ±2 °C; the measurement point is the middle of the body. The datasheet gives no thermal resistance; θ is derived as rise / rated power."
   modules:
     - "00-06 (CF14: 0.25 W at 70 °C, maximum working voltage 350 V, maximum overload voltage 600 V; CF1: 1 W at 70 °C, 500 V, 1000 V; Electrical Specifications, p. 1; body CF14 6.00 × 2.30 mm, CF1 11.00 × 4.50 mm, Mechanical Specifications, p. 2; power derating 100 % to 70 °C, 0 % at 155 °C, operating range -55 °C to +155 °C, p. 3; surface temperature rise at 100 % rated power about 32 °C for CF14 and about 85 °C for CF1, read from the curve on p. 9, so θ ≈ 128 K/W for CF14 and ≈ 85 K/W for CF1, typical, derived)"
+    - "01-01 (carbon film, second maker for `yageo-cfr`: tolerances 2 % and 5 % only, codes G 2 % and J 5 %, How to Order p. 11; TCR by ohmic range: < 10 Ω ±400 ppm/°C, 10 Ω to 9.99 kΩ 0 to -400 ppm/°C, 10 kΩ to 99 kΩ 0 to -500, 100 kΩ to 999 kΩ 0 to -850, 1 MΩ and above 0 to -1500, Electrical Specifications p. 1, no test temperatures stated; endurance at 70 °C, IEC 60115-1 4.25.1: typical result ΔR < ±1 %, test limit ±(2 % + 0.05 Ω) below 100 kΩ and ±(3 % + 0.05 Ω) from 100 kΩ, Performance Characteristics p. 3; colour code silver ±10 %, gold ±5 %, brown ±1 %, red ±2 %, Standard Color Codes p. 9; checked 2026-11-04)"
 
 vishay-mbx-sma:
   section: "datasheet"
@@ -610,6 +661,7 @@ vishay-mbx-sma:
   comment: "Checked 2026-10-28. Corroborates stackpole-cf from a second maker. The temperature rise is a curve (p. 8), read to about ±3 K; the datasheet gives no thermal resistance figure."
   modules:
     - "00-06 (rated dissipation P70 in power mode 0.4 W, 0.6 W, 1.0 W for 0204, 0207, 0414, with 155 °C maximum film temperature; in standard mode 0.25 W, 0.4 W, 0.65 W with 125 °C, p. 2; derating from 70 °C to zero at 125 °C (standard) or 155 °C (power), p. 8; the rise of surface temperature at each size's power-mode rating is about 85 K, curve p. 8, so θ ≈ 210 K/W (0204), ≈ 140 K/W (0207) and ≈ 85 K/W (0414), typical, derived; the rise depends on heat flow into the circuit board, Application Information p. 2)"
+    - "01-01 (metal film: tolerances ±5 %, ±1 %, ±0.5 % and temperature coefficient ±50 ppm/K or ±25 ppm/K, Technical Specifications p. 1, tested at (20/-55/20) °C and (20/155/20) °C, IEC 60115-1 4.8, test table p. 11; \"Resistance value to be selected from E24 series for ± 5 %, ± 2 %, from E24/E96 series for ± 1 % tolerance and from E24/E192 for ± 0.5 % tolerance\", note (1) p. 3; maximum resistance change at rated dissipation for MBB/SMA 0207: 0.25 % (standard mode) or 0.5 % (power mode) after 1000 h, 0.5 % or 1.0 % after 8000 h, 1.5 % after 225 000 h in standard mode, p. 2; \"A special laser is used to achieve the target value by smoothly cutting a helical groove in the resistive layer\" and \"an extensive testing procedure performed on 100 % of the individual resistors\", Description p. 7; colour rings per IEC 60062, p. 7; checked 2026-11-04)"
 
 energizer-nh15-2500:
   section: "datasheet"
@@ -689,6 +741,50 @@ csb-gp1272:
   comment: "Checked 2026-10-30. No test conditions are given for the internal resistance or the short-circuit current. 12 V ÷ 23 mΩ would be about 520 A, so the stated 276 A is not simply V/R and was presumably measured another way. Sealed lead-acid is not among the batteries ROADMAP §3.1 allows."
   modules:
     - "00-07 (12 V sealed lead-acid, 7.46 Ah at the 8 h rate: internal resistance approx. 23.0 mΩ, short circuit current 276 A, max discharge current 130 A (100 A with F1 terminals), p. 1)"
+
+vishay-std-ohmic-values:
+  section: "datasheet"
+  authors: "Vishay Sfernice"
+  title: "Standard Ohmic Values"
+  edition: "Revision 07-Aug-13"
+  identifier: "Document Number 52022"
+  url: "https://www.vishay.com/docs/52022/stohval.pdf"
+  comment: "Checked 2026-11-04; all values seen in the PDF Vishay serves (2 pages, one decade 100–988). The free substitute for the IEC 60063 tables, which were not seen. Its tolerance row pairs ±2 % with E48, where `vishay-decade-table` and `vishay-mbx-sma` pair ±2 % with E24: the pairing is a maker's convention."
+  modules:
+    - "01-01 (one decade of E3, E6, E12, E24, E48, E96 and E192 in one table, headed E192 ± 0.5 %, E96 ± 1 %, E48 ± 2 %, E24 ± 5 %, E12 ± 10 %, E6 ± 20 %, E3 no tolerance, pp. 1–2; E6 = 100, 150, 220, 330, 470, 680; E12 adds 120, 180, 270, 390, 560, 820; E24 adds 110, 130, 160, 200, 240, 300, 360, 430, 510, 620, 750, 910; E48 = 100, 105, 110, 115, 121, 127, 133, 140, 147, 154, 162, 169, 178, 187, 196, 205, 215, 226, 237, 249, 261, 274, 287, 301, 316, 332, 348, 365, 383, 402, 422, 442, 464, 487, 511, 536, 562, 590, 619, 649, 681, 715, 750, 787, 825, 866, 909, 953; E96 and E192 with three significant digits, e.g. E96 100, 102, 105, 107, 110 …; E192 has 920 where E24 has 910; several E24 values are not in E96, e.g. 120, 160, 180 and 220, where E96 has 118/121, 158/162, 178/182 and 221)"
+
+vishay-decade-table:
+  section: "datasheet"
+  authors: "Vishay Dale"
+  title: "Standard Electronic Decade Value Tables"
+  edition: "Revision 04-Oct-06"
+  identifier: "Document Number 31001"
+  url: "https://www.vishay.com/docs/31001/dectable.pdf"
+  comment: "Checked 2026-11-04 (1 page; the formula symbols for the ratios do not survive text extraction). Pairs tolerance and series differently from `vishay-std-ohmic-values` (±2 % with E24, not E48)."
+  modules:
+    - "01-01 (\"The number series under the ± 10 % column is known as the E12 Series because there are 12 standard values within a decade range. ± 2 % and ± 5 % utilize the E24 Series, ± 1 % uses E96 and ± 0.1 %, ± 0.25 % and ± 0.5 % use E192\"; successive values are related approximately by the 12th, 24th, 96th and 192nd root of 10; \"Use of standard values is encouraged because stocking programs are designed around them\"; standard resistances are the table values times powers of 10, e.g. 13.3 gives 133 Ω, 1.33 kΩ …; table of E192/E96 and E24/E12 values, p. 335)"
+
+yageo-mfr:
+  section: "datasheet"
+  authors: "YAGEO Corporation"
+  title: "Metal Film Resistors, General Purpose, MFR Series"
+  edition: "Product specification V.4"
+  year: "3 Apr. 2024"
+  url: "https://www.yageogroup.com/content/Resource%20Library/Datasheet/YAGEO-MFR_DATASHEET.pdf"
+  modules:
+    - "01-01 (metal film, the 1 % counterpart of `yageo-cfr`: tolerances ±0.5 %, ±1 %, ±2 %, ±5 %, p. 1; codes D = ±0.5 %, F = ±1 %, G = ±2 %, J = ±5 %, temperature coefficient codes E = ±50 ppm/°C and F = ±100 ppm/°C, values from E24, E96 and E192, Ordering Information p. 2; temperature coefficient ±50 ppm/°C or ±100 ppm/°C, Electrical Characteristics p. 3, tested between -55 °C and +155 °C, IEC 60115-1 4.8, p. 4; endurance at 70 °C, rated voltage for 1,000 h (1.5 h on, 0.5 h off): ±1.5 % + 0.05 Ω, against ±3.0 % + 0.05 Ω for carbon film in `yageo-cfr`, p. 4; colour code brown ±1 % (F), red ±2 % (G), green ±0.5 % (D), gold ±5 % (J); 4-band code for ±2 % and ±5 %, 5-band code for ±0.5 % and ±1 %, Marking p. 15; checked 2026-11-04)"
+  comment: "Through-hole. Checked 2026-11-04. The grey and white multipliers in its Marking table (0.001 Ω, 0.0001 Ω) disagree with `tt-tn004`; do not quote them."
+
+vishay-tnpw-e3:
+  section: "datasheet"
+  authors: "Vishay"
+  title: "TNPW e3: High Stability Thin Film Flat Chip Resistors"
+  edition: "Revision 10-Apr-2026"
+  identifier: "Document Number 28758"
+  url: "https://www.vishay.com/docs/28758/tnpw_e3.pdf"
+  comment: "Checked 2026-11-04 against the PDF Vishay serves. The thin-film precision chip, for contrast with the thick-film `yageo-rc-l`."
+  modules:
+    - "01-01 (thin-film chip, sizes 0201 to 1210: tolerance ±1 %, ±0.5 %, ±0.1 % (0201: ±0.5 %, ±0.1 % only) and temperature coefficient ±50, ±25, ±15 or ±10 ppm/K (0201: ±25 ppm/K only), Technical Specifications p. 1, measured at (20/-55/20) °C and (20/125/20) °C, test table p. 12; ±1 % from E24/E96, ±0.5 % and ±0.1 % from E24/E192, pp. 3–4; maximum resistance change at rated dissipation after 1000 h: ≤ 0.05 % (general mode, film at 125 °C), ≤ 0.10 % (power, 155 °C), ≤ 0.20 % (advanced, 175 °C); after 8000 h ≤ 0.10 % and ≤ 0.20 %, p. 2; \"A special laser is used to achieve the target value by smoothly fine trimming the resistive layer\", Description p. 5)"
 
 # ---------------------------------------------------------------------------
 # §5 Online courses, references and tools
@@ -827,7 +923,7 @@ openstax-fisica-u2-es:
   title: "Física universitaria, volumen 2"
   url: "https://openstax.org/books/física-universitaria-volumen-2"
   lang: "es"
-  modules: ["00", "01", "02", "00-06 (§9.5 Energía eléctrica y potencia: P = IV = I²R = V²/R, a resistor dissipates the power as heat)", "00-07 (§10.1 Fuerza electromotriz, subsection \"Resistencia interna y voltaje de los terminales\": a real battery has internal resistance r, the terminal voltage is the emf minus Ir and falls as the current rises, and r generally rises as the battery runs down; checked 2026-10-30 at openstax.org/books/física-universitaria-volumen-2/pages/10-1-fuerza-electromotriz)"]
+  modules: ["00", "01", "02", "00-06 (§9.5 Energía eléctrica y potencia: P = IV = I²R = V²/R, a resistor dissipates the power as heat)", "00-07 (§10.1 Fuerza electromotriz, subsection \"Resistencia interna y voltaje de los terminales\": a real battery has internal resistance r, the terminal voltage is the emf minus Ir and falls as the current rises, and r generally rises as the battery runs down; checked 2026-10-30 at openstax.org/books/física-universitaria-volumen-2/pages/10-1-fuerza-electromotriz)", "01-01 (§9.3 Resistividad y resistencia, subsection \"Dependencia de la temperatura de la resistividad\": R = R0(1 + αΔT), eq. 9.10, with R0 usually taken at 20 °C, and α is the temperature coefficient of the material; Tabla 9.1 (at 20 °C) gives α in (°C)⁻¹ of 0,0039 for copper, 0,0004 for nichrome, 0,00003 for constantan, 0,000002 for manganin and −0,0005 for carbon, i.e. 3900, 400, 30, 2 and −500 ppm/K (converted); \"Un resistor tiene cuatro bandas de color […] El cuarto color representa la tolerancia del resistor\", Figura 9.16 example 20 × 10⁵ Ω ± 10 %; checked 2026-11-04 at openstax.org/books/física-universitaria-volumen-2/pages/9-3-resistividad-y-resistencia; the material coefficients are bulk-material values, not resistor specifications)"]
   comment: "Ch. 9 (current and resistance), 10 (DC circuits, Kirchhoff's rules, RC circuits), 14 (inductance), 15 (AC circuits); free, openly licensed"
 
 hyperphysics-es:
@@ -837,7 +933,7 @@ hyperphysics-es:
   publisher: "Georgia State University"
   url: "https://hyperphysics.gsu.edu/hbasees/electric/ohmlaw.html"
   lang: "es"
-  modules: ["00", "02", "00-06 (page \"Potencia Eléctrica\", hbasees/electric/elepow.html: P = VI and the power dissipated in a resistor)", "00-07 (page \"Teorema de Thevenin\", hbasees/electric/thevenin.html: any two-terminal combination of batteries and resistors can be replaced by one voltage source and one series resistor, the voltage being the open-circuit terminal voltage and the resistance that voltage divided by the short-circuit current; page \"Fuentes de Voltaje y de Corriente\", hbasees/electric/visource.html: a real voltage source is an ideal source with a series resistance; checked 2026-10-30)"]
+  modules: ["00", "02", "00-06 (page \"Potencia Eléctrica\", hbasees/electric/elepow.html: P = VI and the power dissipated in a resistor)", "00-07 (page \"Teorema de Thevenin\", hbasees/electric/thevenin.html: any two-terminal combination of batteries and resistors can be replaced by one voltage source and one series resistor, the voltage being the open-circuit terminal voltage and the resistance that voltage divided by the short-circuit current; page \"Fuentes de Voltaje y de Corriente\", hbasees/electric/visource.html: a real voltage source is an ideal source with a series resistance; checked 2026-10-30)", "01-01 (page \"Resistencias de Carbón\", hbasees/electronic/rescarb.html: four-band colour code, the 4th band is the tolerance, \"5% Oro, 10% Plata, 20% Sin banda\"; printed codes use R for the decimal point and a tolerance letter, \"1% F, 2% G, 5% J, 10% K, 20% M\", e.g. 8R2K = 8,2 Ω ± 10 %; checked 2026-11-04. Do not cite it for the five-band code: it says the fifth band is gold for 1 % and silver for 2 %, which contradicts `tt-tn004`, `yageo-mfr` and `stackpole-cf` (brown 1 %, red 2 %))"]
 
 phet-cck-es:
   section: "es"
