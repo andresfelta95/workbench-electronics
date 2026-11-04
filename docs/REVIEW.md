@@ -1,5 +1,93 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: 01-01 Real resistors: tolerance, standard values and temperature (2026-11-04)
+
+This is an independent check of branch `content/01-01-real-resistors` at
+`083067a` (seven commits on `main`), plus the trivial fixes listed below,
+which are left uncommitted. I re-ran every gate, drove the instrument by
+keyboard in both languages, re-implemented the brief's random model from
+§5 without importing repo code, and re-read five of the new sources from
+their published URLs instead of relying on the implementers' reports.
+
+**Ready to merge: no.** Three Minor findings are open (m-1 to m-3). All
+gates pass, the instrument reproduces the brief's worked examples exactly,
+and EN/ES parity holds; the open items are one technical claim in both
+lessons and the brief, one source qualifier, and unrecorded instrument
+deviations in the brief.
+
+### What changed
+
+- New lesson `01-passives/01-real-resistors` (EN `real-resistors`, ES
+  `resistores-reales`, 14 minutes): opening, five sections, one
+  `tolerance-spread` instance with default props, one `:::safety`
+  ("Measuring resistors safely" / «Medir resistores con seguridad») before
+  the bench step, one `:::key`, a closing `:::note`; 16 reference ids, the
+  same in EN and ES. Glossary 01-01 section (18 rows) and the E12 row updated.
+- New instrument `src/app/widgets/tolerance-spread/` (component, pure maths,
+  41-test spec), registered in `widget-registry.ts`; new `ui.ts` keys in EN
+  and ES.
+- Step 3 shared code: `app-histogram` (`ui/histogram.ts`, 8-test spec, entry
+  in `SPOKEN_INPUTS` of `tools/check-glyphs.mjs`); `schInductor` and `schPot`
+  in `schematic/schematic.ts` (spec 30 → 73 tests), with the `g.art` dim
+  layer (`ART_STYLES`) and a shared `RESISTOR_V` path.
+- 8 new sources (`tt-tn004`, `ti-snva112`, `knudtsen-2022`, `johnson-2010`,
+  `vishay-std-ohmic-values`, `vishay-decade-table`, `yageo-mfr`,
+  `vishay-tnpw-e3`), 01-01 notes on six existing ones, nine new BIBLIOGRAPHY
+  §8 rows.
+- `docs/briefs/tolerance-spread.md` (D-1 to D-23); ROADMAP, ARCHITECTURE,
+  DESIGN-PIXEL-ART, README.
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/ver0101-dist`), then `ng build --verbose` | Pass: content 12 modules, 8 lessons × 2; glyphs **1537** instrument strings all covered; **43 prerendered routes** (41 + the two 01-01 pages). `main` 328.38 / 91.78 kB; `tolerance-spread` 15.47 / 5.27 kB (bundles `app-histogram`); 01-01 lesson chunks 23.90 / 7.81 kB (EN) and 27.39 / 8.92 kB (ES). Per-lesson range still 7.8–33.4 kB, per-instrument still 5.6–22.8 kB. |
+| `pnpm test:ci` | **12 files, 290 tests pass** (format 33, ohm-law 12, resistor-network 14, divider 16, kirchhoff 14, meter-loading 23, power-dissipation 19, thevenin 27, tolerance-spread 41, curve 10, histogram 8, schematic 73). |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ `prefers-contrast: more`) pass; table current (no new colour). |
+| axe on the private copy | **0 violations**, 43 routes × 4 theme states = **172 pages** (light 0, system-dark 0, dark 0, light-forced 0). |
+| Behaviour test (Playwright from `AXE_TOOLS_DIR`, outside the repo), keyboard only, EN and ES | All functional checks pass, no console or page errors. Tab order inside the widget: Tolerance radio → Assumed shape radio → New batch → Vin box → slider → R1 box → slider → R2 box → slider. ArrowRight on Tolerance gives W-2 exactly (±1%, 4.455 V to 4.545 V; ±0.5%, 4.477 V to 4.521 V; +0.7%, 4.534 V); ArrowRight on shape gives W-3 (±3.9%, 4.327 V to 4.671 V; +4.9%, 4.719 V); Enter and Space on New batch step batches 2–5 with the brief's figures (batch 2 ±2.4%, +4.2%, 4.688 V; batch 3 −3.9%, 4.325 V; batch 5 ±2.4%, −4.3%, 4.305 V); the live region is empty until New batch, then reads "Batch 2: 95% of builds within ±2.4%, furthest +4.2% off." (ES «Lote 2: …»); keys and sliders never write to it. Typed values: 10k / 1k 818.2 mV, ±9.5% (746.7 mV to 895.7 mV), batch 1 ±4.4% (782 mV to 853.4 mV), +7% 875.5 mV; 1k / 10k 8.182 V, ±0.9% (8.104 V to 8.253 V), ±0.5%, −0.7%; 12 V, 10k, 2.7k: 2.551 V, ±8.1% (2.356 V to 2.758 V), and ±1.6% at 1% (the prose's figure). ES: default «4,5 V», «±5 %», «de 4,275 V a 4,725 V», «+3,7 %», «4,668 V, lote 1»; the prose's `2,7k` (decimal comma) and `2.7k` both parse, ±8,1 % then ±1,6 %. Histogram: `role="img"`, spoken label updates with the numbers; two `4 4` dashed band rules; tick labels 4.275 V, 4.5 V, 4.725 V, title Vout, minor ticks at ±1 %. Focus ring visible on every control. |
+| Layout, 375 / 900 / 1280 px, light and dark, EN and ES, for 10k/10k, 100k/100k, 1M/1M, 10k/1k, 100/1M | No horizontal page or widget overflow anywhere; both segments stay on one row at every width (key tops differ by the pressed key's 2–3 px offset only); readout grid is 1 column at 375 px, 2 at 900 and 1280. No collision between the right-aligned accent nominal at (30, 5.6) and the `±5 %` resistor values, including `100 kΩ ±5 %` and `1 MΩ ±5 %` at 375 px, which confirms the reason for moving it; no histogram text collisions. The only bounding-box contacts are the stacked name/value lines of each resistor (about 3 px of line box), the same as every schematic. Screenshots at 375 and 1280 px, both themes, checked by eye. |
+| Maths (independent re-implementation of brief §5 in a throwaway script) | mulberry32(1) and the first four bell and flat deviates match brief §5 spec cases 1–2 to the last digit. W-1: 4.5 V; 4.275 / 4.725 V; lo95 4.388, hi95 4.605 (±2.48 %); furthest 4.668 V (+3.74 %); first three 4.368, 4.388, 4.451 V; sd 54.128 mV (1.203 %, first-order 1.1785 %); the 66-bin array equals the brief's exactly, max 64. W-2: 4.477 / 4.521 V, +0.75 %, max bin 271, same bins. W-3: 4.327 / 4.671 V (±3.85 %), furthest 4.719 V (+4.88 %), 38 builds beyond ±4 % ("a few dozen"), max bin 38; flat 1 % 4.466 / 4.534 V, +0.98 %, max 158; flat sd/nominal 2.048 % against 2.041 %. Batches 2–5: ±2.36, 2.32, 2.38, 2.39 %; furthest +4.19, −3.88, −3.43, −4.33 %. W-4: −8.734 / +9.479 %; 1k/10k −0.948 / +0.873 %; 12 V 2.551 V, −7.654 / +8.107 %, at 1 % ±1.584 % (→ ±1.6 %). W-5: 2.520 % and 8.921 % (TI 2.54, 9.02), 15 V 2.867 % and 10.728 % (TI 2.87, 10.76), six-sigma RSS 1.453 % and 5.362 % (Table 4 1.45, 5.36). W-6: 9·9.75/19.75 = 4.443 V (−1.27 %), 4.557 V, metal film 4.511 V, 10.3 kΩ. W-7: ratios 10.07 %, 21.15 %, 2.43 %; see m-1 for the band gaps. Truncated bell: 67.9 % of parts within t/3 ("about two in three"). Bench divider 450 µA, 2.03 mW per resistor. |
+| Sources (fetched 2026-11-04; PDF text extracted with pypdf outside the repo) | `ti-snva112`: Table 1 at 5.0 V, ΔVref ±1.0: 2.54 % (1 %) and 9.02 % (5 %), 15 V 2.87 / 10.76; Table 4 1.45 / 5.36; "excessively conservative tolerance limits" (§3 p. 2); "the vendor may be reluctant to release this data" (§6 p. 4); Fig. 6 "Typical Resistor Variation: 1% General Purpose 0805 SMD", axis 130–136 Ω; Table 1's 2.64 % misprint at 3.3 V confirmed. `johnson-2010` (sigcon.com): 1983, 300 resistors, 10 % carbon composition, "none-absolutely none" within the 1 % window, the mentor's napkin explanation, no measured values. `vishay-tnpw-e3` (rev. 10-Apr-2026): TCR ±50/±25/±15/±10 ppm/K (p. 1), ≤ 0.05 % after 1000 h in general mode (p. 2); the same document's p. 3 table also lists TNPU e3 at ±5 and ±2 ppm/K (m-2). `yageo-cfr`: tolerance codes G ±2 % and J ±5 % only; Table 2 CFR-25 "-500 ~ +350" ppm/°C under 100 kΩ; endurance at 70 °C 1,000 h ±3.0 % + 0.05 Ω. `knudtsen-2022` (Electronic Design, Steve Knudtsen, ADI, 1 Feb. 2022): "worst-case limits are statistically improbable"; "both worst-case and statistical analysis provide valuable insights". `stackpole-cf` returned 403 to scripted requests and was not re-checked. Nothing from BIBLIOGRAPHY §8 supports a figure: IEC 60063 is cited for its existence only, the pairing is presented as a convention, `hyperphysics-es` only for four-band colours and letters, `johnson-2010` only as an anecdote, no hobbyist measurement is used. |
+| Safety (brief §8, ROADMAP §3.1) | One `:::safety` callout in the same place and with the same claims in EN and ES, directly before the bench step; bench is a 9 V battery and 10 kΩ parts, power off, one end lifted, leads in COM and V/Ω. No suggestion to heat a resistor (the 50 K case is a datasheet calculation), no bench build of an instrument extreme, no in-circuit powered measurement. Instrument clamps Vin 1–24 V, R 100 Ω–1 MΩ, shows no power or temperature and has no warn/danger tone. ROADMAP §3.1 table has the 01-01 row (D-18). |
+| EN/ES parity, SKILL.md, glossary | Same sections, widget line, callouts, 16 references and numbers; ES decimal commas, «…», tú, LatAm wording («computadora», «agregar»). Control labels in the prose match `ui.ts` (Worst case / «Peor caso», 95% of builds / «95 % de los montajes», Furthest of 1000 / «El más alejado de 1000», Bell / «Campana», Flat / «Plana», New batch / «Otro lote», Assumed shape / «Forma supuesta»). No em dashes; average sentence 17.1 words (EN) and 19.4 (ES). Every new term defined at first use and in the glossary. The 01-01 title matches ROADMAP §4 and the glossary heading. |
+| Code (CLAUDE.md Angular rules) | Standalone by default, no `standalone: true`, no explicit `OnPush`, `input()`, signals, `linkedSignal` seeded through `parseValue` and clamped, `computed()` for all derived state, native `@for`, `[class.x]` bindings, no `ngClass`/`ngStyle`, module-counter radio names, live region written only by New batch. `app-histogram` is generic, `role="img"` or `aria-hidden` when unlabelled, nothing focusable. Spec coverage of the symbol deviations: leads-only highlight (stroke-width 4 on `path.lead`, 2 on coil and core, butt caps) and the `g.art` structure are asserted. |
+| Docs | ROADMAP status, module 01 (1 of 5), totals (69 / 61, 66 / 58), A1 row, A2 note, §3.1 row; ARCHITECTURE tree, §4.4, §4.5, §5.5; DESIGN-PIXEL-ART file table and non-colour cues (including the 1-unit minimum bar, which the code enforces); README. Every "TBD-by-verification" marker filled below. |
+| Hygiene | `git diff --check main...HEAD` clean; no CR in any changed file, all end in a newline; `git status` before my edits clean; no untracked file; no harness, screenshot or scratch file in the repo (all in the session scratchpad and `/tmp`). |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| m-1 | Minor | Technical accuracy | `content/en/01-passives/01-real-resistors.md` "Standard values" ¶2 ("Neighbouring bands meet or nearly meet, so whatever value you work out, a listed value lies within about its tolerance") and ES ¶2 («Las bandas vecinas se tocan o casi se tocan…»); `docs/briefs/tolerance-spread.md` §6 W-7 bullet 2 ("touch or just overlap … within tolerance") | At ±5 % the E24 bands leave gaps at seven of 24 steps, not only 27→30 and 82→91: 13→15 (13.65 to 14.25 kΩ, a 4.4 % gap), 16→18 and 24→27 (1.8 %), 18→20 and 27→30 (0.5 %), 82→91 (0.4 %), 56→62 (0.2 %); at ±10 % E12 has 12→15 (2.3 %) and 22→27 (0.4 %). A value midway between 13 and 15 is 7.4 % from the nearest E24 value (11.8 % for E12). Content agent: say the neighbours' bands come close and sometimes leave a small gap (13 and 15 kΩ at 5 % leave about 4 %), and that any value is within about 7 % of an E24 value, or drop the "within its tolerance" clause; same change in EN and ES. Brief owner: correct W-7 to the same facts. |
+| m-2 | Minor | References | EN "Temperature and age" list, "±10 ppm/K in Vishay's best grade"; ES «en el mejor grado de Vishay»; `vishay-tnpw-e3` notes | The cited datasheet's p. 3 table also lists TNPU e3 thin-film chips at ±5 and ±2 ppm/K, so ±10 ppm/K is the best grade of the TNPW line, not Vishay's best. Write "in the best grade of Vishay's TNPW line" / «en el mejor grado de la línea TNPW de Vishay» (or "a precision grade"). |
+| m-3 | Minor | Plan | `docs/briefs/tolerance-spread.md` §4 Schematic (accent `schLabel` "at (21, 5.6), anchor middle"), §4 Readouts, §4 `app-histogram` geometry ("height `round(count / yMax · H)`") | Step 4 deviations are recorded only in code comments: the accent nominal moved to (30, 5.6), `anchor="end"` (justified: verified above, `100 kΩ ±5 %` would reach it at phone size); the readout grid uses `minmax(min(100%, 180px), 1fr)`, one column on phones (justified: the range notes would break before their unit); every non-empty bin is at least 1 unit tall (`Math.max(1, …)`, recorded in DESIGN-PIXEL-ART but not the brief). The brief says "record any change of decision here first": add a "Step 4 deviations" paragraph like the step 3 one. |
+| S-1 | Suggestion | Design | `src/app/schematic/schematic.ts` `SchBattery` (pre-existing, 00-07; out of scope) | The symbols agent's suspicion is right: the bottom lead (`M0 34 V40` for `battery`, `M0 26 V40` for `cell`) has a square cap that extends 1 unit (2 when highlighted) into the last plate's `rect.fill` (y 30–34 or 22–26), so under `dim` the 2 × 1 overlap composites twice (1 − 0.45² ≈ 0.80 instead of 0.55) and shows a darker seam. Follow-up: wrap the battery's drawing in `g.art` with `ART_STYLES` (as `schPot`), or butt-cap that lead, with a spec case. |
+| S-2 | Suggestion | Code | `src/app/schematic/schematic.spec.ts` schInductor / schPot | The specs assert the `g.art` structure but not its effect; add a check that under `dim` the computed opacity is 0.55 on `g.art` and 1 on its paths and fills. |
+| S-3 | Suggestion | Pedagogy | Both lessons, a few sentences over 30 words (ES «La vida bajo carga es…» 43 words, «La nota de Texas Instruments…» 39; EN the `R = R₀ · …` sentence 33) | SKILL §1 says split anything over 30; averages are within the 20-word aim. Optional split on the next content pass. |
+| S-4 | Suggestion | Content parity | `content/es/01-passives/_module.md` summary (pre-existing) | Besides the «Resistencias» fixed below, the summary keeps the English «derating» and an em dash; consider «reducción de la potencia nominal» when module 01's later lessons land. |
+
+### Fixed during verification
+
+- `content/es/01-passives/_module.md` summary: «Resistencias, condensadores y
+  bobinas» → «Resistores, …» (glossary rule: «resistor» is the part,
+  «resistencia» the property).
+- `ARCHITECTURE.md` §3 (same method that reproduces `main`'s 572 / 352 /
+  3326 + 1553 lines, 8,542 lines of non-spec source and 28,184 words of
+  lesson bodies): `i18n/ui.ts` 642 lines, `lesson/` 354, `widgets/` 4016
+  lines plus 2038 of maths specs; "Roughly 9,800 lines of source" (9,790),
+  "~34,000 words" (33,979; 01-01 is 2,713 EN / 3,082 ES words of body).
+  The `core/`, `pages/`, `schematic/` and `ui/` figures already matched.
+- `ARCHITECTURE.md` §4.3: `tolerance-spread` 15.5 kB, inside 5.6–22.8 kB.
+- `ARCHITECTURE.md` §4.8 size table and note: `main.js` 314 / 88 kB → 328 / 92
+  kB (measured); 01-01 lesson chunks 23.9 / 7.8 kB (EN), 27.4 / 8.9 kB (ES),
+  `tolerance-spread` 15.5 / 5.3 kB, ranges unchanged.
+- `ARCHITECTURE.md` §5.2: 43 prerendered routes; §5.5: 290 tests.
+- `docs/ROADMAP.md` A7: 290 specs; module 01 note: the built instrument
+  reproduces W-1 to W-4 (checked above).
+
+**Ready to merge: no** (m-1, m-2, m-3 open).
+
 ## Verification: 00-07 Real sources: internal resistance and Thévenin (2026-10-30)
 
 This is an independent check of branch `content/00-07-real-sources` at

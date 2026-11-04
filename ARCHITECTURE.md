@@ -135,14 +135,14 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (596 lines, plus a 269-line spec)
-│       ├── i18n/ui.ts          ← every UI string, both languages (TBD-by-verification lines; 572 before 01-01)
-│       ├── lesson/             ← the Markdown → components renderer (TBD-by-verification lines; 352 before 01-01)
+│       ├── i18n/ui.ts          ← every UI string, both languages (642 lines; 572 before 01-01)
+│       ├── lesson/             ← the Markdown → components renderer (354 lines; 352 before 01-01)
 │       ├── pages/              ← the five routed views (1051 lines)
 │       ├── schematic/          ← SVG symbol library (706 lines, plus an 855-line spec)
 │       ├── ui/                 ← panel, control, readout, curve, histogram primitives (1316 lines, plus 545 lines of specs)
 │       │   ├── curve.ts        ← app-curve: static XY plot (00-07), with curve.spec.ts
 │       │   └── histogram.ts    ← app-histogram: static histogram (01-01), with histogram.spec.ts
-│       ├── widgets/            ← the instruments (TBD-by-verification lines, plus TBD-by-verification lines of maths specs; 3326 and 1553 before 01-01)
+│       ├── widgets/            ← the instruments (4016 lines, plus 2038 lines of maths specs; 3326 and 1553 before 01-01)
 │       │   ├── thevenin/       ← 00-07's instrument; arithmetic in thevenin-math.ts + spec
 │       │   └── tolerance-spread/ ← 01-01's instrument; arithmetic in tolerance-spread-math.ts + spec
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
@@ -154,8 +154,8 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly TBD-by-verification lines of source, plus ~TBD-by-verification words
-of lesson prose so far (8,500 and ~28,000 before 01-01).
+Roughly 9,800 lines of source, plus ~34,000 words of lesson prose so far
+(8,500 and ~28,000 before 01-01).
 
 ---
 
@@ -263,7 +263,7 @@ makes the prerenderer wait.
 
 The widget registry is a plain map of `type → () => import(...)`, so a lesson
 downloads only the instruments it references. Each instrument is its own lazy
-chunk of 5.6–22.8 kB (before 01-01; `tolerance-spread` TBD-by-verification).
+chunk of 5.6–22.8 kB (`tolerance-spread`, 15.5 kB, is inside that range).
 
 ### 4.4 The instruments
 
@@ -405,7 +405,7 @@ not injected after hydration.
 
 | | Raw | Gzipped |
 |---|---|---|
-| `main.js` | 314 kB | **88 kB** |
+| `main.js` | 328 kB | **92 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
 | Per-lesson chunk | 7.8–33.4 kB | 2.7–10.2 kB |
 | Per-instrument chunk | 5.6–22.8 kB | 2.0–6.7 kB |
@@ -418,8 +418,10 @@ the per-lesson row again on 2026-10-28, with 00-06; `power-dissipation` is
 6.3 kB / 2.6 kB, inside the per-instrument range; both rows updated
 2026-10-30, with 00-07: its lesson chunks are 29.6 / 8.9 kB (EN) and
 33.4 / 10.2 kB (ES), and `thevenin`, which bundles `app-curve`, is
-22.8 / 6.7 kB; 01-01's lesson chunks and `tolerance-spread`, which bundles
-`app-histogram`, are TBD-by-verification, and both ranges with them).
+22.8 / 6.7 kB; on 2026-11-04, with 01-01, its lesson chunks are
+23.9 / 7.8 kB (EN) and 27.4 / 8.9 kB (ES) and `tolerance-spread`, which
+bundles `app-histogram`, is 15.5 / 5.3 kB, all inside the ranges above; the
+`main.js` row was re-measured the same day).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -504,7 +506,7 @@ the parameterised ones from the generated curriculum:
 
 Adding a lesson to `content/` is therefore all it takes to get a new static
 page — the route list is derived, never hand-maintained. The current build
-produces **TBD-by-verification prerendered routes** (41 before 01-01, which
+produces **43 prerendered routes** (41 before 01-01, which
 adds its EN and ES pages).
 
 `lessonResolver` matters here. Loading the lesson in a resolver rather than
@@ -601,7 +603,7 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   Kirchhoff, meter loading, power dissipation, Thévenin, tolerance spread),
   `ui/curve.spec.ts` and `ui/histogram.spec.ts` (the `app-curve` and
   `app-histogram` plots) and `schematic/schematic.spec.ts` (the meter,
-  battery, box, inductor and potentiometer symbols), TBD-by-verification
+  battery, box, inductor and potentiometer symbols), 290
   tests (198 before 01-01). `pnpm test:ci` runs them once and needs no `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
   `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x
