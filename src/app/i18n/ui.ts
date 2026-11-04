@@ -166,6 +166,32 @@ export interface UiStrings {
     sourceNameNimhSpoken: string;
     sourceNameCr2032Spoken: string;
     sourceNameCustomSpoken: string;
+    /** Tolerance-spread instrument. The 5 % / 1 % key labels come from
+     *  formatPercent, not from here. */
+    tolerance: string;
+    assumedShape: string;
+    shapeBell: string;
+    shapeFlat: string;
+    newBatch: string;
+    nominal: string;
+    exactParts: string;
+    worstCase: string;
+    /** A readout note's range; `{low}` and `{high}` are formatted voltages. */
+    rangeTo: string;
+    ninetyFiveOfBuilds: string;
+    /** `{n}` is the number of simulated builds. */
+    furthestOf: string;
+    /** `{v}` is the furthest build's voltage, `{k}` the batch number. */
+    furthestNote: string;
+    /** The histogram's label above the dashed worst-case rules. */
+    worstCaseBand: string;
+    toleranceSpreadSpoken: string;
+    toleranceCircuitSpoken: string;
+    histogramSpoken: string;
+    shapeBellSpoken: string;
+    shapeFlatSpoken: string;
+    /** Announced (aria-live) only when New batch is pressed. */
+    newBatchSpoken: string;
   };
   theme: { toggle: string; light: string; dark: string };
   langSwitch: { label: string; other: string };
@@ -353,6 +379,27 @@ const en: UiStrings = {
     sourceNameNimhSpoken: 'AA NiMH rechargeable cell',
     sourceNameCr2032Spoken: 'CR2032 lithium coin cell',
     sourceNameCustomSpoken: 'custom source',
+    tolerance: 'Tolerance',
+    assumedShape: 'Assumed shape',
+    shapeBell: 'Bell',
+    shapeFlat: 'Flat',
+    newBatch: 'New batch',
+    nominal: 'Nominal',
+    exactParts: 'exact parts',
+    worstCase: 'Worst case',
+    rangeTo: '{low} to {high}',
+    ninetyFiveOfBuilds: '95% of builds',
+    furthestOf: 'Furthest of {n}',
+    furthestNote: '{v}, batch {k}',
+    worstCaseBand: 'worst case',
+    toleranceSpreadSpoken: 'Vout = Vin × R2 / (R1 + R2), each resistor within its tolerance',
+    toleranceCircuitSpoken:
+      'A {vin} supply feeds R1, {r1}, and R2, {r2}, both {tol} parts. With exact parts the output would be {nominal}.',
+    histogramSpoken:
+      'Histogram of {n} simulated dividers built from {tol} parts, assuming a {shape} spread. Nominal output {nominal}. 95 of every 100 land between {lo95} and {hi95}; the furthest is {far}, {farRel} off. The worst case runs from {low} to {high}.',
+    shapeBellSpoken: 'bell-shaped',
+    shapeFlatSpoken: 'flat',
+    newBatchSpoken: 'Batch {k}: 95% of builds within {rel95}, furthest {farRel} off.',
   },
   theme: { toggle: 'Switch theme', light: 'Light', dark: 'Dark' },
   langSwitch: { label: 'Language', other: 'Español' },
@@ -553,6 +600,29 @@ const es: UiStrings = {
     sourceNameNimhSpoken: 'pila recargable NiMH AA',
     sourceNameCr2032Spoken: 'pila de botón de litio CR2032',
     sourceNameCustomSpoken: 'fuente libre',
+    tolerance: 'Tolerancia',
+    assumedShape: 'Forma supuesta',
+    shapeBell: 'Campana',
+    shapeFlat: 'Plana',
+    newBatch: 'Otro lote',
+    nominal: 'Nominal',
+    exactParts: 'con piezas exactas',
+    worstCase: 'Peor caso',
+    rangeTo: 'de {low} a {high}',
+    ninetyFiveOfBuilds: '95 % de los montajes',
+    furthestOf: 'El más alejado de {n}',
+    furthestNote: '{v}, lote {k}',
+    worstCaseBand: 'peor caso',
+    toleranceSpreadSpoken:
+      'Vout = Vin × R2 / (R1 + R2), cada resistor dentro de su tolerancia',
+    toleranceCircuitSpoken:
+      'Una fuente de {vin} alimenta R1, {r1}, y R2, {r2}, ambos con una tolerancia de {tol}. Con piezas exactas, la salida sería {nominal}.',
+    histogramSpoken:
+      'Histograma de {n} divisores simulados, montados con piezas de {tol}, suponiendo una distribución {shape}. Salida nominal: {nominal}. 95 de cada 100 quedan entre {lo95} y {hi95}; el más alejado da {far}, una desviación de {farRel}. El peor caso va de {low} a {high}.',
+    shapeBellSpoken: 'en forma de campana',
+    shapeFlatSpoken: 'plana',
+    newBatchSpoken:
+      'Lote {k}: el 95 % de los montajes, dentro de {rel95}; el más alejado, a {farRel}.',
   },
   theme: { toggle: 'Cambiar tema', light: 'Claro', dark: 'Oscuro' },
   langSwitch: { label: 'Idioma', other: 'English' },
