@@ -253,6 +253,24 @@ Under the schematic in the same `panelFigure` screen.
   bars, rules and text `CanvasText`. Non-colour cue: bars are solid, the band
   rules dashed.
 
+### Step 4 deviations (recorded after verification m-3)
+
+- *Nominal label.* The accent `schLabel` with the nominal output sits at
+  (30, 5.6) with `anchor="end"`, right-aligned over the Vout pad, not at
+  (21, 5.6) anchored middle as in `divider`. Here the resistor values carry
+  the tolerance (`100 kΩ ±5 %` reaches x ≈ 215 at phone text size) and
+  collided with a centred label at 375 px; the 4-figure value (`818,2 mV`)
+  keeps clear of them right-aligned (`tolerance-spread.ts` template comment).
+- *Readout grid.* `div[panelReadouts]` uses
+  `grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr))`:
+  2 × 2 on wide panels, one column on phones, so a range note such as
+  "4.275 V to 4.725 V" never breaks before its unit.
+- *Minimum bar height.* In `app-histogram` every non-empty bin is at least
+  1 unit tall, `Math.max(1, round(min(1, count / yMax) · H))`, so a lone
+  build (the furthest one at 1 %, where `yMax` is about 310) does not round
+  to nothing. Zero-count bins still draw no rect. (Also in
+  DESIGN-PIXEL-ART's non-colour cues.)
+
 ### New primitive and symbols (step 3)
 
 #### `app-histogram`, `src/app/ui/histogram.ts` (D-4, D-13)
@@ -770,10 +788,18 @@ of the same size as its tolerance.
 - Neighbouring values differ by `10^(1/24)` = 10.07 % in E24, 21.15 % in E12,
   2.43 % in E96 (computed from the lists' definition, `vishay-decade-table`
   "approximately by the 24th … root of 10").
-- So the tolerance bands of neighbours touch or just overlap: 10 kΩ ±5 % is
-  9.5–10.5 kΩ, 11 kΩ ±5 % is 10.45–11.55 kΩ; 10 kΩ ±10 % is 9–11 kΩ, 12 kΩ
-  ±10 % is 10.8–13.2 kΩ. Any value you could want is within tolerance of a
-  value on the list.
+- So the tolerance bands of neighbours nearly cover the decade, but not
+  quite: 10 kΩ ±5 % is 9.5–10.5 kΩ and 11 kΩ ±5 % is 10.45–11.55 kΩ
+  (overlap); 10 kΩ ±10 % is 9–11 kΩ and 12 kΩ ±10 % is 10.8–13.2 kΩ. Gaps
+  between neighbouring bands (computed; corrected after verification m-1):
+  E24 at ±5 % has seven, 13→15 (13.65 to 14.25, 4.40 %), 16→18 (1.79 %),
+  24→27 (1.79 %), 18→20 (0.53 %), 27→30 (0.53 %), 82→91 (0.41 %), 56→62
+  (0.17 %); E12 at ±10 % has two, 12→15 (13.2 to 13.5, 2.27 %) and 22→27
+  (0.41 %). The furthest any value can be from the nearest listed one is
+  7.4 % for E24 (the geometric middle of 13 and 15, about 13.96) and 11.8 %
+  for E12 (between 12 and 15). The prose says the bands nearly cover the
+  decade but leave small gaps, with 13→15 at 5 % as the example; it does not
+  say every value is within tolerance of a listed one.
 - The pairing: E12 with ±10 %, E24 with ±5 % and ±2 %, E96 with ±1 %,
   E192 with ±0.5 % and tighter (`vishay-decade-table`); `vishay-std-ohmic-values`
   heads E48 with ±2 %. Present it as the usual convention (BIBLIOGRAPHY §8:

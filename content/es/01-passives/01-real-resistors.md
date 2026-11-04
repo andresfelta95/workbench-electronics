@@ -127,8 +127,11 @@ multiplica por la raíz 24, 12 o 96 de diez.) Esa separación encaja con las
 tolerancias. Una pieza de 10 kΩ y 5 % cubre de 9,5 kΩ a 10,5 kΩ, y el valor
 siguiente de la E24, 11 kΩ, cubre de 10,45 kΩ a 11,55 kΩ. La E12 hace lo mismo
 con 10 %: 10 kΩ cubre de 9 kΩ a 11 kΩ, y 12 kΩ cubre de 10,8 kΩ a 13,2 kΩ. Las
-bandas vecinas se tocan o casi se tocan, así que para cualquier valor que
-calcules hay un valor de la lista a más o menos su tolerancia.
+bandas casi cubren cada factor de diez, pero algunas vecinas dejan un pequeño
+hueco. Con 5 %, 13 kΩ llega hasta 13,65 kΩ y 15 kΩ baja hasta 14,25 kΩ, así
+que ningún valor de la E24 cubre el 4,4 % que hay entre ellos. Un valor que
+calculas en unos 14 kΩ queda a más o menos un 7 % del valor de la E24 más
+cercano, un poco más allá de la tolerancia.
 
 La combinación habitual es la E12 para piezas de 10 %, la E24 para 5 % y 2 %,
 y la E96 para 1 %. Es una costumbre, no una ley: otra tabla de Vishay pone el
@@ -294,7 +297,7 @@ Según los límites de las hojas de datos:
   Hasta −2,5 %, o 9,75 kΩ.
 - **Chip de película gruesa** (Yageo RC0603): ±100 ppm/K. ±0,5 %, o 10,05 kΩ.
 - **Película metálica:** ±50 ppm/K. ±0,25 %, unos 10,03 kΩ.
-- **Chip de película delgada:** ±10 ppm/K en el mejor grado de Vishay.
+- **Chip de película delgada:** ±10 ppm/K en el mejor grado de la línea TNPW de Vishay.
   ±0,05 %, unos 10,01 kΩ.
 
 El carbono como material tiene −500 ppm/K en la tabla de OpenStax: es una

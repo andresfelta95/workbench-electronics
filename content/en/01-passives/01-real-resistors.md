@@ -118,8 +118,11 @@ E24, 21 % in E12 and 2.4 % in E96. (Each step multiplies by the 24th, 12th or
 96th root of ten.) That spacing fits the tolerances. A 10 kΩ, 5 % part covers
 9.5 kΩ to 10.5 kΩ, and the next E24 value, 11 kΩ, covers 10.45 kΩ to
 11.55 kΩ. E12 does the same at 10 %: 10 kΩ covers 9 kΩ to 11 kΩ, and 12 kΩ
-covers 10.8 kΩ to 13.2 kΩ. Neighbouring bands meet or nearly meet, so
-whatever value you work out, a listed value lies within about its tolerance.
+covers 10.8 kΩ to 13.2 kΩ. The bands nearly cover each factor of ten, but
+some neighbours leave a small gap. At 5 %, 13 kΩ reaches up to 13.65 kΩ and
+15 kΩ reaches down to 14.25 kΩ, so nothing in E24 covers the 4.4 % between
+them. A value you work out at about 14 kΩ is about 7 % from the nearest E24
+value, a little beyond the tolerance.
 
 The usual pairing is E12 for 10 % parts, E24 for 5 % and 2 %, and E96 for
 1 %. It is a convention, not a law: another Vishay table puts 2 % with a
@@ -273,7 +276,7 @@ with a much thinner resistive layer. Take a 10 kΩ resistor that warms from
   −2.5 %, or 9.75 kΩ.
 - **Thick-film chip** (Yageo RC0603): ±100 ppm/K. ±0.5 %, or 10.05 kΩ.
 - **Metal film:** ±50 ppm/K. ±0.25 %, about 10.03 kΩ.
-- **Thin-film chip:** ±10 ppm/K in Vishay's best grade. ±0.05 %, about
+- **Thin-film chip:** ±10 ppm/K in the best grade of Vishay's TNPW line. ±0.05 %, about
   10.01 kΩ.
 
 Carbon as a bulk material has −500 ppm/K in OpenStax's table: a property of
