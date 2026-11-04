@@ -88,6 +88,34 @@ deviations in the brief.
 
 **Ready to merge: no** (m-1, m-2, m-3 open).
 
+### Re-verification (2026-11-04)
+
+Branch at `46a36d1` ("Lesson 01-01 fixes: E-series band gaps, TNPW
+wording, step 4 deviations"), on top of `2842b4d` (this section and the
+docs counts).
+
+| Check | Result |
+|---|---|
+| `pnpm content`, `pnpm build` (inside `flock`, fresh copy `/tmp/ver0101-dist2`) | Pass: 12 modules, 8 lessons × 2; glyphs 1537 all covered; 43 routes. `main` 328.40 / 91.69 kB; `tolerance-spread` 15.47 / 5.28 kB; 01-01 lesson chunks now 24.14 / 7.89 kB (EN) and 27.66 / 9.02 kB (ES), still inside the per-lesson range. The prerendered `/es/componentes-pasivos/` page carries the new summary. |
+| `pnpm test:ci`, `pnpm check:contrast` | 12 files, 290 tests pass; 28 pairs × 2 themes pass, table current. |
+| axe on the fresh copy | 0 violations, 43 routes × 4 theme states = 172 pages (light, system-dark, dark, light-forced all 0). |
+| Hygiene | `git diff --check HEAD~1 HEAD` clean; the four changed files have no CR. |
+
+| # | Status | Evidence |
+|---|---|---|
+| m-1 | **Closed** | Recomputed with the earlier script: E24 at ±5 % gaps 13→15 0.600 (4.40 % of 13.65), 16→18 1.79 %, 18→20 0.53 %, 24→27 1.79 %, 27→30 0.53 %, 56→62 0.17 %, 82→91 0.41 % (seven); E12 at ±10 % 12→15 2.27 %, 22→27 0.41 % (two); worst distance to the nearest listed value 7.42 % (E24) and 11.80 % (E12). Brief W-7 now states exactly these. EN and ES prose: "the bands nearly cover each factor of ten, but some neighbours leave a small gap"; 13.65 / 14.25 kΩ and the 4.4 % gap; a value of about 14 kΩ is about 7 % from the nearest E24 value (15 kΩ: 7.1 % of 14, 6.7 % of 15), "a little beyond the tolerance". Correct, the same in both languages, decimal commas in ES. |
+| m-2 | **Closed** | EN "±10 ppm/K in the best grade of Vishay's TNPW line", ES «en el mejor grado de la línea TNPW de Vishay»: matches `vishay-tnpw-e3` (TNPW e3 ±50/±25/±15/±10 ppm/K, p. 1; the ±5 and ±2 ppm/K rows on p. 3 are TNPU e3) and the bibliography entry. |
+| m-3 | **Closed** | Brief §4 "Step 4 deviations" matches the code: `schLabel` at `[x]="30" [y]="5.6"`, `anchor="end"` (`tolerance-spread.ts` template); `grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr))`; `Math.max(1, Math.round(Math.min(1, c / max) * height))` in `histogram.ts`, zero-count bins skipped; `yMax` at 1 % is 1.15 × 271 ≈ 312, as stated. |
+| S-4 | **Closed** | ES `_module.md` summary quoted, no em dash, «reducción de la potencia nominal» (the glossary's term). |
+| S-1, S-2, S-3 | Open, Suggestions | Unchanged; S-1 (`schBattery` dim seam) is a follow-up outside this change. |
+
+Fixed during re-verification: `ARCHITECTURE.md` §4.8 note, 01-01 lesson
+chunks 23.9 / 7.8 → 24.1 / 7.9 kB (EN) and 27.4 / 8.9 → 27.7 / 9.0 kB (ES),
+as measured above.
+
+**Ready to merge: yes.** No Blocker, Major or Minor finding is open in this
+change's scope; three Suggestions remain.
+
 ## Verification: 00-07 Real sources: internal resistance and Thévenin (2026-10-30)
 
 This is an independent check of branch `content/00-07-real-sources` at

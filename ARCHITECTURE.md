@@ -419,7 +419,7 @@ the per-lesson row again on 2026-10-28, with 00-06; `power-dissipation` is
 2026-10-30, with 00-07: its lesson chunks are 29.6 / 8.9 kB (EN) and
 33.4 / 10.2 kB (ES), and `thevenin`, which bundles `app-curve`, is
 22.8 / 6.7 kB; on 2026-11-04, with 01-01, its lesson chunks are
-23.9 / 7.8 kB (EN) and 27.4 / 8.9 kB (ES) and `tolerance-spread`, which
+24.1 / 7.9 kB (EN) and 27.7 / 9.0 kB (ES) and `tolerance-spread`, which
 bundles `app-histogram`, is 15.5 / 5.3 kB, all inside the ranges above; the
 `main.js` row was re-measured the same day).
 
