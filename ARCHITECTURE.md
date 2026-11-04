@@ -101,6 +101,10 @@ electronics/
 │   │   ├── 06-power-and-heat.md
 │   │   └── 07-real-sources.md
 │   ├── es/00-fundamentals/     ← same ids, translated slugs and prose
+│   ├── en/01-passives/
+│   │   ├── _module.md
+│   │   └── 01-real-resistors.md
+│   ├── es/01-passives/         ← likewise; modules 02–11 hold only _module.md so far
 │   ├── bibliography.yaml       ← every source, keyed by id; lessons cite ids
 │   └── LICENSE                 ← CC BY-SA 4.0, content only
 │
@@ -131,14 +135,16 @@ electronics/
 │       ├── app.config.server.ts
 │       │
 │       ├── core/               ← services and pure logic (596 lines, plus a 269-line spec)
-│       ├── i18n/ui.ts          ← every UI string, both languages (572 lines)
-│       ├── lesson/             ← the Markdown → components renderer (352 lines)
+│       ├── i18n/ui.ts          ← every UI string, both languages (642 lines; 572 before 01-01)
+│       ├── lesson/             ← the Markdown → components renderer (354 lines; 352 before 01-01)
 │       ├── pages/              ← the five routed views (1051 lines)
-│       ├── schematic/          ← SVG symbol library (532 lines, plus a 485-line spec)
-│       ├── ui/                 ← panel, control, readout, curve primitives (1004 lines, plus a 274-line spec)
-│       │   └── curve.ts        ← app-curve: static XY plot (00-07), with curve.spec.ts
-│       ├── widgets/            ← the instruments (3326 lines, plus 1553 lines of maths specs)
-│       │   └── thevenin/       ← 00-07's instrument; arithmetic in thevenin-math.ts + spec
+│       ├── schematic/          ← SVG symbol library (706 lines, plus an 855-line spec)
+│       ├── ui/                 ← panel, control, readout, curve, histogram primitives (1316 lines, plus 545 lines of specs)
+│       │   ├── curve.ts        ← app-curve: static XY plot (00-07), with curve.spec.ts
+│       │   └── histogram.ts    ← app-histogram: static histogram (01-01), with histogram.spec.ts
+│       ├── widgets/            ← the instruments (4016 lines, plus 2038 lines of maths specs; 3326 and 1553 before 01-01)
+│       │   ├── thevenin/       ← 00-07's instrument; arithmetic in thevenin-math.ts + spec
+│       │   └── tolerance-spread/ ← 01-01's instrument; arithmetic in tolerance-spread-math.ts + spec
 │       └── content-generated/  ← BUILD OUTPUT, git-ignored
 │
 ├── .github/workflows/build.yml ← CI: build, unit tests + contrast, axe (§5.5)
@@ -148,7 +154,8 @@ electronics/
 └── ARCHITECTURE.md             ← this file
 ```
 
-Roughly 8,500 lines of source, plus ~28,000 words of lesson prose so far.
+Roughly 9,800 lines of source, plus ~34,000 words of lesson prose so far
+(8,500 and ~28,000 before 01-01).
 
 ---
 
@@ -256,7 +263,7 @@ makes the prerenderer wait.
 
 The widget registry is a plain map of `type → () => import(...)`, so a lesson
 downloads only the instruments it references. Each instrument is its own lazy
-chunk of 5.6–22.8 kB.
+chunk of 5.6–22.8 kB (`tolerance-spread`, 15.5 kB, is inside that range).
 
 ### 4.4 The instruments
 
@@ -281,7 +288,7 @@ Three shared primitives under `ui/` mean a new instrument is mostly arithmetic:
 - **`Readout`** — one measured value with a label, optional note, and a semantic
   tone that colours it when a number crosses into trouble.
 
-A fourth, smaller one serves instruments that need a graph:
+Two smaller ones serve instruments that need a graph:
 
 - **`Curve`** (`app-curve`, `ui/curve.ts`, added in 00-07) — a static XY plot:
   one series, log or linear x, linear y from 0, tick labels, axis titles and
@@ -290,6 +297,24 @@ A fourth, smaller one serves instruments that need a graph:
   numbers; nothing on it is interactive, so a widget drives it from an
   `app-control`. It is not ROADMAP A2's `app-trace` (cursors, scope and Bode
   traces), which may later absorb it.
+- **`Histogram`** (`app-histogram`, `ui/histogram.ts`, added in 01-01) — a
+  static histogram. Inputs: `w` and `h` in grid units; `xMin` and `xMax`, a
+  linear range the bins span exactly; `counts`, equal-width bins low to high;
+  `yMax`, the count at the plot top (larger counts are clamped; ≤ 0 or not
+  finite draws no bars); `xTicks` (the same `CurveTick` shape as `app-curve`);
+  `xTitle`; an optional `band` `{ lo, hi, label }`, two dashed full-height
+  rules with the label centred above them, ends clamped to the range; and the
+  spoken `label`. There is no y axis: the counts belong in the `label`, which
+  is the `aria-label` of a `role="img"` SVG with no live region, and an empty
+  `label` makes the plot decorative (`aria-hidden`). Margins are fixed, so a
+  given `w × h` always has the same plot area. Any positive count draws a bar
+  at least one unit tall, so a lone build is never rounded away. Drawing
+  order: the axis first (its 2-unit stroke straddles the baseline and would
+  hide a 1-unit bar), then the bars, then the band, so a bar straddling an
+  end cannot hide its rule; ticks and the title last. It is a sibling of
+  `app-curve`, not an extension of it, importing only `CurveTick`
+  (`docs/briefs/tolerance-spread.md` D-13): bars and a band are a different
+  data model, and A2 may absorb `app-curve` without them.
 
 `core/format.ts` holds the shared arithmetic: engineering notation with SI
 prefixes (`formatSI`), locale-correct decimal separators (`4.5 V` / `4,5 V`),
@@ -311,8 +336,9 @@ Circuits are components, not images. Symbols are **attribute selectors on
 
 Everything sits on a 10-unit grid. Symbols share an abstract base class giving
 them `x`, `y`, `dim` and `highlight`. The library (`SCHEMATIC`) holds the
-canvas and the resistor, capacitor, source, battery, meter, box, ground,
-terminal, junction, current arrow, wire and label symbols. The meter,
+canvas and the resistor, inductor, potentiometer, capacitor, source, battery,
+meter, box, ground, terminal, junction, current arrow, wire and label symbols.
+The meter,
 `svg:g[schMeter]`, is a round body with `V`, `A` or `Ω` inside (`kind`), drawn
 vertical or horizontal, and is how the multimeter lesson puts a voltmeter or
 ammeter into a circuit. The battery, `svg:g[schBattery]` (00-07), is the IEC
@@ -321,8 +347,25 @@ plate over one short thick plate, `kind="battery"` two such pairs joined by a
 dashed link. The box, `svg:g[schBox]` (00-07), is a dashed enclosure of `w` by
 `h` units with an optional `name`, drawn first so the parts sit on top: what is
 inside it is one thing seen from its terminals (a battery's model, or a divider
-and its Thévenin equivalent). `schematic.spec.ts` renders the meter with `dim`
-and `highlight`, and covers the battery and the box.
+and its Thévenin equivalent).
+
+The inductor, `svg:g[schInductor]` (01-01), has the resistor's footprint
+(horizontal 5 units, vertical 4) and a coil of four humps drawn as stepped
+arches of whole-unit runs, not circles; `kind="cored"` adds two straight core
+lines alongside the coil. It is three stroked paths, lead, coil and core, and
+**a highlight thickens the leads only**, to 4: at stroke 4 the coil's 2-unit
+details close up into a toothed bar and the two core lines, 4 units apart,
+merge, so a scoped rule keeps the coil and core at 2. The potentiometer,
+`svg:g[schPot]` (01-01), sits on the vertical resistor's body (the two share
+one path constant), vertical only: `kind="pot"` adds the wiper from a third
+pin at (30, 20) with a pixel arrowhead, `kind="variable"` the IEC oblique
+arrow through the body, the library's one diagonal. Both draw inside a
+`g.art` layer that dims as one at the same 0.55 (`ART_STYLES`), because their
+parts overlap (a lead over the coil, the wiper's square cap over the
+arrowhead) and dimming each part alone would leave darker seams.
+`schematic.spec.ts` renders the meter with `dim` and `highlight`, and covers
+the battery, the box, the inductor (both kinds, both orientations) and the
+potentiometer (both kinds).
 
 > **Trap worth knowing.** That abstract base class **must** carry an
 > `@Directive()` decorator. Without it Angular silently ignores every inherited
@@ -362,7 +405,7 @@ not injected after hydration.
 
 | | Raw | Gzipped |
 |---|---|---|
-| `main.js` | 314 kB | **88 kB** |
+| `main.js` | 328 kB | **92 kB** |
 | `styles.css` | 10.1 kB | 2.5 kB |
 | Per-lesson chunk | 7.8–33.4 kB | 2.7–10.2 kB |
 | Per-instrument chunk | 5.6–22.8 kB | 2.0–6.7 kB |
@@ -375,7 +418,10 @@ the per-lesson row again on 2026-10-28, with 00-06; `power-dissipation` is
 6.3 kB / 2.6 kB, inside the per-instrument range; both rows updated
 2026-10-30, with 00-07: its lesson chunks are 29.6 / 8.9 kB (EN) and
 33.4 / 10.2 kB (ES), and `thevenin`, which bundles `app-curve`, is
-22.8 / 6.7 kB).
+22.8 / 6.7 kB; on 2026-11-04, with 01-01, its lesson chunks are
+24.1 / 7.9 kB (EN) and 27.7 / 9.0 kB (ES) and `tolerance-spread`, which
+bundles `app-histogram`, is 15.5 / 5.3 kB, all inside the ranges above; the
+`main.js` row was re-measured the same day).
 
 The initial bundle is Angular itself. Lessons and instruments are code-split and
 fetched on demand.
@@ -460,7 +506,8 @@ the parameterised ones from the generated curriculum:
 
 Adding a lesson to `content/` is therefore all it takes to get a new static
 page — the route list is derived, never hand-maintained. The current build
-produces **41 prerendered routes**.
+produces **43 prerendered routes** (41 before 01-01, which
+adds its EN and ES pages).
 
 `lessonResolver` matters here. Loading the lesson in a resolver rather than
 inside the component makes the router *wait* for the content chunk, which is what
@@ -546,16 +593,18 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   fail in visible text. Spoken-only text is exempt: `ui.ts` keys ending in
   `Spoken` or `Label` (or documented as spoken in `UiStrings`), `aria-*`
   bindings, and the inputs listed in `SPOKEN_INPUTS` in `check-glyphs.mjs`
-  (`app-panel` `headingLabel`, `sch-canvas` `label`, `app-curve` `label`). It also
+  (`app-panel` `headingLabel`, `sch-canvas` `label`, `app-curve` `label`,
+  `app-histogram` `label`). It also
   fails if `--pix-font` no longer lists the families in the coverage file's
   order. The Dockerfile runs `pnpm build`, so an image cannot be built past
   either check.
 - **Unit tests**: `ng test` (Vitest in jsdom) runs `core/format.spec.ts`,
   one `*-math.spec.ts` per widget (Ohm's law, series/parallel, divider,
-  Kirchhoff, meter loading, power dissipation, Thévenin),
-  `ui/curve.spec.ts` (the `app-curve` plot) and
-  `schematic/schematic.spec.ts` (the meter, battery and box symbols), 198
-  tests. `pnpm test:ci` runs them once and needs no `pnpm content` first.
+  Kirchhoff, meter loading, power dissipation, Thévenin, tolerance spread),
+  `ui/curve.spec.ts` and `ui/histogram.spec.ts` (the `app-curve` and
+  `app-histogram` plots) and `schematic/schematic.spec.ts` (the meter,
+  battery, box, inductor and potentiometer symbols), 290
+  tests (198 before 01-01). `pnpm test:ci` runs them once and needs no `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
   `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x
   ratios for a fixed pair list and regenerates the table in

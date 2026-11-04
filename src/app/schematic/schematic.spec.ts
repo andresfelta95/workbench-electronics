@@ -1,7 +1,19 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { SCHEMATIC, SchBattery, SchBatteryKind, SchBox, SchMeter, SchMeterKind } from './schematic';
+import {
+  SCHEMATIC,
+  SchBattery,
+  SchBatteryKind,
+  SchBox,
+  SchInductor,
+  SchInductorKind,
+  SchMeter,
+  SchMeterKind,
+  SchPot,
+  SchPotKind,
+  SchResistor,
+} from './schematic';
 
 /** Hosts one meter inside an SVG, with every input driven by a signal. */
 @Component({
@@ -41,18 +53,21 @@ async function render(setup: (host: MeterHost) => void = () => {}) {
   return { fixture, root, group };
 }
 
-/** Every vertex an absolute/relative M, H, V, v path visits, split into subpaths. */
+/** Every vertex an absolute/relative M, L, H, V, h, v path visits, split into subpaths. */
 function subpaths(d: string): [number, number][][] {
   const out: [number, number][][] = [];
   let x = 0;
   let y = 0;
-  for (const [, cmd, args] of d.matchAll(/([MHVhvZz])\s*([-\d\s]*)/g)) {
+  for (const [, cmd, args] of d.matchAll(/([MLHVhvZz])\s*([-\d\s]*)/g)) {
     const n = args.trim().split(/\s+/).filter(Boolean).map(Number);
     switch (cmd) {
       case 'M':
         [x, y] = n;
         out.push([[x, y]]);
         continue;
+      case 'L':
+        [x, y] = n;
+        break;
       case 'H':
         x = n[0];
         break;
@@ -481,5 +496,360 @@ describe('schBox', () => {
   it('takes the dim and highlight classes', async () => {
     const { fixture, group } = await render();
     await expectEmphasis(fixture, fixture.componentInstance, group);
+  });
+});
+
+/** Hosts one inductor inside an SVG, with every input driven by a signal. */
+@Component({
+  imports: [SchInductor],
+  template: `
+    <svg>
+      <svg:g
+        schInductor
+        [kind]="kind()"
+        [vertical]="vertical()"
+        [name]="name()"
+        [value]="value()"
+        [dim]="dim()"
+        [highlight]="highlight()"
+      />
+    </svg>
+  `,
+})
+class InductorHost {
+  readonly kind = signal<SchInductorKind>('air');
+  readonly vertical = signal(false);
+  readonly name = signal('L1');
+  readonly value = signal('10 µH');
+  readonly dim = signal(false);
+  readonly highlight = signal(false);
+}
+
+/** Hosts one inductor with every input left at its default. */
+@Component({
+  imports: [SchInductor],
+  template: `<svg><svg:g schInductor /></svg>`,
+})
+class BareInductorHost {}
+
+/** Hosts one potentiometer or variable resistor inside an SVG. */
+@Component({
+  imports: [SchPot],
+  template: `
+    <svg>
+      <svg:g
+        schPot
+        [kind]="kind()"
+        [name]="name()"
+        [value]="value()"
+        [dim]="dim()"
+        [highlight]="highlight()"
+      />
+    </svg>
+  `,
+})
+class PotHost {
+  readonly kind = signal<SchPotKind>('pot');
+  readonly name = signal('RV1');
+  readonly value = signal('10 kΩ');
+  readonly dim = signal(false);
+  readonly highlight = signal(false);
+}
+
+/** Hosts one pot with every input left at its default. */
+@Component({
+  imports: [SchPot],
+  template: `<svg><svg:g schPot /></svg>`,
+})
+class BarePotHost {}
+
+/** Hosts the vertical resistor, so schPot's body can be compared with it. */
+@Component({
+  imports: [SchResistor],
+  template: `<svg><svg:g schResistor [vertical]="true" /></svg>`,
+})
+class ResistorHost {}
+
+type Point = [number, number];
+
+/** Each consecutive pair of vertices in every subpath, as one segment. */
+const segmentsOf = (parts: Point[][]): [Point, Point][] =>
+  parts.flatMap((p) => p.slice(1).map((b, i): [Point, Point] => [p[i], b]));
+
+const allWhole = (parts: Point[][]) => parts.flat(2).every((n) => Number.isInteger(n));
+
+const textAt = (t: Element) => [
+  t.getAttribute('class'),
+  t.getAttribute('x'),
+  t.getAttribute('y'),
+  t.getAttribute('text-anchor'),
+];
+
+const textWith = (g: SVGGElement, s: string) =>
+  [...g.querySelectorAll('text')].find((t) => t.textContent?.trim() === s)!;
+
+describe('schInductor', () => {
+  beforeEach(() => TestBed.configureTestingModule({ imports: [InductorHost, BareInductorHost] }));
+  const render = (setup?: (h: InductorHost) => void) =>
+    renderHost(InductorHost, 'schInductor', setup);
+  const coilOf = (g: SVGGElement) => subpaths(g.querySelector('path.coil')!.getAttribute('d')!);
+  const leadsOf = (g: SVGGElement) => subpaths(g.querySelector('path.lead')!.getAttribute('d')!);
+
+  it('is exported in SCHEMATIC', () => {
+    expect(SCHEMATIC).toContain(SchInductor);
+  });
+
+  for (const vertical of [false, true]) {
+    for (const kind of ['air', 'cored'] as const) {
+      const orientation = vertical ? 'vertical' : 'horizontal';
+      const setup = (h: InductorHost) => {
+        h.kind.set(kind);
+        h.vertical.set(vertical);
+      };
+
+      describe(`${kind} ${orientation}`, () => {
+        it('takes the dim and highlight classes', async () => {
+          const { fixture, group } = await render(setup);
+          await expectEmphasis(fixture, fixture.componentInstance, group);
+        });
+
+        it('has the resistor footprint: leads from the pins meet the coil, whole units, axis-aligned', async () => {
+          const { group } = await render(setup);
+          const leads = leadsOf(group);
+          expect(leads).toEqual(
+            vertical
+              ? [
+                  [
+                    [0, 0],
+                    [0, 4],
+                  ],
+                  [
+                    [0, 36],
+                    [0, 40],
+                  ],
+                ]
+              : [
+                  [
+                    [0, 0],
+                    [9, 0],
+                  ],
+                  [
+                    [41, 0],
+                    [50, 0],
+                  ],
+                ],
+          );
+          const parts = coilOf(group);
+          expect(parts).toHaveLength(1);
+          const coil = parts[0];
+          // The coil runs unbroken from the end of one lead to the start of the other.
+          expect(coil[0]).toEqual(leads[0][1]);
+          expect(coil[coil.length - 1]).toEqual(leads[1][0]);
+          expect(allWhole(parts)).toBe(true);
+          for (const [[x0, y0], [x1, y1]] of segmentsOf(parts)) {
+            expect(x0 === x1 || y0 === y1).toBe(true);
+          }
+        });
+
+        it('draws leads, coil and core inside one g.art layer, text outside it', async () => {
+          const { group } = await render(setup);
+          const art = group.querySelector(':scope > g.art')!;
+          expect(art).not.toBeNull();
+          const classes = [...art.querySelectorAll('path')].map((p) => p.getAttribute('class'));
+          expect(classes).toEqual(
+            kind === 'cored'
+              ? ['stroke lead', 'stroke coil', 'stroke core']
+              : ['stroke lead', 'stroke coil'],
+          );
+          expect(group.querySelectorAll('path')).toHaveLength(classes.length);
+          expect(art.querySelector('text')).toBeNull();
+          expect(group.querySelectorAll(':scope > text')).toHaveLength(2);
+        });
+
+        it('draws four humps 6 units off the axis, each crowned by a 4-unit run', async () => {
+          const parts = coilOf((await render(setup)).group);
+          // Distance off the axis (up, or to the right), and position along it.
+          const off = ([x, y]: Point) => (vertical ? x : 0 - y); // 0 - y, not -y: no −0 on the axis
+          const along = ([x, y]: Point) => (vertical ? y : x);
+          const offs = parts[0].map(off);
+          expect(Math.min(...offs)).toBe(0);
+          expect(Math.max(...offs)).toBe(6);
+          const crowns = segmentsOf(parts).filter(([a, b]) => off(a) === 6 && off(b) === 6);
+          expect(crowns).toHaveLength(4);
+          for (const [a, b] of crowns) expect(Math.abs(along(b) - along(a))).toBe(4);
+        });
+
+        it(
+          kind === 'cored' ? 'adds two 32-unit core lines alongside' : 'has no core lines',
+          async () => {
+            const { group } = await render(setup);
+            expect(group.querySelectorAll('path.stroke')).toHaveLength(kind === 'cored' ? 3 : 2);
+            const core = group.querySelectorAll('path.stroke.core');
+            if (kind === 'air') {
+              expect(core).toHaveLength(0);
+              return;
+            }
+            expect(core).toHaveLength(1);
+            const lines = subpaths(core[0].getAttribute('d')!);
+            expect(lines).toHaveLength(2);
+            expect(allWhole(lines)).toBe(true);
+            for (const [[x0, y0], [x1, y1]] of lines) {
+              // Parallel to the coil's axis, 32 long, clear of the 6-unit humps.
+              if (vertical) {
+                expect(x0).toBe(x1);
+                expect(Math.abs(y1 - y0)).toBe(32);
+                expect(x0).toBeGreaterThan(6);
+              } else {
+                expect(y0).toBe(y1);
+                expect(Math.abs(x1 - x0)).toBe(32);
+                expect(y0).toBeLessThan(-6);
+              }
+            }
+          },
+        );
+
+        it('places name and value as the brief sets out', async () => {
+          const { group } = await render(setup);
+          const [name, value] = [textWith(group, 'L1'), textWith(group, '10 µH')];
+          if (vertical) {
+            const x = kind === 'cored' ? '20' : '12';
+            expect(textAt(name)).toEqual(['label', x, '17', null]);
+            expect(textAt(value)).toEqual(['value', x, '29', null]);
+          } else {
+            const y = kind === 'cored' ? '-20' : '-12';
+            expect(textAt(name)).toEqual(['label', '25', y, 'middle']);
+            expect(textAt(value)).toEqual(['value', '25', '16', 'middle']);
+          }
+        });
+
+        it('draws no circle', async () => {
+          expect((await render(setup)).group.querySelector('circle')).toBeNull();
+        });
+      });
+    }
+  }
+
+  it('defaults to an air-cored horizontal coil named L', async () => {
+    const { group } = await renderHost(BareInductorHost, 'schInductor');
+    expect(group.querySelector('path.core')).toBeNull();
+    expect(group.querySelector('text.label')?.textContent?.trim()).toBe('L');
+    const leads = leadsOf(group);
+    expect(leads[leads.length - 1][1]).toEqual([50, 0]);
+  });
+
+  it('highlight thickens the leads to 4 and keeps the coil and core at 2', async () => {
+    const { fixture, group } = await render((h) => {
+      h.kind.set('cored');
+      h.highlight.set(true);
+    });
+    const width = (sel: string) => getComputedStyle(group.querySelector(sel)!).strokeWidth;
+    expect(width('path.lead')).toBe('4');
+    expect(width('path.coil')).toBe('2');
+    expect(width('path.core')).toBe('2');
+    expect(getComputedStyle(group.querySelector('path.lead')!).strokeLinecap).toBe('butt');
+
+    fixture.componentInstance.highlight.set(false);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(width('path.lead')).toBe('2');
+  });
+});
+
+describe('schPot', () => {
+  beforeEach(() =>
+    TestBed.configureTestingModule({ imports: [PotHost, BarePotHost, ResistorHost] }),
+  );
+  const render = (setup?: (h: PotHost) => void) => renderHost(PotHost, 'schPot', setup);
+  const pathOf = (g: SVGGElement) => g.querySelector('path.stroke')!.getAttribute('d')!;
+
+  it('is exported in SCHEMATIC', () => {
+    expect(SCHEMATIC).toContain(SchPot);
+  });
+
+  for (const kind of ['pot', 'variable'] as const) {
+    describe(kind, () => {
+      it('takes the dim and highlight classes', async () => {
+        const { fixture, group } = await render((h) => h.kind.set(kind));
+        await expectEmphasis(fixture, fixture.componentInstance, group);
+      });
+
+      it('draws the vertical schResistor body, pins at (0, 0) and (0, 40)', async () => {
+        const resistor = await renderHost(ResistorHost, 'schResistor');
+        const body = subpaths(resistor.group.querySelector('path')!.getAttribute('d')!);
+        const parts = subpaths(pathOf((await render((h) => h.kind.set(kind))).group));
+        expect(parts.slice(0, body.length)).toEqual(body);
+        expect(body[0][0]).toEqual([0, 0]);
+        const lastLead = body[body.length - 1];
+        expect(lastLead[lastLead.length - 1]).toEqual([0, 40]);
+      });
+
+      it('draws body, wiper or arrow, and fills inside one g.art layer, text outside it', async () => {
+        const { group } = await render((h) => h.kind.set(kind));
+        const art = group.querySelector(':scope > g.art')!;
+        expect(art).not.toBeNull();
+        const drawn = group.querySelectorAll('path, rect');
+        expect(drawn.length).toBe(kind === 'pot' ? 4 : 2);
+        for (const el of drawn) expect(art.contains(el)).toBe(true);
+        expect(group.querySelectorAll(':scope > text')).toHaveLength(2);
+      });
+
+      it('uses whole units everywhere and draws no circle', async () => {
+        const { group } = await render((h) => h.kind.set(kind));
+        expect(group.querySelector('circle')).toBeNull();
+        for (const p of group.querySelectorAll('path')) {
+          expect(allWhole(subpaths(p.getAttribute('d')!))).toBe(true);
+        }
+        for (const r of group.querySelectorAll('rect')) {
+          expect(Object.values(rectOf(r)).every(Number.isInteger)).toBe(true);
+        }
+      });
+    });
+  }
+
+  it('pot: a wiper from the third pin at (30, 20), a left-pointing arrowhead, text left', async () => {
+    const { group } = await render();
+    expect(pathOf(group)).toContain('M16 20 H30');
+    const parts = subpaths(pathOf(group));
+    expect(parts[parts.length - 1]).toEqual([
+      [16, 20],
+      [30, 20],
+    ]);
+    const cols = [...group.querySelectorAll('rect.fill')].map(rectOf).sort((a, b) => a.x - b.x);
+    expect(cols).toEqual([
+      { x: 10, y: 19, w: 2, h: 2 },
+      { x: 12, y: 17, w: 2, h: 6 },
+      { x: 14, y: 15, w: 2, h: 10 },
+    ]);
+    // Each column centred on the wiper; the tip (x = 10) touches the body's edge.
+    for (const c of cols) expect(c.y + c.h / 2).toBe(20);
+    expect(group.querySelector('path.fill')).toBeNull();
+    expect(textAt(textWith(group, 'RV1'))).toEqual(['label', '-14', '17', 'end']);
+    expect(textAt(textWith(group, '10 kΩ'))).toEqual(['value', '-14', '29', 'end']);
+  });
+
+  it('variable: no wiper, one oblique arrow from (−12, 32) to (12, 8), a chevron, text right', async () => {
+    const { group } = await render((h) => h.kind.set('variable'));
+    expect(pathOf(group)).not.toContain('H30');
+    expect(group.querySelectorAll('rect')).toHaveLength(0);
+    const oblique = segmentsOf(subpaths(pathOf(group))).filter(
+      ([[x0, y0], [x1, y1]]) => x0 !== x1 && y0 !== y1,
+    );
+    expect(oblique).toEqual([
+      [
+        [-12, 32],
+        [12, 8],
+      ],
+    ]);
+    const chevron = group.querySelectorAll('path.fill');
+    expect(chevron).toHaveLength(1);
+    expect(chevron[0].getAttribute('d')).toBe('M6 6 H14 V14 H12 V8 H6 Z');
+    expect(textAt(textWith(group, 'RV1'))).toEqual(['label', '16', '17', null]);
+    expect(textAt(textWith(group, '10 kΩ'))).toEqual(['value', '16', '29', null]);
+  });
+
+  it('defaults to a pot named R', async () => {
+    const { group } = await renderHost(BarePotHost, 'schPot');
+    expect(pathOf(group)).toContain('M16 20 H30');
+    expect(group.querySelector('text.label')?.textContent?.trim()).toBe('R');
   });
 });

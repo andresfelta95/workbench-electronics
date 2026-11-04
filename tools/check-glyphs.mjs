@@ -51,6 +51,7 @@ const SPOKEN_INPUTS = [
   { selector: 'app-panel', input: 'headingLabel' },
   { selector: 'sch-canvas', input: 'label' },
   { selector: 'app-curve', input: 'label' },
+  { selector: 'app-histogram', input: 'label' },
 ];
 
 const rel = (file) => path.relative(ROOT, file).split(path.sep).join('/');
