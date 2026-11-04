@@ -241,7 +241,10 @@ interface KeyOption<K> {
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
     }
 
+    /* Positioned, so the visually hidden live region below is anchored here
+       and not to whatever ancestor happens to be positioned. */
     .batch {
+      position: relative;
       display: flex;
     }
 

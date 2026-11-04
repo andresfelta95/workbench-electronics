@@ -29,7 +29,7 @@ references:
   - id: vishay-tnpw-e3
     note: "Chip de película delgada: coeficiente de temperatura de hasta ±10 ppm/K en el mejor grado (p. 1); como máximo 0,05 % de cambio tras 1000 h a la potencia nominal (p. 2); ajustado por láser (p. 5)."
   - id: ti-snva112
-    note: "El peor caso toma todas las tolerancias en sus extremos a la vez y da límites «excessively conservative» (excesivamente conservadores) (§1, §3). Los fabricantes «may be reluctant to release this data» (pueden no querer publicar estos datos), así que la nota supone un reparto gaussiano (§6). Fig. 6, un histograma medido de resistores de chip 0805 de 1 %: un solo pico, todas las barras dentro de aproximadamente ±0,8 %, leído del gráfico (p. 5)."
+    note: "El peor caso toma todas las tolerancias en sus extremos a la vez y da límites «excessively conservative» (excesivamente conservadores) (§1, §3). Los fabricantes «may be reluctant to release this data» (pueden no querer publicar estos datos), así que la nota supone un reparto gaussiano (§6), con la tolerancia tomada como ±6σ (pp. 5, 8). Fig. 6, un histograma medido de resistores de chip 0805 de 1 %: un solo pico, todas las barras dentro de aproximadamente ±0,8 %, leído del gráfico (p. 5)."
   - id: knudtsen-2022
     note: "Simulación de Monte Carlo en LTspice frente al análisis del peor caso: «worst-case limits are statistically improbable» (los límites del peor caso son estadísticamente improbables); «both worst-case and statistical analysis provide valuable insights»."
   - id: johnson-2010
@@ -136,8 +136,8 @@ cercano, un poco más allá de la tolerancia.
 La combinación habitual es la E12 para piezas de 10 %, la E24 para 5 % y 2 %,
 y la E96 para 1 %. Es una costumbre, no una ley: otra tabla de Vishay pone el
 2 % con una lista de 48 valores. Vishay también da la razón para quedarse en
-las listas: los programas de existencias de los fabricantes se diseñan en
-torno a ellas. También puedes comprar piezas de 1 % con valores de la E24,
+las listas: «stocking programs are designed around them» (los programas de
+existencias se diseñan en torno a ellas). También puedes comprar piezas de 1 % con valores de la E24,
 aunque algunos valores de la E24, como 220, no están en la E96 (que tiene
 221).
 
@@ -217,8 +217,10 @@ formas, y las teclas de «Forma supuesta» dicen que son suposiciones:
 - **Plana** es un **reparto plano** (uniforme): cualquier valor de la banda es
   igual de probable. Es el caso prudente.
 
-La campana es la forma que supone la nota de TI. El único histograma medido
-que trae, de resistores de chip de 1 %, tiene un solo pico, con todas las
+La campana es la forma que supone la nota de TI. Pero la campana de TI es más
+estrecha: pone el borde de la banda seis veces más lejos que el error de una
+pieza típica, y el instrumento lo pone tres veces más lejos, la opción más
+prudente. El único histograma medido que trae la nota, de resistores de chip de 1 %, tiene un solo pico, con todas las
 barras dentro de aproximadamente ±0,8 %. Además, los fabricantes fijan el
 valor de cada pieza en lugar de clasificar un reparto ancho. En el **ajuste
 por láser**, un láser corta un surco en la película hasta que la pieza llega a
@@ -323,7 +325,8 @@ los fabricantes hacen trabajar las piezas a su potencia nominal durante
 película metálica. La película de carbono de Stackpole cambia típicamente
 menos de ±1 %, y los chips de película delgada de Vishay como máximo 0,05 %.
 Así que una pieza de película de carbono de 10 kΩ usada a su potencia nominal
-puede terminar en 10,3 kΩ: un cambio tan grande como su tolerancia.
+puede terminar en 10,3 kΩ: un cambio de más de la mitad de su tolerancia de
+5 %.
 
 :::note Lo que viene ahora
 Los condensadores vienen después, en la lección 01-02. También tienen

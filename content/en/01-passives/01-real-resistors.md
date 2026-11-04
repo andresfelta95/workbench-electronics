@@ -29,7 +29,7 @@ references:
   - id: vishay-tnpw-e3
     note: "Thin-film chip: temperature coefficient down to ±10 ppm/K in the best grade (p. 1); at most 0.05 % change after 1000 h at rated dissipation (p. 2); laser trimmed (p. 5)."
   - id: ti-snva112
-    note: "Worst case takes all tolerances at their extremes at once and gives \"excessively conservative\" limits (§1, §3). Vendors \"may be reluctant to release\" distribution data, so the note assumes a Gaussian spread (§6). Fig. 6, a measured histogram of 1 % 0805 chip resistors: one peak, every bar within about ±0.8 %, read from the plot (p. 5)."
+    note: "Worst case takes all tolerances at their extremes at once and gives \"excessively conservative\" limits (§1, §3). Vendors \"may be reluctant to release\" distribution data, so the note assumes a Gaussian spread (§6), with the tolerance taken as ±6σ (pp. 5, 8). Fig. 6, a measured histogram of 1 % 0805 chip resistors: one peak, every bar within about ±0.8 %, read from the plot (p. 5)."
   - id: knudtsen-2022
     note: "Monte Carlo analysis in LTspice against worst-case analysis: \"worst-case limits are statistically improbable\"; \"both worst-case and statistical analysis provide valuable insights\"."
   - id: johnson-2010
@@ -203,8 +203,10 @@ Assumed shape keys say they are assumptions:
 - **Flat** is a **flat spread**: every value in the band is equally likely.
   This is the cautious case.
 
-The bell is the shape TI's note assumes. The one measured histogram in it, of
-1 % chip resistors, has a single peak, with every bar within about ±0.8 %.
+The bell is the shape TI's note assumes. TI's bell is narrower, though: it
+puts the band's edge six times as far out as a typical part's error, where the
+instrument puts it three times as far, the more cautious choice. The one
+measured histogram in TI's note, of 1 % chip resistors, has a single peak, with every bar within about ±0.8 %.
 Makers also set each part's value instead of sorting a wide spread. In
 **laser trimming**, a laser cuts a groove in the film until the part reaches
 its target value, and Vishay tests every resistor in its professional
@@ -298,7 +300,7 @@ weeks, and state the most the value may change. Yageo allows ±3.0 % + 0.05 Ω
 for its carbon film at 70 °C and ±1.5 % + 0.05 Ω for its metal film.
 Stackpole's carbon film typically drifts less than ±1 %, and Vishay's thin-film
 chips at most 0.05 %. So a 10 kΩ carbon-film part run at its rating can end up
-at 10.3 kΩ: a drift as large as its tolerance.
+at 10.3 kΩ: a drift of more than half its 5 % tolerance.
 
 :::note What comes next
 Capacitors come next, in lesson 01-02. They have tolerances and drift too, and
