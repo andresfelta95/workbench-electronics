@@ -23,10 +23,9 @@ BIBLIOGRAPHY §8 may be used for a figure. In particular, **no source shows how
 shape the instrument draws is a labelled assumption (D-2), and the prose says
 so.
 
-D-1 to D-6 came with the brief request and are binding. D-7 onward are this
-brief's proposals, each with a recommendation, for the maintainer to settle
-(§10). The body is written as if every recommendation is accepted; it cites the
-decisions by number.
+All decisions are binding and listed in §10: D-1 to D-6 came with the brief
+request, D-7 to D-23 were proposed by this brief and settled by the maintainer
+on 2026-11-04, every one as recommended. The body cites them by number.
 
 ---
 
@@ -941,9 +940,9 @@ láser. Existing: carbon-film resistor (00-06), datasheet (00-03).
 | D-5 | **Tempco and E-series in the lesson;** a temperature control only if it serves the one question. Recommendation: cut from the instrument, prose only (D-14). | §1, §6 W-6, §9 |
 | D-6 | **About 15 minutes, EN and ES;** no mandatory callout from the §3.1 table; say whether any hazard is touched (yes: meter use and a 9 V battery, D-18). Depends only on module 00. | §8, §9 |
 
-### Proposed, for the maintainer (each with the recommendation)
+### Settled on 2026-11-04 (all as recommended)
 
-| # | Proposal | Recommendation |
+| # | Decision | Settled |
 |---|---|---|
 | D-7 | **Misconception wording:** "A divider built from 5 % resistors will be about 5 % off." | Accept. |
 | D-8 | **Switch, not overlay:** a `5%` / `1%` segment over the same builds; the x axis fixed at the 5 % worst-case span (± 1.1 ×) so 1 % looks narrow; y rescaled to the tallest bin. An overlay needs two fills told apart without colour and squashes the 5 % hump to a fifth of the height. | Accept switch. |
