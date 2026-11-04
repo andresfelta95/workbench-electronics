@@ -67,7 +67,7 @@ does more or less damage depending on the ratio.
 **Misconception it corrects (D-7):** "A divider built from 5 % resistors will
 be about 5 % off" (and its twin: "the worst case is what to expect").
 
-### Not in this instrument (decided or proposed)
+### Not in this instrument (decided)
 
 - **Temperature (D-5, D-14).** No temperature control. Tempco shifts every
   build by the same fraction when both resistors are the same type at the same
@@ -815,7 +815,7 @@ lesson touches:** meter use (measuring a resistor's value with the meter's
 ohms range, 00-05) and a 9 V battery feeding 00-03's divider (9 V across
 20 kΩ: 450 µA, 2.03 mW in each 1/4 W resistor, harmless). §3.1's general rule
 says a `:::safety` callout is mandatory in any lesson that touches "batteries,
-meter use"; the table's silence on 01-01 does not override that. **Proposal
+meter use"; the table's silence on 01-01 does not override that. **Decided
 (D-18):** one short callout before the bench step.
 
 **The instrument must:**
@@ -839,7 +839,7 @@ meter use"; the table's silence on 01-01 does not override that. **Proposal
 figures are the makers' tolerances, and "about" / "typical" for every curve or
 endurance figure.
 
-**Proposed callout (D-18)**, before the bench step in section 2:
+**Callout (D-18)**, before the bench step in section 2:
 
 | Title (EN / ES) | Says |
 |---|---|
@@ -934,8 +934,8 @@ láser. Existing: carbon-film resistor (00-06), datasheet (00-03).
 | # | Decision | Where it applies |
 |---|---|---|
 | D-1 | **One question:** "If I build 00-03's divider from 5 % parts, how far off can its output be, and how far off will it usually be?" Many simulated dividers, a histogram of Vout, 5 % against 1 % (switch or overlay), worst-case bounds marked, readouts for nominal, worst-case range and the statistical spread. | §1, §3, §4 |
-| D-2 | **Distribution:** no source establishes a binned "gap in the middle" 5 % distribution. Model bell (σ = tolerance / 3) and flat across the band, both labelled assumptions. Binned: out, or only as a labelled "what if" (proposal: out, D-9). | §1, §3, §5, §6 W-3 |
-| D-3 | **Seeded, deterministic PRNG:** same props, same histogram on the server and in the browser; prose numbers reproducible; specs stable; a new-seed control if useful (proposal: New batch, D-11). | §3, §5 |
+| D-2 | **Distribution:** no source establishes a binned "gap in the middle" 5 % distribution. Model bell (σ = tolerance / 3) and flat across the band, both labelled assumptions. Binned: out, or only as a labelled "what if" (settled: out, D-9). | §1, §3, §5, §6 W-3 |
+| D-3 | **Seeded, deterministic PRNG:** same props, same histogram on the server and in the browser; prose numbers reproducible; specs stable; a new-seed control if useful (settled: New batch, D-11). | §3, §5 |
 | D-4 | **Step 3 builds the A1 module 01 symbols** (inductor air and cored; potentiometer / variable resistor) with full specs, and any `ui/` primitive the histogram needs, never drawn inline, with a text equivalent. Decided here: a new `app-histogram`, not an extension of `app-curve` (reasons in §4; confirm as D-13). | §4, §5 step 3 specs |
 | D-5 | **Tempco and E-series in the lesson;** a temperature control only if it serves the one question. Recommendation: cut from the instrument, prose only (D-14). | §1, §6 W-6, §9 |
 | D-6 | **About 15 minutes, EN and ES;** no mandatory callout from the §3.1 table; say whether any hazard is touched (yes: meter use and a 9 V battery, D-18). Depends only on module 00. | §8, §9 |
