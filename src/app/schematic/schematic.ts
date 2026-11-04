@@ -128,6 +128,32 @@ const SYMBOL_STYLES = `
 `;
 
 /**
+ * For symbols whose drawing is several overlapping elements (a square cap over
+ * a filled column, a lead over a coil): wrap the drawing in `g.art` and it dims
+ * as one layer at the same 0.55, so overlaps do not composite into darker seams.
+ */
+const ART_STYLES = `
+  .art {
+    transition: opacity 160ms steps(2, end);
+  }
+  .sch--dim .art {
+    opacity: 0.55;
+  }
+  .sch--dim .art .stroke,
+  .sch--dim .art .fill {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .art {
+      transition: none;
+    }
+  }
+`;
+
+/** The vertical resistor's leads and body, shared with schPot so the two never drift. */
+const RESISTOR_V = 'M0 0 v10 M-9 10 h18 v20 h-18 z M0 30 v10';
+
+/**
  * IEC box resistor. Horizontal: 5 grid units long, pins at (0, 0) and (50, 0),
  * a 30 × 18 body from x = 10 to 40. Vertical: 4 grid units long, pins at (0, 0)
  * and (0, 40), an 18 × 20 body from y = 10 to 30. Each lead ends on the grid
@@ -155,9 +181,155 @@ export class SchResistor extends SchSymbol {
   readonly vertical = input(false);
 
   protected readonly path = computed(() =>
+    this.vertical() ? RESISTOR_V : 'M0 0 h10 M10 -9 h30 v18 h-30 z M40 0 h10',
+  );
+}
+
+export type SchInductorKind = 'air' | 'cored';
+
+/** Hump starts along the coil: four humps, 8 units each, from 9 (or 4) on. */
+const HUMPS_H = [9, 17, 25, 33];
+const HUMPS_V = [4, 12, 20, 28];
+
+/**
+ * IEC inductor (A1 module 01): a coil of four humps, drawn as stepped arches
+ * of whole-unit runs rather than circles. Same footprint as `schResistor`:
+ * horizontal 5 grid units, pins at (0, 0) and (50, 0), humps above the axis;
+ * vertical 4 units, pins at (0, 0) and (0, 40), humps to the right.
+ *
+ * Each hump is 8 units wide and 6 tall: a 4-unit stub off the axis, a 2-unit
+ * step, a 4-unit crown, and back down to the axis at its end, so where two
+ * humps meet the cusp reads as a short stub, the pixel form of touching humps.
+ *
+ * `cored` adds two straight 32-unit lines alongside the coil (the IEC mark
+ * for a magnetic core) and moves the name past them. Nothing hangs below (or
+ * left of) the axis except the value, horizontally.
+ *
+ * Three stroked paths: `lead` (pin to coil, butt caps so a thick lead ends
+ * flush inside the coil's first stub), `coil` and `core`. A highlight
+ * thickens only the leads to 4 (the non-colour cue); the coil and core keep
+ * 2. At 4 the coil's 2-unit details close up and it reads as a toothed bar,
+ * and the core's two lines, 4 apart, merge into one; no hump geometry inside
+ * the 50 × 0 / 0 × 40 footprint stays open at 4. The drawing dims as one
+ * layer (`ART_STYLES`), so the lead–coil overlaps leave no seam.
+ */
+@Component({
+  selector: 'svg:g[schInductor]',
+  template: `
+    <svg:g [attr.transform]="transform()" [attr.class]="klass()">
+      <svg:g class="art">
+        <svg:path class="stroke lead" [attr.d]="leads()" />
+        <svg:path class="stroke coil" [attr.d]="coil()" />
+        @if (kind() === 'cored') {
+          <svg:path class="stroke core" [attr.d]="core()" />
+        }
+      </svg:g>
+      @if (vertical()) {
+        <svg:text class="label" [attr.x]="textX()" y="17">{{ name() }}</svg:text>
+        <svg:text class="value" [attr.x]="textX()" y="29">{{ value() }}</svg:text>
+      } @else {
+        <svg:text class="label" x="25" [attr.y]="nameY()" text-anchor="middle">
+          {{ name() }}
+        </svg:text>
+        <svg:text class="value" x="25" y="16" text-anchor="middle">{{ value() }}</svg:text>
+      }
+    </svg:g>
+  `,
+  styles: `
+    ${SYMBOL_STYLES}
+    ${ART_STYLES}
+    .stroke.lead {
+      stroke-linecap: butt;
+    }
+    .sch--hot .stroke.coil,
+    .sch--hot .stroke.core {
+      stroke-width: 2;
+    }
+  `,
+})
+export class SchInductor extends SchSymbol {
+  readonly kind = input<SchInductorKind>('air');
+  readonly vertical = input(false);
+  readonly name = input('L');
+  readonly value = input('');
+
+  protected readonly leads = computed(() =>
+    this.vertical() ? 'M0 0 V4 M0 36 V40' : 'M0 0 H9 M41 0 H50',
+  );
+
+  protected readonly coil = computed(() =>
     this.vertical()
-      ? 'M0 0 v10 M-9 10 h18 v20 h-18 z M0 30 v10'
-      : 'M0 0 h10 M10 -9 h30 v18 h-30 z M40 0 h10',
+      ? 'M0 4 ' + HUMPS_V.map((y) => `H4 V${y + 2} H6 V${y + 6} H4 V${y + 8} H0`).join(' ')
+      : 'M9 0 ' + HUMPS_H.map((x) => `V-4 H${x + 2} V-6 H${x + 6} V-4 H${x + 8} V0`).join(' '),
+  );
+
+  protected readonly core = computed(() =>
+    this.vertical() ? 'M10 4 V36 M14 4 V36' : 'M9 -10 H41 M9 -14 H41',
+  );
+
+  protected readonly cored = computed(() => this.kind() === 'cored');
+  /** Vertical text x: beside the coil, or beside the core lines. */
+  protected readonly textX = computed(() => (this.cored() ? 20 : 12));
+  /** Horizontal name baseline: above the coil, or above the core lines. */
+  protected readonly nameY = computed(() => (this.cored() ? -20 : -12));
+}
+
+export type SchPotKind = 'pot' | 'variable';
+
+/**
+ * Potentiometer or variable resistor (A1 module 01) on the vertical resistor's
+ * body: pins at (0, 0) and (0, 40). Vertical only for now: a horizontal pot's
+ * wiper pin would land at x = 25, off the grid, so that form waits for the
+ * first lesson that needs it.
+ *
+ * `pot` (three terminals) adds the wiper: a wire from the third pin at
+ * (30, 20) to x = 16 and a pixel arrowhead of three filled 2-unit columns
+ * pointing left, its tip on the body's right edge. The name and value go on
+ * the left, out of the wiper's way.
+ *
+ * `variable` (two terminals) draws the IEC oblique arrow through the body,
+ * (−12, 32) to (12, 8), the one diagonal in the library (crispEdges steps it
+ * like a pixel line), with a filled pixel chevron at its head. Text right.
+ *
+ * Filled parts keep their size when a highlight thickens the strokes to 4.
+ * The drawing dims as one layer (`ART_STYLES`): the wiper's square cap
+ * overlaps the arrowhead's last column, which would otherwise dim to a seam.
+ */
+@Component({
+  selector: 'svg:g[schPot]',
+  template: `
+    <svg:g [attr.transform]="transform()" [attr.class]="klass()">
+      <svg:g class="art">
+        <svg:path class="stroke" [attr.d]="path()" />
+        @if (kind() === 'pot') {
+          <svg:rect class="fill" x="10" y="19" width="2" height="2" />
+          <svg:rect class="fill" x="12" y="17" width="2" height="6" />
+          <svg:rect class="fill" x="14" y="15" width="2" height="10" />
+        } @else {
+          <svg:path class="fill" d="M6 6 H14 V14 H12 V8 H6 Z" />
+        }
+      </svg:g>
+      @if (kind() === 'pot') {
+        <svg:text class="label" x="-14" y="17" text-anchor="end">{{ name() }}</svg:text>
+        <svg:text class="value" x="-14" y="29" text-anchor="end">{{ value() }}</svg:text>
+      } @else {
+        <svg:text class="label" x="16" y="17">{{ name() }}</svg:text>
+        <svg:text class="value" x="16" y="29">{{ value() }}</svg:text>
+      }
+    </svg:g>
+  `,
+  styles: `
+    ${SYMBOL_STYLES}
+    ${ART_STYLES}
+  `,
+})
+export class SchPot extends SchSymbol {
+  readonly kind = input<SchPotKind>('pot');
+  readonly name = input('R');
+  readonly value = input('');
+
+  protected readonly path = computed(
+    () => `${RESISTOR_V} ${this.kind() === 'pot' ? 'M16 20 H30' : 'M-12 32 L12 8'}`,
   );
 }
 
@@ -518,6 +690,8 @@ export class SchLabel extends SchSymbol {
 export const SCHEMATIC = [
   SchCanvas,
   SchResistor,
+  SchInductor,
+  SchPot,
   SchCapacitor,
   SchSource,
   SchBattery,

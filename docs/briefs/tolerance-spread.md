@@ -312,6 +312,23 @@ magnetic core. Same footprint as `schResistor`: horizontal 5 grid units, pins
 - `highlight` thickens both paths to 4 (`.sch--hot .stroke`); `dim` per
   `SYMBOL_STYLES`; everything `currentColor`.
 
+**Step 3 deviations (recorded by the symbols agent).**
+- *Highlight.* Under highlight, a stroke-4 coil closes its 2-unit details and
+  reads as a toothed bar, and the core's two lines, 4 apart, merge into one
+  (checked in renders at 4× and phone scale, light and dark). Taller or wider
+  humps were tried: none stays open at 4 inside the 50 × 0 / 0 × 40 footprint,
+  because adjacent humps share a cusp and would need about 6 units of axis
+  between them. So the drawing is three stroked paths: `path.stroke.lead`
+  (`M0 0 H9 M41 0 H50`; vertical `M0 0 V4 M0 36 V40`, butt caps),
+  `path.stroke.coil` (the hump path above, from (9, 0) to (41, 0), or (0, 4)
+  to (0, 36)) and `path.stroke.core`. A highlight thickens only the leads to
+  4, which is the non-colour cue, and a scoped rule keeps the coil and core at
+  2. Hump geometry, pins and text positions are unchanged.
+- *Dim.* The paths sit in one `g.art` that dims as a layer at the same 0.55
+  (`ART_STYLES`), so the lead and coil overlaps leave no darker seam. `schPot`
+  uses the same layer, because the wiper's square cap overlaps the
+  arrowhead's last column.
+
 #### `svg:g[schPot]` (A1 module 01, D-4, D-15)
 
 Potentiometer (three terminals: the wiper is the third pin, as 00-03's
