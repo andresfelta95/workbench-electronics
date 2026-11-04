@@ -1,21 +1,23 @@
 # Roadmap: finishing every chapter
 
-Status on 2026-10-30: module 00 is complete, with seven lessons and seven
+Status on 2026-11-04: module 00 is complete, with seven lessons and seven
 instruments (`ohm-law`, `resistor-network`, `divider`, `kirchhoff`,
-`meter-loading`, `power-dissipation`, `thevenin`). Next is module 01, starting
-with 01-01 real-resistors (tolerance); its A1 symbols (inductor,
-potentiometer) come first. The pixel-art skin
+`meter-loading`, `power-dissipation`, `thevenin`). Module 01 has started:
+01-01 real-resistors ships with its instrument, `tolerance-spread`, the
+`app-histogram` primitive and module 01's A1 symbols (inductor,
+potentiometer), built in its step 3. Next is 01-02 capacitors. The pixel-art skin
 (A6) is built, with the REVIEW M-10 layout fix applied, and was merged in PR #1.
-Modules 01–11 exist only as `_module.md` and render as "being written". This
+Modules 02–11 exist only as `_module.md` and render as "being written"; module
+01 lists 01-01 and nothing else yet. This
 document plans the rest: the shared infrastructure the remaining modules depend
 on, the reference board for module 11, a repeatable per-chapter workflow with a
 safety policy, and a lesson-by-lesson outline for every module.
 
 Lesson ids are language-neutral and final once published (they key the language
-switcher). Module folder ids (`00-fundamentals` … `11-pcb`) and the seven
+switcher). Module folder ids (`00-fundamentals` … `11-pcb`) and the eight
 published lessons (`00-fundamentals/01-ohms-law`, `02-series-and-parallel`,
 `03-voltage-divider`, `04-kirchhoff`, `05-multimeter`, `06-power-and-heat`,
-`07-real-sources`) never change. Every other id below is
+`07-real-sources`; `01-passives/01-real-resistors`) never change. Every other id below is
 unpublished and may still move. Titles here are working titles; slugs are
 chosen per language when the lesson is written.
 
@@ -86,6 +88,9 @@ reference board (§2).
   enclosure `schBox`). 00-06 needed no new symbol. They use no traces or
   audio; 00-07's load-power curve uses the small static `app-curve` plot
   (A2 below), not `app-trace`.
+- **01 started on 2026-11-04 with 01-01.** Its step 3 built the A1 module 01
+  row (`schInductor`, `schPot`) before any lesson draws them, and the
+  `app-histogram` plot (A2 below), not `app-trace`.
 - **Exception: 00-04 shipped before A5 and A7** at the maintainer's request
   (2026-10-02). The bridge was an interim rule that sourced the figures in
   00-01 to 00-04 in `docs/BIBLIOGRAPHY.md` by lesson id. That debt is paid:
@@ -105,13 +110,13 @@ reference board (§2).
 
 | # | Work item | Why it blocks chapters | Done when |
 |---|---|---|---|
-| A1 | **Schematic symbols v2** in `src/app/schematic/`, per the table below | Every module from 01 on draws parts the library lacks (today: canvas, resistor, capacitor, source, battery, meter, box (dashed enclosure), ground, terminal, junction, current arrow, wire, label) | The 01–04 rows exist before module 01. Later rows are built in step 3 of their module, from this list, never inline. Each symbol on the 10-unit grid, inherits `currentColor`, supports `highlight`/`dim`, shown on a symbol gallery route or spec |
-| A2 | **`app-trace` plot primitive** in `src/app/ui/`: time-domain (scope) and frequency-domain (Bode, log axes) traces as SVG polylines, cursors, labelled axes, two channels | Modules 02, 03, 04, 05, 06, 07, 08 are mostly "watch the waveform change" | Renders 2k-point traces without jank; keyboard-movable cursor; axis text through `formatSI`; **key values (cursor time/frequency, value per channel, and the widget's headline numbers) exposed through `app-readout` or a visually hidden summary that updates on cursor move (WCAG 1.1.1)**. **Note (2026-10-30):** 00-07 added a small static XY plot, `app-curve` (`src/app/ui/curve.ts`, spec `curve.spec.ts`; `docs/briefs/thevenin.md` D-2, D-15): one series, log or linear x, linear y from 0, hollow and filled markers with an optional guide, tick labels, a spoken `label` on a `role="img"` SVG; no cursor, time axis or second channel. It is not A2. When `app-trace` lands it may absorb `app-curve` or wrap it; until then module 01's `mlcc-derating` and `inductor-derating` can use `app-curve` |
+| A1 | **Schematic symbols v2** in `src/app/schematic/`, per the table below | Every module from 01 on draws parts the library lacks (today: canvas, resistor, inductor, potentiometer / variable resistor, capacitor, source, battery, meter, box (dashed enclosure), ground, terminal, junction, current arrow, wire, label) | The 01–04 rows exist before module 01. Later rows are built in step 3 of their module, from this list, never inline. Each symbol on the 10-unit grid, inherits `currentColor`, supports `highlight`/`dim`, shown on a symbol gallery route or spec |
+| A2 | **`app-trace` plot primitive** in `src/app/ui/`: time-domain (scope) and frequency-domain (Bode, log axes) traces as SVG polylines, cursors, labelled axes, two channels | Modules 02, 03, 04, 05, 06, 07, 08 are mostly "watch the waveform change" | Renders 2k-point traces without jank; keyboard-movable cursor; axis text through `formatSI`; **key values (cursor time/frequency, value per channel, and the widget's headline numbers) exposed through `app-readout` or a visually hidden summary that updates on cursor move (WCAG 1.1.1)**. **Note (2026-10-30):** 00-07 added a small static XY plot, `app-curve` (`src/app/ui/curve.ts`, spec `curve.spec.ts`; `docs/briefs/thevenin.md` D-2, D-15): one series, log or linear x, linear y from 0, hollow and filled markers with an optional guide, tick labels, a spoken `label` on a `role="img"` SVG; no cursor, time axis or second channel. It is not A2. When `app-trace` lands it may absorb `app-curve` or wrap it; until then module 01's `mlcc-derating` and `inductor-derating` can use `app-curve`. **Note (2026-11-04):** 01-01 added `app-histogram` (`src/app/ui/histogram.ts`, spec `histogram.spec.ts`; `docs/briefs/tolerance-spread.md` D-4, D-13) beside `app-curve`: equal-width bins as solid bars on a linear x range, an optional dashed band with a label, caller ticks and a spoken `label` on a `role="img"` SVG; no y axis, nothing interactive. It is a sibling of `app-curve`, not an extension: bars, bins and a band are a different data model, and folding them into `app-curve` would make A2's absorption of it carry histogram code; it shares only the `CurveTick` type. If A2 unifies the plots, both move together |
 | A3 | **`AudioOut` service** wrapping Web Audio: oscillator/noise source → `BiquadFilterNode` → gain, muted by default, explicit play button, ramped gain | Module 02 promises "a filter you can hear"; module 08 is about sound | Never autoplays; global mute; SSR-safe (no-op on the server); **hard output cap enforced in the service, not per widget (master gain ceiling about −12 dBFS, default lower); visible "playing" indicator while sound is on; stops on Escape and when the tab is hidden; every audible effect is also shown on screen (trace or readout)** |
 | A4 | **Logic-analyser primitive** (`app-logic-trace`): stacked digital lanes, decoded byte annotations | Module 06 (debounce, PWM) and all of 07 | UART/SPI/I²C frames render from a bit array; **decoded frames also available as text (a list or table), and the lane under the cursor announced through a visually hidden summary** |
 | A5 | **References in content**: a `references:` list in lesson front matter (ids into `content/bibliography.yaml`), rendered as a "Sources and further reading" block; the build fails on an unknown id | Every lesson needs citable sources; one shared bibliography avoids 69 copies of Horowitz & Hill | `pnpm content` validates ids; an entry may carry an `es:` alternate edition, rendered on ES pages (Floyd, Sedra & Smith and Franco have one; Boylestad and Malvino are Spanish-only entries in BIBLIOGRAPHY §6). **Status (2026-10-21): done.** `content/bibliography.yaml` holds the entries (keyed by id; unknown keys fail the build); lessons cite ids or `{ id, note }` in `references:`; `pnpm content` fails on an unknown or duplicate id, a malformed item or entry, a bad `es:` link, or EN and ES citing different ids; lesson pages render "Sources and further reading" / "Fuentes y lecturas recomendadas", with an "En español" line on ES pages. 00-01 to 00-04 carry `references:`. Still open: generating BIBLIOGRAPHY.md from the YAML (§6) |
 | A6 | **Pixel-art instrument skin** (see `docs/DESIGN-PIXEL-ART.md`) applied to `Panel`, `Control`, `Readout`, the schematic canvas and the three existing widgets | Every new instrument inherits it for free if it lands before the first new widget | Both themes, WCAG AA, keyboard and reduced-motion intact, `pnpm build` passes; drawing fills at least about 70 % of its screen (REVIEW M-10) |
-| A7 | **Quality gates**: `ng test` specs for `core/format.ts` and each widget's arithmetic; axe over every prerendered route in four theme states (light, system-dark, explicit dark, explicit light on a dark OS) as a **build gate**; a check in `build-content.mjs` that every `::widget` type is registered **and every prop is known to that widget**; a **glyph-coverage check** of instrument strings against the pixel font; a script that regenerates the contrast table from `_pixel.scss` | Sixty-nine lessons cannot be checked by eye | Scriptable, documented in README. **Status (2026-10-27):** done, see README "Quality gates" and ARCHITECTURE §5.5. `pnpm build` now fails on an unregistered widget type or an unknown or non-numeric prop (`build-content.mjs` via `tools/widget-props.mjs`) and on a visible instrument glyph outside the DESIGN-PIXEL-ART §Glyph coverage rule, `×` and subscripts included (`tools/check-glyphs.mjs`); `pnpm test:ci` runs 198 specs once (`core/format.ts`, the ohm-law, resistor-network, divider, kirchhoff, meter-loading, power-dissipation and thevenin arithmetic, the `schMeter`, `schBattery` and `schBox` symbols, and the `app-curve` plot); `tools/contrast-table.mjs` regenerates the DESIGN-PIXEL-ART contrast table from `_pixel.scss` and `--check` fails on a stale table or a pair under its minimum; CI (`.github/workflows/build.yml`) runs the build, the unit tests, the contrast check and `tools/axe-check.mjs` on the build output (every route, four states) on every pull request and push to `main`. Still open: axe is a CI gate only, not part of a local `pnpm build` or the Docker image build (it needs a browser); making the three CI jobs required checks on `main` is a repository setting, not yet set |
+| A7 | **Quality gates**: `ng test` specs for `core/format.ts` and each widget's arithmetic; axe over every prerendered route in four theme states (light, system-dark, explicit dark, explicit light on a dark OS) as a **build gate**; a check in `build-content.mjs` that every `::widget` type is registered **and every prop is known to that widget**; a **glyph-coverage check** of instrument strings against the pixel font; a script that regenerates the contrast table from `_pixel.scss` | Sixty-nine lessons cannot be checked by eye | Scriptable, documented in README. **Status (2026-10-27):** done, see README "Quality gates" and ARCHITECTURE §5.5. `pnpm build` now fails on an unregistered widget type or an unknown or non-numeric prop (`build-content.mjs` via `tools/widget-props.mjs`) and on a visible instrument glyph outside the DESIGN-PIXEL-ART §Glyph coverage rule, `×` and subscripts included (`tools/check-glyphs.mjs`); `pnpm test:ci` runs TBD-by-verification specs once (198 before 01-01; `core/format.ts`, the ohm-law, resistor-network, divider, kirchhoff, meter-loading, power-dissipation, thevenin and tolerance-spread arithmetic, the `schMeter`, `schBattery`, `schBox`, `schInductor` and `schPot` symbols, and the `app-curve` and `app-histogram` plots); `tools/contrast-table.mjs` regenerates the DESIGN-PIXEL-ART contrast table from `_pixel.scss` and `--check` fails on a stale table or a pair under its minimum; CI (`.github/workflows/build.yml`) runs the build, the unit tests, the contrast check and `tools/axe-check.mjs` on the build output (every route, four states) on every pull request and push to `main`. Still open: axe is a CI gate only, not part of a local `pnpm build` or the Docker image build (it needs a browser); making the three CI jobs required checks on `main` is a repository setting, not yet set |
 | A8 | **Glyph decision** for τ, β, θ, →, ←, ₁, ₂, ∥ and the small `×` (VT323 lacks them; IBM Plex Mono lacks τ, β, θ, Ω, ∥) | `rc-transient` (τ, module 02), `bjt-switch` (β), `ldo-thermal`/`power-dissipation` (θ), `thermistor-divider` (β) | Before module 02 starts: one option chosen (ASCII names in instruments, a pixel Greek fallback face, or SVG glyphs like the tone glyphs), recorded in DESIGN-PIXEL-ART.md §Font, and enforced by the A7 glyph check. 00-06 shows θ in instrument strings (the `T = Ta + P · θ` nameplate and the `θ = 128 °C/W` note), drawn by the JetBrains Mono Greek fallback and passed by the A7 glyph check (`docs/briefs/power-dissipation.md` D-12). **Status (2026-10-01):** the font side is recorded in DESIGN-PIXEL-ART.md §Glyph coverage: `--pix-font` falls back to JetBrains Mono for Greek and Iosevka Charon Mono for ∥, arrows and subscripts, and visible text prefers `·` to `×` and `R1` to `R₁`. **Status (2026-10-27):** enforced by the A7 glyph check (`tools/check-glyphs.mjs`, part of `pnpm build`). Done |
 
 **Symbols by first use** (A1). Prose never draws a symbol the library lacks.
@@ -119,7 +124,7 @@ reference board (§2).
 | First module | Symbols |
 |---|---|
 | 00 | meter (circle with V / A / Ω): `svg:g[schMeter]`, kinds `V`, `A`, `Ω`, done in 00-05's step 3 ✅; battery: `svg:g[schBattery]`, kinds `cell` (one long thin + plate, one short thick − plate) and `battery` (two plate pairs joined by a dashed link), vertical only, done in 00-07's step 3 ✅ (`docs/briefs/thevenin.md` D-5, D-20); dashed enclosure: `svg:g[schBox]` (`w`, `h`, optional `name`), "what is inside is one thing seen from its terminals", also done in 00-07's step 3 ✅ |
-| 01 | inductor (air and cored), potentiometer / variable resistor |
+| 01 | inductor: `svg:g[schInductor]`, kinds `air` and `cored` (two straight core lines alongside the coil), horizontal and vertical, the resistor's footprint, four stepped humps, no circles; a highlight thickens the leads only, to 4, and the coil and core stay at 2, because at 4 the humps close up and the core lines merge (brief, "Step 3 deviations"); potentiometer / variable resistor: `svg:g[schPot]`, kinds `pot` (wiper pin at (30, 20), pixel arrowhead) and `variable` (the IEC oblique arrow, the library's one diagonal), vertical only, a horizontal pot waiting for its first user; both draw inside a `g.art` layer that dims as one; both done in 01-01's step 3 ✅, though 01-01 draws neither (`docs/briefs/tolerance-spread.md` D-4, D-15) |
 | 02 | AC source, switch (SPST), scope probe |
 | 03 | diode, Schottky, zener, TVS, LED, NPN, PNP, N-MOSFET, P-MOSFET |
 | 04 | op-amp, comparator, IC box with pins |
@@ -217,6 +222,7 @@ explanation in 00-05) when the prose makes clear it is a simulation.
 | 00-05 multimeter | IEC 61010 measurement categories (via `fluke-abc-safety`); never put the meter in current mode across a source; fused current jack |
 | 00-06 power-and-heat | A resistor at its rating can burn skin; smoke means stop |
 | 00-07 real-sources | Never short a battery to measure its short-circuit current; Li-ion shorts start fires; keep coin cells away from children (swallowing) |
+| 01-01 real-resistors | "Measuring resistors safely", before the bench step: measure with the battery disconnected and one end of the resistor lifted, probes in the V/Ω jacks; never connect anything straight across a 9 V battery's side-by-side terminals (meter use and batteries; `docs/briefs/tolerance-spread.md` D-18) |
 | 02-04 rl-transient | The inductive kick reaches tens to hundreds of volts; low energy, but it destroys transistors and can shock |
 | 05-01 linear-regulators | Regulator tabs run hot enough to burn |
 | 05-04 ripple-and-bulk | Enclosed AC adapter only; electrolytic polarity, venting |
@@ -284,22 +290,42 @@ equals the internal resistance and the efficiency is 50 % (derived, not
 sourced). The lesson measures Rint with the two-reading method on 00-05's
 meter, `Rint = (Voc − V) / I`, and carries three `:::safety` callouts (never
 short a battery; Li-ion shorts start fires; coin cells away from children).
-Lead-acid and Li-ion presets are out (D-1, D-10). Next: module 01, starting
-with 01-01 real-resistors.
+Lead-acid and Li-ion presets are out (D-1, D-10). Next: module 01 (below).
 
 **Count:** 7 lessons (7 done, 0 to write) · 7 instruments (7 built, 0 new) · 0 without instrument.
 
-### 01: Passive Components
+### 01: Passive Components (1 of 5 done)
 
 | Id | Lesson | Instrument |
 |---|---|---|
-| 01-real-resistors | Tolerance, E-series and tempco | ★ `tolerance-spread`: Monte-Carlo histogram of a divider built from 5 % vs 1 % parts |
+| 01-real-resistors | Real resistors: tolerance, standard values and temperature ✅ | ★ `tolerance-spread` ✅: Monte-Carlo histogram of a divider built from 5 % vs 1 % parts |
 | 02-capacitors | Capacitors: dielectrics, what C means, and ESR (qualitative; quantified in 02-05) | `cap-holdup`: how long a capacitor keeps a load alive after the supply drops (I = C·dV/dt), against a brown-out threshold |
 | 03-mlcc-dc-bias | The ceramic capacitor that loses most of its value | `mlcc-derating`: capacitance vs DC bias by package and dielectric |
 | 04-inductors | Inductors: DCR and saturation current | `inductor-derating`: inductance vs DC current past Isat, and I²·DCR heat; shares the curve plot with `mlcc-derating` |
 | 05-reading-datasheets | Reading a passive's datasheet | none (annotated datasheet figure) |
 
-**Count:** 5 lessons · 4 instruments (4 new) · 1 without instrument (05).
+01-01 shipped with ★ `tolerance-spread` (brief in
+`docs/briefs/tolerance-spread.md`), the `app-histogram` primitive and the
+module's A1 symbols, `schInductor` and `schPot`, which 01-01 itself does not
+draw (D-4). The instrument builds 00-03's unloaded divider (9 V, two 10 kΩ,
+4.5 V) 1000 times on the computer from 5 % or 1 % parts. A seeded generator
+(mulberry32, D-10) makes the server and the browser draw the same builds, and
+the page always opens on batch 1, so every prose number is reproducible; New
+batch steps the seed (D-11). The parts follow an assumed shape, Bell
+(σ = tolerance / 3, truncated at ±3σ) or Flat, and the panel labels it an
+assumption: no source shows how parts are spread inside their band (D-2), and
+the binned "gap in the middle" shape is left out (D-9). Under the drawing an
+`app-histogram` shows the 1000 outputs in 66 bins, on an x axis fixed at the
+5 % worst-case span so 1 % looks narrow (D-8), with the selected tolerance's
+worst case as a dashed band. The readouts give the nominal output, the worst
+case, the range holding 95 % of the builds (empirical, the 26th to the 975th,
+D-23) and the furthest build. Tempco is prose only (D-14). The lesson carries
+one `:::safety` callout, "Measuring resistors safely", before its bench step
+(D-18). The figures the prose quotes are the brief's worked examples W-1 to
+W-4; TBD-by-verification that the built instrument reproduces them. Next:
+01-02 capacitors.
+
+**Count:** 5 lessons (1 done, 4 to write) · 4 instruments (1 built, 3 new) · 1 without instrument (05).
 
 ### 02: Time and Frequency
 
@@ -444,7 +470,7 @@ stays because fast bus edges are where probe technique first matters.
 
 **Count:** 6 lessons · 4 instruments (4 new) · 2 without instrument (01, 06).
 
-**Total: 69 lessons (7 done, 62 to write) · 66 instruments (7 built, 59 new) ·
+**Total: 69 lessons (8 done, 61 to write) · 66 instruments (8 built, 58 new) ·
 3 lessons without an instrument (01-05, 11-01, 11-06).**
 Lessons: 7 + 5 + 7 + 6 + 5 + 5 + 6 + 4 + 6 + 7 + 5 + 6 = 69.
 Instruments: 7 + 4 + 7 + 6 + 5 + 5 + 6 + 4 + 6 + 7 + 5 + 4 = 66.
@@ -458,7 +484,7 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 | Phase A | 0 | 4 primitives (A2–A4, symbols A1) + skin, refs, gates, glyphs | — | Unblocks everything; A1–A4 and A8 only before their first user |
 | Track H | 0 | 0 | — | Reference board, parallel from module 01 |
 | 00 finish | 0 | 0 | A5 (done), A6, A7 (done); meter symbol (done in 00-05); battery symbol (done in 00-07 step 3, with `schBox` and `app-curve`) | Done (00-06 and 00-07 shipped). Reuses existing symbols; the content fixes from REVIEW have landed (PR #1) |
-| 01 | 5 | 4 | A1 (inductor, potentiometer) | |
+| 01 | 4 | 3 | A1 (inductor, potentiometer: done in 01-01 step 3, with `app-histogram`) | 01-01 shipped. `mlcc-derating` and `inductor-derating` can use `app-curve` |
 | 02 | 7 | 7 | A2, A3, A8 | First user of `app-trace` and audio |
 | 03 | 6 | 6 | A1 semiconductors | Biggest symbol demand |
 | 04 | 5 | 5 | Op-amp symbol, A2 Bode | |
@@ -467,7 +493,7 @@ Against the pre-review figures (62 lessons, about 55 instruments): +11 % and
 | 07 | 4 | 4 | A4 | |
 | 08 / 09 / 10 | 6 / 7 / 5 | 6 / 7 / 5 | A3 (08) | Run in parallel. Close source gaps (BIBLIOGRAPHY §8) in step 7: electret note (08-01), optocoupler and stepper/servo notes (09), strain-gauge note (10-02) |
 | 11 | 6 | 4 | H4 | Told over the tested reference board |
-| **Total** | **62** | **59** | | Plus 7 lessons and 7 instruments already done: 69 and 66 |
+| **Total** | **61** | **58** | | Plus 8 lessons and 8 instruments already done: 69 and 66 |
 
 ## 6. Definition of done for the course
 
