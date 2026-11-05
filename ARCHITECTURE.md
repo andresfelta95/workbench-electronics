@@ -138,7 +138,7 @@ electronics/
 │       ├── i18n/ui.ts          ← every UI string, both languages (642 lines; 572 before 01-01)
 │       ├── lesson/             ← the Markdown → components renderer (354 lines; 352 before 01-01)
 │       ├── pages/              ← the five routed views (1051 lines)
-│       ├── schematic/          ← SVG symbol library (706 lines, plus an 855-line spec)
+│       ├── schematic/          ← SVG symbol library (715 lines, plus an 883-line spec)
 │       ├── ui/                 ← panel, control, readout, curve, histogram primitives (1316 lines, plus 545 lines of specs)
 │       │   ├── curve.ts        ← app-curve: static XY plot (00-07), with curve.spec.ts
 │       │   └── histogram.ts    ← app-histogram: static histogram (01-01), with histogram.spec.ts
@@ -359,10 +359,11 @@ merge, so a scoped rule keeps the coil and core at 2. The potentiometer,
 `svg:g[schPot]` (01-01), sits on the vertical resistor's body (the two share
 one path constant), vertical only: `kind="pot"` adds the wiper from a third
 pin at (30, 20) with a pixel arrowhead, `kind="variable"` the IEC oblique
-arrow through the body, the library's one diagonal. Both draw inside a
-`g.art` layer that dims as one at the same 0.55 (`ART_STYLES`), because their
-parts overlap (a lead over the coil, the wiper's square cap over the
-arrowhead) and dimming each part alone would leave darker seams.
+arrow through the body, the library's one diagonal. Both, and the battery,
+draw inside a `g.art` layer that dims as one at the same 0.55 (`ART_STYLES`),
+because their parts overlap (a lead over the coil, the wiper's square cap over
+the arrowhead, the battery's bottom lead cap over its last plate) and dimming
+each part alone would leave darker seams.
 `schematic.spec.ts` renders the meter with `dim` and `highlight`, and covers
 the battery, the box, the inductor (both kinds, both orientations) and the
 potentiometer (both kinds).
@@ -603,7 +604,7 @@ Sixty-nine lessons cannot be checked by eye, so the checks are scripts (README,
   Kirchhoff, meter loading, power dissipation, Thévenin, tolerance spread),
   `ui/curve.spec.ts` and `ui/histogram.spec.ts` (the `app-curve` and
   `app-histogram` plots) and `schematic/schematic.spec.ts` (the meter,
-  battery, box, inductor and potentiometer symbols), 290
+  battery, box, inductor and potentiometer symbols), 294
   tests (198 before 01-01). `pnpm test:ci` runs them once and needs no `pnpm content` first.
 - **Contrast**: `tools/contrast-table.mjs` reads both palettes (and the
   `prefers-contrast: more` overrides) from `_pixel.scss`, computes WCAG 2.x
