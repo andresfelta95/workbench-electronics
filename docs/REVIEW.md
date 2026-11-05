@@ -1,5 +1,69 @@
 # Review: roadmap, pixel-art skin, module 00 content, sources
 
+## Verification: schBattery dim seam (2026-11-05)
+
+This is an independent check of branch `fix/schbattery-dim-seam` at
+`aacf314` (one commit on `main`), plus the trivial fixes listed below,
+which are left uncommitted. I re-ran every gate, built `main` separately
+(a `git archive` copy in `/tmp`) and compared real renders of both builds
+pixel by pixel, and mutation-tested the new spec cases.
+
+**Ready to merge: yes.** No Blocker, Major or Minor finding is open. All
+gates pass, the seam is gone in every state that showed it, and nothing
+else on screen changed.
+
+### What changed
+
+- `src/app/schematic/schematic.ts` `SchBattery`: the plates, leads and dots
+  are wrapped in `<svg:g class="art">` and the component adds `ART_STYLES`,
+  as `schInductor` and `schPot` do. The `+`, name and value text stay outside
+  the layer. A doc comment explains why.
+- `src/app/schematic/schematic.spec.ts`: four cases (two per kind). The
+  drawing sits inside one `g.art` with the text outside it, and under `dim`
+  the computed opacity is 0.55 on `g.art`, 1 on its parts, and unset or 1 on
+  the text.
+- `ARCHITECTURE.md` §4.5 and `docs/DESIGN-PIXEL-ART.md` (file table and the
+  "Schematic dim" cue) list `schBattery` with the other `g.art` symbols.
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `pnpm build` (inside `flock`, copied to `/tmp/vbatt-dist`) | Pass: 43 prerendered routes; glyph check passes; `thevenin` 22.82 / 6.70 kB. |
+| `pnpm test:ci` | **12 files, 294 tests pass** (schematic 77, up from 73). |
+| `pnpm check:contrast` | 28 pairs × 2 themes (+ `prefers-contrast: more`) pass; table current. |
+| axe on the private copy | **0 violations**, 43 routes × 4 theme states = **172 pages** (light 0, system-dark 0, dark 0, light-forced 0). |
+| Diff review | `git diff -w` on `schematic.ts` shows only the new `<svg:g class="art">` wrapper, the comment and the `styles` change. Paths, rects, pins, text positions and classes are byte-identical to `main`. Labels are outside `g.art`, so they keep the muted-ink dim rule and never go transparent. `.sch--dim .art .stroke/.fill` (three classes) beats `SYMBOL_STYLES`' `.sch--dim .stroke/.fill` (two), so the parts reset to 1. CLAUDE.md Angular rules: nothing new (native `@if`, attribute bindings, no `standalone`, no `OnPush`). |
+| Spec cases are meaningful (mutation test, under `flock`, file restored with `git checkout` afterwards) | With `main`'s `schematic.ts` and the branch spec, all 4 new cases fail. With the branch template but `${ART_STYLES}` removed from `SchBattery`, the 2 "dims the layer to 0.55" cases fail (75 / 77 pass). So the cases check both the structure and its effect. |
+| Visual check (throwaway Playwright from `AXE_TOOLS_DIR`, outside the repo; `main` and branch builds served side by side; EN 00-07 page, AA → `cell`, 9 V → `battery`; the battery's `g.sch` class set to plain, `sch--dim`, `sch--hot` and both; light and dark; device scale 4, reduced motion) | **Plain and highlight:** pixel-identical to `main` for both kinds in both themes (0 differing pixels). **Dim:** on `main` a 50-pixel block (2 × 1 units at 5.12 px/unit) at the bottom lead / last plate is darker (light `62,74,59` against the dimmed ink `109,120,101`; dark `113,199,135` against `80,142,96`). On the branch it has the uniform dimmed ink. **Dim + highlight:** on `main` 200–220 seam pixels (the 2-unit cap of the 4-wide lead) at `153,96,53` (light) / `204,144,75` (dark). On the branch they are uniform. The rest of the dimmed drawing differs from `main` by at most 1 in one channel (group versus per-element opacity rounding), which is invisible. Crops checked by eye: the dark band under the plate on `main` is gone on the branch. No console or page errors. |
+| 00-07 page unchanged | Full-page screenshots at 1280 px of `/en/fundamentals/real-sources/` and `/es/fundamentos/fuentes-reales/`, light and dark, are **byte-identical** between `main` and the branch. The widget's SVG for AA and 9 V is identical at device scale 4. The battery is never dimmed or highlighted there, as expected. The light page height alternates between two values on repeated loads of either build (see S-1), so the comparison was retried until both builds settled on the same height. |
+| Overlap audit (the implementer's claim) | Every other symbol has at most one dimmable element: `schResistor`, `schCapacitor`, `schSource`, `schMeter`, `schGround` and `schBox` are one `path.stroke` each; `schTerminal` and `schJunction` are one rect; `schCurrent` is one `path.fill` (several subpaths in one element composite once). `schWire`'s `.flow` overlay has no opacity rule, so only the wire under it dims, and no seam forms. `schLabel` is text only. The claim holds. Overlaps between separate symbols (a battery lead over a wire's end) are the same on `main` and the branch, and are outside this change. |
+| Docs | ARCHITECTURE §4.5 and DESIGN-PIXEL-ART (file table and "Schematic dim" row) match the code: three `g.art` symbols, 0.55, labels outside. The `SchBattery` doc comment is right: the cap reaches 1 unit into the plate, and 2 when highlighted. The line counts and test counts elsewhere were stale (fixed below). |
+| Hygiene | `git diff --check main...HEAD` clean. The four changed files have no CR and end in a newline. `git status` was clean before my edits, with no untracked files. All harness files, builds and screenshots are in the session scratchpad and `/tmp` (`vbatt-*`). |
+
+### Findings
+
+| # | Severity | Area | Location | Recommendation |
+|---|---|---|---|---|
+| S-1 | Suggestion | Design | 00-07 page in the light theme (pre-existing, both builds; out of scope) | Four loads of the same build give a document height of 16797 px on three and 17155 px on one (1280 px wide, EN). The same happens on `main`, with the same fonts loaded each time. This change does not cause it. Find which block's height changes (likely something that lays out before a late resource arrives) in a separate pass. |
+
+01-01 findings touched by this change:
+
+| # | Status | Evidence |
+|---|---|---|
+| 01-01 S-1 (`schBattery` dim seam) | **Resolved** | The drawing dims as one `g.art` layer. Under `dim` and `dim + highlight` the lead/plate overlap now renders in the uniform dimmed ink in both themes and both kinds (pixel evidence above). The spec cases guard both the structure and the effect. |
+| 01-01 S-2 (spec asserts the `g.art` effect) | Open, Suggestion (narrowed) | `schBattery`'s cases now assert the computed opacities. `schInductor` and `schPot` still assert the structure only. |
+
+### Fixed during verification
+
+- `ARCHITECTURE.md` §3 tree: `schematic/` "706 lines, plus an 855-line
+  spec" → "715 lines, plus an 883-line spec" (`wc -l`).
+- `ARCHITECTURE.md` §5.5: 290 → 294 tests.
+- `docs/ROADMAP.md` A7: `pnpm test:ci` runs 290 → 294 specs.
+
+**Ready to merge: yes.** No Blocker, Major or Minor finding is open. One
+out-of-scope Suggestion is recorded.
+
 ## Verification: 01-01 Real resistors: tolerance, standard values and temperature (2026-11-04)
 
 This is an independent check of branch `content/01-01-real-resistors` at
