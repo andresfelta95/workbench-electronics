@@ -443,6 +443,34 @@ describe('schBattery', () => {
         expect(group.querySelector('circle')).toBeNull();
         expect(group.querySelectorAll('path.stroke')).toHaveLength(1);
       });
+
+      it('draws the plates and leads inside one g.art layer, text outside it', async () => {
+        const { group } = await render((h) => h.kind.set(kind));
+        const art = group.querySelector(':scope > g.art')!;
+        expect(art).not.toBeNull();
+        const drawn = group.querySelectorAll('path, rect');
+        expect(drawn.length).toBe(kind === 'cell' ? 2 : 5);
+        for (const el of drawn) expect(art.contains(el)).toBe(true);
+        expect(art.querySelector('text')).toBeNull();
+        // +, name and value.
+        expect(group.querySelectorAll(':scope > text')).toHaveLength(3);
+      });
+
+      it('dims the layer to 0.55 as a whole and keeps its parts at 1', async () => {
+        const { group } = await render((h) => {
+          h.kind.set(kind);
+          h.dim.set(true);
+        });
+        const art = group.querySelector(':scope > g.art')!;
+        expect(getComputedStyle(art).opacity).toBe('0.55');
+        for (const el of art.querySelectorAll('path, rect')) {
+          expect(getComputedStyle(el).opacity).toBe('1');
+        }
+        // Text sits outside the layer and takes no opacity rule (unset or 1).
+        for (const t of group.querySelectorAll(':scope > text')) {
+          expect(['', '1']).toContain(getComputedStyle(t).opacity);
+        }
+      });
     });
   }
 });

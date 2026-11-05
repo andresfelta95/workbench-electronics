@@ -381,21 +381,27 @@ export type SchBatteryKind = 'cell' | 'battery';
  * 9 V) is two pairs joined by a dotted link, the IEC way of drawing a battery
  * of cells. The short plates are 12 × 4 filled rects, so they stay 4 thick
  * when a highlight thickens the stroked parts from 2 to 4.
+ *
+ * The drawing dims as one layer (`ART_STYLES`): the bottom lead's square cap
+ * reaches 1 unit (2 when highlighted) into the last short plate, which would
+ * otherwise dim to a seam.
  */
 @Component({
   selector: 'svg:g[schBattery]',
   template: `
     <svg:g [attr.transform]="transform()" [attr.class]="klass()">
-      @if (kind() === 'battery') {
-        <svg:path class="stroke" d="M0 0 V6 M-12 6 H12 M-12 26 H12 M0 34 V40" />
-        <svg:rect class="fill" x="-6" y="10" width="12" height="4" />
-        <svg:rect class="fill" x="-1" y="16" width="2" height="2" />
-        <svg:rect class="fill" x="-1" y="20" width="2" height="2" />
-        <svg:rect class="fill" x="-6" y="30" width="12" height="4" />
-      } @else {
-        <svg:path class="stroke" d="M0 0 V16 M-12 16 H12 M0 26 V40" />
-        <svg:rect class="fill" x="-6" y="22" width="12" height="4" />
-      }
+      <svg:g class="art">
+        @if (kind() === 'battery') {
+          <svg:path class="stroke" d="M0 0 V6 M-12 6 H12 M-12 26 H12 M0 34 V40" />
+          <svg:rect class="fill" x="-6" y="10" width="12" height="4" />
+          <svg:rect class="fill" x="-1" y="16" width="2" height="2" />
+          <svg:rect class="fill" x="-1" y="20" width="2" height="2" />
+          <svg:rect class="fill" x="-6" y="30" width="12" height="4" />
+        } @else {
+          <svg:path class="stroke" d="M0 0 V16 M-12 16 H12 M0 26 V40" />
+          <svg:rect class="fill" x="-6" y="22" width="12" height="4" />
+        }
+      </svg:g>
       @if (plus()) {
         <svg:text class="label" x="-18" y="8" text-anchor="end">+</svg:text>
       }
@@ -407,7 +413,10 @@ export type SchBatteryKind = 'cell' | 'battery';
       }
     </svg:g>
   `,
-  styles: SYMBOL_STYLES,
+  styles: `
+    ${SYMBOL_STYLES}
+    ${ART_STYLES}
+  `,
 })
 export class SchBattery extends SchSymbol {
   readonly kind = input<SchBatteryKind>('cell');

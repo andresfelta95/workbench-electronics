@@ -359,10 +359,11 @@ merge, so a scoped rule keeps the coil and core at 2. The potentiometer,
 `svg:g[schPot]` (01-01), sits on the vertical resistor's body (the two share
 one path constant), vertical only: `kind="pot"` adds the wiper from a third
 pin at (30, 20) with a pixel arrowhead, `kind="variable"` the IEC oblique
-arrow through the body, the library's one diagonal. Both draw inside a
-`g.art` layer that dims as one at the same 0.55 (`ART_STYLES`), because their
-parts overlap (a lead over the coil, the wiper's square cap over the
-arrowhead) and dimming each part alone would leave darker seams.
+arrow through the body, the library's one diagonal. Both, and the battery,
+draw inside a `g.art` layer that dims as one at the same 0.55 (`ART_STYLES`),
+because their parts overlap (a lead over the coil, the wiper's square cap over
+the arrowhead, the battery's bottom lead cap over its last plate) and dimming
+each part alone would leave darker seams.
 `schematic.spec.ts` renders the meter with `dim` and `highlight`, and covers
 the battery, the box, the inductor (both kinds, both orientations) and the
 potentiometer (both kinds).
